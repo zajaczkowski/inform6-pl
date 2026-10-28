@@ -7,6 +7,9 @@ on:
 jobs:
   testy:
     runs-on: ubuntu-latest
+    env:
+      LANG: C.UTF-8      # dfrotz wypisuje polskie litery tylko w lokalizacji UTF-8
+      LC_ALL: C.UTF-8
     steps:
       - uses: actions/checkout@v4
 

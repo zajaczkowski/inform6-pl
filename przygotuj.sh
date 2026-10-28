@@ -32,4 +32,24 @@ pobierz https://gitlab.com/DavidGriffith/frotz.git "$FROTZ_TAG" narzedzia/src/fr
 ( cd narzedzia/src/frotz && make -s dumb CURSES_CONFIG=true HOMEBREW_PREFIX=/usr >/dev/null )
 cp narzedzia/src/frotz/dfrotz narzedzia/bin/dfrotz
 
+# Pliki biblioteki mają nazwy pisane małymi literami, a gry tradycyjnie
+# dołączają "Parser", "VerbLib", "PolskiZ" itd.  Na systemach rozróżniających
+# wielkość liter (Linux) trzeba więc utworzyć dowiązania z wielką literą, jak
+# zaleca README biblioteki Inform.  Na macOS i Windows nie wolno ich tworzyć,
+# bo wskazywałyby same na siebie.
+touch narzedzia/.wielkosc_liter
+if [ ! -e narzedzia/.WIELKOSC_LITER ]; then
+    echo "System rozróżnia wielkość liter: dowiązania Parser.h, PolskiZ.h..."
+    ( cd narzedzia/inform6lib
+      for n in English Grammar Parser Verblib VerbLib; do
+          m=$(echo "$n" | tr 'A-Z' 'a-z')
+          ln -sf "$m.h" "$n.h"
+      done
+      for n in Polski PolskiZ PolskiG; do
+          m=$(echo "$n" | tr 'A-Z' 'a-z')
+          ln -sf "../../lib/$m.h" "$n.h"
+      done )
+fi
+rm -f narzedzia/.wielkosc_liter
+
 echo "Gotowe.  Teraz: ./build.sh ruins_pl   albo   ./test.sh"

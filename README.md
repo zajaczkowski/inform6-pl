@@ -46,6 +46,8 @@ Do kompilacji potrzebne są kompilator Inform 6.44 i biblioteka standardowa 6.12
 
 Narzędzia trafiają do katalogu `narzedzia/`, który nie jest częścią repozytorium. Kto ma już własny kompilator i bibliotekę, może zamiast tego ustawić zmienne `INFORM6`, `INFORM6LIB` i `DFROTZ` (szczegóły w `sciezki.sh`).
 
+**Linux i inne systemy rozróżniające wielkość liter.** Pliki bibliotek mają nazwy pisane małymi literami (`parser.h`, `polskiz.h`), a gry dołączają je tradycyjnie jako `"Parser"` czy `"PolskiZ"`. Kompilator nie zmienia wielkości liter, więc – zgodnie z zaleceniem biblioteki Inform – potrzebne są dowiązania `Parser.h`, `VerbLib.h`, `PolskiZ.h`, `PolskiG.h` itd. `przygotuj.sh` tworzy je sam, jeśli wykryje taki system. Kto używa własnej instalacji biblioteki, musi je utworzyć ręcznie. Na macOS i Windows dowiązań tworzyć nie wolno, bo wskazywałyby same na siebie.
+
 Kompilacja gry:
 
 ```sh
