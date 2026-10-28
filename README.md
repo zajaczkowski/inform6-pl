@@ -4,9 +4,11 @@
 
 Polska wersja biblioteki standardowej **Inform 6**, napisana od nowa dla biblioteki **6.12.8** (grudzień 2025) i kompilatora **Inform 6.44**. Gry napisane z jej pomocą odmieniają nazwy przedmiotów przez przypadki, rozumieją polecenia wpisane naturalną polszczyzną, także bez polskich liter, i działają w maszynie Z oraz w Glulx.
 
+**Do pobrania:** gotowe gry (`.z5` i `.ulx`) i pełne archiwum biblioteki są w [najnowszym wydaniu](https://github.com/zajaczkowski/inform6-pl/releases/latest). Jak w nie grać: [podręcznik gracza](docs/podrecznik_gracza.md).
+
 Poprzednia wersja, oparta na bibliotece 6/11, znajduje się w repozytorium [inform-pl](https://github.com/zajaczkowski/inform-pl).
 
-> **In English:** a Polish translation of the Inform 6 Standard Library 6.12.8 for the Inform 6.44 compiler. It declines object names automatically through all six cases used in the game (the notation is inspired by the Russian RInform), understands commands typed with or without Polish diacritics, and runs on both the Z-machine and Glulx. All example games from the IF Archive are translated and come with walkthrough scripts that `./test.sh` runs. Licensed like the Inform library itself (traditional Inform licence or Artistic License 2.0).
+> **In English:** a Polish translation of the Inform 6 Standard Library 6.12.8 for the Inform 6.44 compiler. It declines object names automatically through all six cases used in the game (the notation is inspired by the Russian RInform), understands commands typed with or without Polish diacritics, and runs on both the Z-machine and Glulx. All example games from the IF Archive are translated and come with walkthrough scripts that `./test.sh` runs; compiled games are in the [latest release](https://github.com/zajaczkowski/inform6-pl/releases/latest). Licensed like the Inform library itself (traditional Inform licence or Artistic License 2.0).
 
 Dokumentacja:
 
@@ -14,6 +16,7 @@ Dokumentacja:
 - [docs/suplement.md](docs/suplement.md) – suplement o budowaniu poszczególnych mechanizmów, z przykładami ze wszystkich gier przykładowych,
 - [docs/podrecznik_gracza.md](docs/podrecznik_gracza.md) – podręcznik dla graczy: jak grać i jakie polecenia rozumieją gry,
 - [CHANGELOG.md](CHANGELOG.md) – historia wydań,
+- [CONTRIBUTING.md](CONTRIBUTING.md) – jak zgłaszać błędy i wprowadzać zmiany,
 - [POCHODZENIE.md](POCHODZENIE.md) – skąd pochodzą poszczególne części biblioteki (poprzednia wersja 6/11/PL, metoda odmiany zapożyczona z rosyjskiego RInform, projekty źródłowe) i w czym pomagała sztuczna inteligencja (Claude firmy Anthropic).
 
 ## Założenia

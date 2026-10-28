@@ -1,0 +1,43 @@
+name: wydanie
+
+# Po wypchnięciu tagu wersji (np. git push origin 6.12.8-pl3) sprawdza całość
+# testami, składa paczkę skryptem wydanie.sh i publikuje wydanie na GitHubie.
+on:
+  push:
+    tags:
+      - '6.*'
+
+permissions:
+  contents: write
+
+jobs:
+  wydanie:
+    runs-on: ubuntu-latest
+    env:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Narzędzia z pamięci podręcznej
+        uses: actions/cache@v4
+        with:
+          path: narzedzia
+          key: narzedzia-${{ runner.os }}-${{ hashFiles('przygotuj.sh') }}
+
+      - name: Pobranie i budowa narzędzi
+        run: ./przygotuj.sh
+
+      - name: Testy
+        run: ./test.sh
+
+      - name: Paczka wydania
+        run: ./wydanie.sh "${{ github.ref_name }}"
+
+      - name: Wydanie na GitHubie
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$TAG" dist/*.zip dist/*.z5 dist/*.ulx \
+            --title "inform6-pl $TAG" --notes-file dist/opis.md

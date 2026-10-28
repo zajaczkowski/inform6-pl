@@ -4,6 +4,13 @@ Numer wydania składa się z wersji biblioteki standardowej Inform, na której
 oparta jest polska wersja, i kolejnego numeru polskiego wydania:
 `6.12.8-pl1` to pierwsze wydanie dla biblioteki 6.12.8.
 
+## Niewydane
+
+- Wydania tworzy automatycznie GitHub Actions po wypchnięciu tagu
+  (`wydanie.sh`, `.github/workflows/wydanie.yml`).
+- `CONTRIBUTING.md`, szablon zgłoszenia błędu, link do pobrania gier w README,
+  rozpoznawanie języka repozytorium (`.gitattributes`).
+
 ## 6.12.8-pl2 – 28 października 2026
 
 - **Pisanie bez polskich liter.** Słowo spoza słownika, które bez ogonków

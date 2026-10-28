@@ -4,3 +4,4 @@ narzedzia/
 *.z8
 *.ulx
 .DS_Store
+dist/

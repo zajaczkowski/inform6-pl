@@ -1,0 +1,35 @@
+name: Błąd
+description: Gra lub biblioteka zachowuje się niepoprawnie albo komunikat brzmi źle.
+labels: ["błąd"]
+body:
+  - type: input
+    id: gra
+    attributes:
+      label: Gra
+      description: Której gry dotyczy błąd (albo „własna gra”)?
+      placeholder: np. Ruiny
+    validations:
+      required: true
+  - type: input
+    id: wersja
+    attributes:
+      label: Wersja biblioteki i maszyna
+      description: Wynik polecenia „wersja” w grze oraz czy to plik .z5 czy .ulx.
+      placeholder: np. inform6-pl 6.12.8-pl2, .z5, Gargoyle
+    validations:
+      required: true
+  - type: textarea
+    id: zapis
+    attributes:
+      label: Zapis z gry
+      description: Polecenia, które wpisano, i odpowiedź gry – najlepiej skopiowane z okna gry.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: oczekiwane
+    attributes:
+      label: Czego się spodziewano?
+      description: Co gra powinna odpowiedzieć albo jak powinien brzmieć poprawny komunikat.
+    validations:
+      required: true

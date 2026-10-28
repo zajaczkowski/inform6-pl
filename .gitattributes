@@ -1,0 +1,7 @@
+# Statystyka języków na GitHubie (Linguist) nie zna Inform 6: pliki .h uznaje
+# za C, a .inf pomija.  Najbliższy znany język to "Inform 7".
+*.inf    linguist-language=Inform 7
+lib/*.h  linguist-language=Inform 7
+
+# Skrypty przejść to zwykły tekst.
+*.przejscie  linguist-detectable=false

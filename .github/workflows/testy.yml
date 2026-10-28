@@ -33,4 +33,5 @@ jobs:
           path: |
             build/*.z5
             build/*.ulx
-            !build/advent_test.z5
+            !build/advent_test.*
+            !build/test.*
