@@ -2,11 +2,11 @@
 
 [![testy](https://github.com/zajaczkowski/inform6-pl/actions/workflows/testy.yml/badge.svg)](https://github.com/zajaczkowski/inform6-pl/actions/workflows/testy.yml)
 
-Polska wersja biblioteki standardowej **Inform 6**, napisana od nowa dla biblioteki **6.12.8** (grudzień 2025) i kompilatora **Inform 6.44**. Gry napisane z jej pomocą odmieniają nazwy przedmiotów przez przypadki, rozumieją polecenia wpisane naturalną polszczyzną, także bez polskich liter, i działają w maszynie Z.
+Polska wersja biblioteki standardowej **Inform 6**, napisana od nowa dla biblioteki **6.12.8** (grudzień 2025) i kompilatora **Inform 6.44**. Gry napisane z jej pomocą odmieniają nazwy przedmiotów przez przypadki, rozumieją polecenia wpisane naturalną polszczyzną, także bez polskich liter, i działają w maszynie Z oraz w Glulx.
 
 Poprzednia wersja, oparta na bibliotece 6/11, znajduje się w repozytorium [inform-pl](https://github.com/zajaczkowski/inform-pl).
 
-> **In English:** a Polish translation of the Inform 6 Standard Library 6.12.8 for the Inform 6.44 compiler. It declines object names automatically through all six cases used in the game (the notation is inspired by the Russian RInform), understands commands typed with or without Polish diacritics, and runs on the Z-machine (Glulx builds compile but are not yet tested). All example games from the IF Archive are translated and come with walkthrough scripts that `./test.sh` runs. Licensed like the Inform library itself (traditional Inform licence or Artistic License 2.0).
+> **In English:** a Polish translation of the Inform 6 Standard Library 6.12.8 for the Inform 6.44 compiler. It declines object names automatically through all six cases used in the game (the notation is inspired by the Russian RInform), understands commands typed with or without Polish diacritics, and runs on both the Z-machine and Glulx. All example games from the IF Archive are translated and come with walkthrough scripts that `./test.sh` runs. Licensed like the Inform library itself (traditional Inform licence or Artistic License 2.0).
 
 Dokumentacja:
 
@@ -20,7 +20,7 @@ Dokumentacja:
 
 - **Biblioteka bazowa pozostaje nietknięta.** Pliki `parser.h`, `verblib.h` i pozostałe są używane bez żadnych zmian, a cała polska część mieści się w plikach językowych w `lib/`. Przejście na kolejne wydanie biblioteki nie wymaga więc przenoszenia żadnych poprawek.
 - **Źródła są w UTF-8** (opcja kompilatora `-Cu`). Wersja legacy używała ISO-8859-2, co utrudniało edycję w nowoczesnych edytorach i wymianę plików.
-- **Docelowo obsługiwane są obie maszyny wirtualne:** Z-machine (`.z5`) i Glulx (`.ulx`). Gry kompilują się dla obu, ale na razie sprawdzona jest tylko maszyna Z (zob. ograniczenia niżej).
+- **Obsługiwane są obie maszyny wirtualne:** Z-machine (`.z5`) i Glulx (`.ulx`). Testy przechodzą każdą grę w obu.
 
 ## Struktura
 
@@ -41,13 +41,13 @@ sciezki.sh       ustala, gdzie są narzędzia (używany przez build.sh i test.sh
 
 ## Wymagania i kompilacja
 
-Do kompilacji potrzebne są kompilator Inform 6.44 i biblioteka standardowa 6.12.8, a do testów – interpreter dfrotz. Najprościej pobrać i zbudować wszystkie trzy jednym skryptem; potrzebne są do tego tylko `git`, kompilator C i `make`:
+Do kompilacji potrzebne są kompilator Inform 6.44 i biblioteka standardowa 6.12.8, a do testów – interpretery dfrotz (maszyna Z) i glulxe (Glulx). Najprościej pobrać i zbudować wszystko jednym skryptem; potrzebne są do tego tylko `git`, kompilator C i `make`:
 
 ```sh
 ./przygotuj.sh
 ```
 
-Narzędzia trafiają do katalogu `narzedzia/`, który nie jest częścią repozytorium. Kto ma już własny kompilator i bibliotekę, może zamiast tego ustawić zmienne `INFORM6`, `INFORM6LIB` i `DFROTZ` (szczegóły w `sciezki.sh`).
+Narzędzia trafiają do katalogu `narzedzia/`, który nie jest częścią repozytorium. Kto ma już własny kompilator i bibliotekę, może zamiast tego ustawić zmienne `INFORM6`, `INFORM6LIB`, `DFROTZ` i `GLULXE` (szczegóły w `sciezki.sh`).
 
 **Linux i inne systemy rozróżniające wielkość liter.** Pliki bibliotek mają nazwy pisane małymi literami (`parser.h`, `polskiz.h`), a gry dołączają je tradycyjnie jako `"Parser"` czy `"PolskiZ"`. Kompilator nie zmienia wielkości liter, więc – zgodnie z zaleceniem biblioteki Inform – potrzebne są dowiązania `Parser.h`, `VerbLib.h`, `PolskiZ.h`, `PolskiG.h` itd. `przygotuj.sh` tworzy je sam, jeśli wykryje taki system. Kto używa własnej instalacji biblioteki, musi je utworzyć ręcznie. Na macOS i Windows dowiązań tworzyć nie wolno, bo wskazywałyby same na siebie.
 
@@ -75,7 +75,7 @@ Include "PolskiG";
 ## Polskie znaki
 
 - **Z-machine.** `polskiz.h` przestawia alfabet maszyny Z tak, że polskie małe litery trafiają do alfabetu A1. Litera spoza alfabetu zajmuje w słowniku cztery z-znaki, a litera z alfabetu A1 tylko dwa, więc słowa z ogonkami mieszczą się w dziewięciu z-znakach słownika i nie tracą końcówek: „ścianę” i „ściany” pozostają dla parsera różnymi słowami. Plik musi być dołączony przed jakimkolwiek tekstem, bo zmienia sposób kodowania wszystkich napisów; tekst skompilowany wcześniej byłby zniekształcony. Bez niego `polski.h` przerywa kompilację z odpowiednim komunikatem.
-- **Glulx.** Słownik musi przechowywać znaki Unicode (`$DICT_CHAR_SIZE=4`); `build.sh` dodaje tę opcję samodzielnie, gdy podano `-G`.
+- **Glulx.** Słownik musi przechowywać znaki Unicode (`$DICT_CHAR_SIZE=4`); `build.sh` dodaje tę opcję samodzielnie, gdy podano `-G`. Biblioteka 6.12.8 nie obsługuje takiego słownika i czyta wiersz poleceń w Latin-1, w którym nie ma większości polskich liter. Polska wersja zastępuje więc w Glulx dwie procedury biblioteki: tokenizer (`Tokenise__`) szuka słów w słowniku Unicode, a odczyt wiersza (`KeyboardPrimitive`) czyta go w Unicode i od razu zamienia litery spoza Latin-1 na litery bez ogonków, które biblioteka dopasowuje do słów ze słownika (zob. niżej). Skutek uboczny: w Glulx tekst w cudzysłowie (`napisz "..."`) traci polskie litery.
 - **Pisanie bez polskich liter.** Każde słowo, którego nie ma w słowniku, biblioteka porównuje ze słowami słownika z pominięciem ogonków, więc „wez lampe”, „otworz drzwi”, „idz na polnocny zachod” czy „zapytaj kaplana o xibalbe” działają tak samo jak wersje z polskimi literami. `test.sh` przechodzi każdą grę dwa razy: z polskimi literami i bez nich.
 - Wpisywanie ą, ę, ł, ś, ź, ż, także wielkimi literami, sprawdzono w dfrotz:
 
@@ -126,7 +126,7 @@ W komunikatach używa się reguł wydruku `(mian)`, `(dop)`, `(cel)`, `(bie)`, `
 Ograniczenia ogólne:
 
 - komunikaty biblioteki są napisane wyłącznie w 2. osobie i w czasie teraźniejszym,
-- Glulx nie jest jeszcze sprawdzony. Gry kompilują się dla Glulx, ale nie zostały przetestowane w interpreterze. Tokenizer biblioteki 6.12.8 porównuje słowa bajt po bajcie, a polskie litery wymagają słownika Unicode (`$DICT_CHAR_SIZE=4`), którego ten tokenizer nie obsługuje, więc wersje `.ulx` najpewniej nie rozumieją poleceń. Ponadto biblioteka 6.12 odczytuje w Glulx wiersz poleceń w kodowaniu Latin-1, więc polskich liter nie da się tam wpisać. Do grania służą wersje `.z5`.
+- w Glulx tekst w cudzysłowie wpisany przez gracza traci polskie litery (zob. wyżej).
 
 ## Gramatyka
 
@@ -160,7 +160,7 @@ Wszystkie gry w `games/` to polskie tłumaczenia [przykładowych gier Inform 6 z
 ./test.sh
 ```
 
-Skrypt kompiluje wszystkie gry dla maszyny Z i dla Glulx – każde ostrzeżenie kompilatora jest traktowane jak błąd – a potem przechodzi każdą grę jej skryptem i sprawdza wynik końcowy z tabeli powyżej. Te same testy uruchamia GitHub Actions przy każdej zmianie w repozytorium; skompilowane gry można pobrać z zakładki *Actions* jako artefakt `gry`.
+Skrypt kompiluje wszystkie gry dla maszyny Z i dla Glulx – każde ostrzeżenie kompilatora jest traktowane jak błąd – a potem przechodzi każdą grę jej skryptem i sprawdza wynik końcowy z tabeli powyżej. Każda gra jest przechodzona w maszynie Z i w Glulx, skryptem z polskimi literami i tym samym skryptem bez ogonków. Te same testy uruchamia GitHub Actions przy każdej zmianie w repozytorium; skompilowane gry można pobrać z zakładki *Actions* jako artefakt `gry`.
 
 Pojedynczą grę można przejść ręcznie:
 

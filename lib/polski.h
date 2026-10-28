@@ -981,7 +981,7 @@ Global pl_bez_przyimka;     ! pomija końcowy przyimek w LanguageCommand
     rfalse;
 ];
 
-Constant LanguageVersion = "Polska biblioteka inform6-pl 6.12.8-pl1";
+Constant LanguageVersion = "Polska biblioteka inform6-pl 6.12.8-pl2";
 
 Constant NKEY__TX       = "N = następny temat";
 Constant PKEY__TX       = "P = poprzedni";
@@ -1240,8 +1240,19 @@ Global pl_lista_od;
 
 #Ifnot; ! TARGET_GLULX
 
-[ LowerCase c; return glk_char_to_lower(c); ];
-[ UpperCase c; return glk_char_to_upper(c); ];
+! glk_char_to_lower obsługuje tylko znaki Latin-1 (do 255), a polskie litery
+! ą, ę, ł... leżą dalej, więc dla nich używamy funkcji Unicode.
+Array pl_wielkosc --> 1;
+[ LowerCase c;
+    if (c < 256) return glk_char_to_lower(c);
+    pl_wielkosc-->0 = c; glk_buffer_to_lower_case_uni(pl_wielkosc, 1, 1);
+    return pl_wielkosc-->0;
+];
+[ UpperCase c;
+    if (c < 256) return glk_char_to_upper(c);
+    pl_wielkosc-->0 = c; glk_buffer_to_upper_case_uni(pl_wielkosc, 1, 1);
+    return pl_wielkosc-->0;
+];
 
 #Endif; ! TARGET_
 

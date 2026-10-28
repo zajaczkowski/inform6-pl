@@ -659,6 +659,116 @@ Include "infix";
 Object  pl_rozszerzenie LibraryExtensions
   with  ext_beforeparsing [; return PL_NieznaneSlowa(); ];
 
+#Ifdef TARGET_GLULX;
+#Ifdef DICT_IS_UNICODE;
+! Tokenizer dla słownika Unicode: jak Tokenise__ biblioteki 6.12.8, ale znaki
+! słowa są czterobajtowe, a wpis słownika ma 12 + 4*DICT_WORD_SIZE bajtów
+! (zob. odmiana.h).  Wiersz poleceń jest nadal w Latin-1.
+Array pl_tokenbuf --> DICT_WORD_SIZE;
+
+[ Tokenise__ buf tab  cx numwords len bx ix wx wpos wlen val res dictlen entrylen;
+    len = buf-->0;
+    buf = buf+WORDSIZE;
+    cx = 0;
+    numwords = 0;
+    while (cx < len) {
+        while (cx < len && buf->cx == ' ') cx++;
+        if (cx >= len) break;
+        bx = cx;
+        if (buf->cx == '.' or ',' or '"') cx++;
+        else {
+            while (cx < len && buf->cx ~= ' ' or '.' or ',' or '"') cx++;
+        }
+        tab-->(numwords*3+2) = (cx-bx);
+        tab-->(numwords*3+3) = WORDSIZE+bx;
+        numwords++;
+        if (numwords >= MAX_BUFFER_WORDS) break;
+    }
+    tab-->0 = numwords;
+
+    dictlen = #dictionary_table-->0;
+    entrylen = 12 + DICT_WORD_SIZE*4;
+    for (wx=0 : wx<numwords : wx++) {
+        wlen = tab-->(wx*3+2);
+        wpos = tab-->(wx*3+3);
+        if (wlen > DICT_WORD_SIZE) wlen = DICT_WORD_SIZE;
+        cx = wpos - WORDSIZE;
+        for (ix=0 : ix<wlen : ix++) pl_tokenbuf-->ix = glk_char_to_lower(buf->(cx+ix));
+        for (: ix<DICT_WORD_SIZE : ix++) pl_tokenbuf-->ix = 0;
+        val = #dictionary_table + WORDSIZE;
+        @binarysearch pl_tokenbuf (DICT_WORD_SIZE*4) val entrylen dictlen 4 1 res;
+        tab-->(wx*3+1) = res;
+    }
+];
+#Endif;
+#Endif;
+
+#Ifdef TARGET_GLULX;
+#Ifdef DICT_IS_UNICODE;
+! Wiersz poleceń czytany w Unicode.  Bufor biblioteki jest jednobajtowy, więc
+! litery spoza Latin-1 zamieniane są od razu na litery bez ogonków ("weź" na
+! "wez"); słowo bez ogonków biblioteka i tak dopasowuje do słowa ze słownika.
+Array pl_wiersz --> INPUT_BUFFER_LEN;
+
+[ KeyboardPrimitive  a_buffer a_table done ix c n;
+    if (gg_commandstr ~= 0 && gg_command_reading ~= false) {
+        done = glk_get_line_stream(gg_commandstr, a_buffer+WORDSIZE, (INPUT_BUFFER_LEN-WORDSIZE)-1);
+        if (done == 0) {
+            glk_stream_close(gg_commandstr, 0);
+            gg_commandstr = 0;
+            gg_command_reading = false;
+        }
+        else {
+            if ((a_buffer+WORDSIZE)->(done-1) == 10) done = done-1;
+            a_buffer-->0 = done;
+            glk_set_style(style_Input);
+            glk_put_buffer(a_buffer+WORDSIZE, done);
+            glk_set_style(style_Normal);
+            print "^";
+            jump KPContinue;
+        }
+    }
+    done = false;
+    glk_request_line_event_uni(gg_mainwin, pl_wiersz, INPUT_BUFFER_LEN-WORDSIZE, 0);
+    while (~~done) {
+        glk_select(gg_event);
+        switch (gg_event-->0) {
+          5: ! evtype_Arrange
+            DrawStatusLine();
+          3: ! evtype_LineInput
+            if (gg_event-->1 == gg_mainwin) {
+                n = gg_event-->2;
+                for (ix=0 : ix<n : ix++) {
+                    c = pl_wiersz-->ix;
+                    if (c >= 256) {
+                        c = BezOgonka(c);
+                        if (c >= 256) c = '?';
+                    }
+                    (a_buffer+WORDSIZE)->ix = c;
+                }
+                a_buffer-->0 = n;
+                done = true;
+            }
+        }
+        ix = HandleGlkEvent(gg_event, 0, a_buffer);
+        if (ix == 0) ix = LibraryExtensions.RunWhile(ext_handleglkevent, 0, gg_event, 0, a_buffer);
+        if (ix == 2) done = true;
+        else if (ix == -1) done = false;
+    }
+    if (gg_commandstr ~= 0 && gg_command_reading == false) {
+        glk_put_buffer_stream(gg_commandstr, a_buffer+WORDSIZE, a_buffer-->0);
+        glk_put_char_stream(gg_commandstr, 10);
+    }
+  .KPContinue;
+    Tokenise__(a_buffer, a_table);
+    if (gg_quotewin) {
+        glk_window_close(gg_quotewin, 0);
+        gg_quotewin = 0;
+    }
+];
+#Endif;
+#Endif;
+
 ! Gdy jedno słowo pasuje do kilku obiektów ("wschód": wschód, północny wschód,
 ! południowy wschód), parser wybiera ten, którego nazwa jest dokładnie tym
 ! słowem.  Biblioteczne MatchWord porównuje znaki dosłownie; polska wersja

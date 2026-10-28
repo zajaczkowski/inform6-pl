@@ -40,6 +40,7 @@ done
 # testową (TEST_VERSION), w której polecenie xdeterm je wyłącza.
 sed 's/^! Constant TEST_VERSION;/Constant TEST_VERSION;/' games/advent_pl.inf > build/advent_test.inf
 kompiluj build/advent_test.inf build/advent_test.z5 || blad "advent_test.z5"
+kompiluj build/advent_test.inf build/advent_test.ulx -G '$DICT_CHAR_SIZE=4' || blad "advent_test.ulx"
 
 # Każdą grę przechodzimy dwa razy: skryptem z polskimi literami i tym samym
 # skryptem bez ogonków (build/*.ascii) - gracz może pisać "wez lampe".
@@ -49,6 +50,11 @@ bez_ogonkow() {
 }
 
 echo "Przejścia:"
+# Glulx (jeśli jest glulxe): oba skrypty, z polskimi literami i bez nich.
+graj_glulx() {  # graj_glulx <plik gry> <ziarno> <skrypt>
+    "$GLULXE" -q -u --rngseed "$2" "$1" < "$3" 2>&1
+}
+
 sprawdz() {     # sprawdz <gra> <plik gry> <ziarno> <oczekiwany tekst>
     bez_ogonkow "games/$1.przejscie" > "build/$1.ascii"
     for skrypt in "games/$1.przejscie" "build/$1.ascii"; do
@@ -59,6 +65,17 @@ sprawdz() {     # sprawdz <gra> <plik gry> <ziarno> <oczekiwany tekst>
             blad "$opis: brak „$4”"
         fi
     done
+    if [ -n "$GLULXE" ]; then
+        ulx=$(echo "$2" | sed 's/\.z5$/.ulx/')
+        for skrypt in "games/$1.przejscie" "build/$1.ascii"; do
+            opis="$1 (Glulx)"; [ "$skrypt" = "build/$1.ascii" ] && opis="$1 (Glulx, bez ogonków)"
+            if graj_glulx "$ulx" "$3" "$skrypt" | tr '\n' ' ' | grep -q "$4"; then
+                ok "$opis: $4"
+            else
+                blad "$opis: brak „$4”"
+            fi
+        done
+    fi
 }
 sprawdz ruins_pl         build/ruins_pl.z5         1 "zdobyłeś 30 punktów na 30"
 sprawdz alice_pl         build/alice_pl.z5         1 "Zwyciężyłaś"
@@ -78,6 +95,19 @@ for skrypt in games/museum_pl.przejscie build/museum_pl.ascii; do
     if [ "$n" -eq 1 ]; then ok "$opis: wycieczka bez błędów parsera"
     else blad "$opis: $n błędów parsera (oczekiwano 1)"; fi
 done
+if [ -n "$GLULXE" ]; then
+    # Wyjście z Sali Zmysłów prowadzi losowo; generator glulxe daje przy
+    # ziarnie 1 inną drogę niż dfrotz, przy ziarnie 5 tę samą co skrypt.
+    for skrypt in games/museum_pl.przejscie build/museum_pl.ascii; do
+        opis="museum_pl (Glulx)"; [ "$skrypt" = build/museum_pl.ascii ] && opis="museum_pl (Glulx, bez ogonków)"
+        n=$(graj_glulx build/museum_pl.ulx 5 "$skrypt" |
+            grep -cE 'Nie znam|Nie widzisz niczego|Nie zrozumiałem|Zrozumiałem tylko')
+        if [ "$n" -eq 1 ]; then ok "$opis: wycieczka bez błędów parsera"
+        else blad "$opis: $n błędów parsera (oczekiwano 1)"; fi
+    done
+else
+    echo "  (brak glulxe - przejścia Glulx pominięte; zob. ./przygotuj.sh)"
+fi
 
 echo
 if [ "$bledy" -eq 0 ]; then echo "Wszystkie testy przeszły."; else echo "Błędów: $bledy"; fi

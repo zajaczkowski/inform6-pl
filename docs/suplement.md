@@ -765,7 +765,7 @@ Tablica w biurze „Sklepu” i sześciany w „Równowadze” przyjmują tekst 
 
 Układ bufora wejścia jest inny w maszynie Z i w Glulx, stąd `#Ifdef TARGET_ZCODE`. W „Równowadze” procedura zwraca obiekt `burin` (rylec), który staje się pierwszym dopełnieniem akcji `WriteOn`; drugim jest sześcian.
 
-Polska biblioteka zdejmuje ogonki ze słów spoza słownika, ale tekst w cudzysłowie jest z tego wyłączony, więc na tablicy zostaje dokładnie to, co wpisał gracz. Dotyczy to maszyny Z; Glulx nie jest na razie sprawdzony.
+Polska biblioteka zdejmuje ogonki ze słów spoza słownika, ale tekst w cudzysłowie jest z tego wyłączony, więc na tablicy zostaje dokładnie to, co wpisał gracz. W Glulx polskie litery spoza Latin-1 są zamieniane na litery bez ogonków już przy wczytaniu wiersza, więc tekst w cudzysłowie ich nie zachowa.
 
 ### Jedno dowolne słowo
 

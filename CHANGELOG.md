@@ -4,22 +4,25 @@ Numer wydania składa się z wersji biblioteki standardowej Inform, na której
 oparta jest polska wersja, i kolejnego numeru polskiego wydania:
 `6.12.8-pl1` to pierwsze wydanie dla biblioteki 6.12.8.
 
-## Niewydane
+## 6.12.8-pl2 – 28 października 2026
 
 - **Pisanie bez polskich liter.** Słowo spoza słownika, które bez ogonków
   odpowiada słowu ze słownika, jest zamieniane na to słowo: „wez lampe”,
   „otworz drzwi”, „naucz sie rezrov”, „zapytaj kaplana o xibalbe” działają
   tak samo jak wersje z ogonkami.  Przy kilku obiektach pasujących do jednego
   słowa („wschod”) parser porównuje nazwy z pominięciem ogonków.
-- `test.sh` przechodzi każdą grę także skryptem bez polskich liter.
 - Kierunki: usunięte ręcznie dopisane formy bez ogonków („zachod”), przez które
   „poludniowy zachod” nie pasowało do żadnego kierunku.
 - „Ruiny”: snop światła rozumie „w świetle” i „smugę”.
 - „Muzeum”: `BeforeParsing` kończyło się gołym `return`, przez co biblioteka
   pomijała swoje rozszerzenia (oznaczanie nieznanych słów).
-- Sprostowanie: wersje Glulx się kompilują, ale nie zostały sprawdzone
-  w interpreterze; tokenizer biblioteki 6.12.8 nie obsługuje słownika Unicode,
-  którego wymagają polskie litery.
+- **Glulx działa.**  W wydaniu pl1 wersje `.ulx` nie rozumiały żadnego
+  polecenia: tokenizer biblioteki 6.12.8 nie obsługuje słownika Unicode.
+  Polska wersja zastępuje w Glulx `Tokenise__` (słownik Unicode)
+  i `KeyboardPrimitive` (wiersz w Unicode, litery spoza Latin-1 zamieniane na
+  litery bez ogonków), a `LowerCase` obsługuje polskie litery.
+- `przygotuj.sh` buduje też interpreter glulxe; `test.sh` przechodzi każdą grę
+  w maszynie Z i w Glulx, skryptem z polskimi literami i bez nich.
 
 ## 6.12.8-pl1 – 28 października 2026
 
@@ -58,5 +61,7 @@ i dfrotz), `build.sh`, `test.sh` oraz testy w GitHub Actions.
 Znane ograniczenia:
 
 - w Glulx nie da się wpisywać polskich liter (biblioteka 6.12 czyta tam
-  wiersz poleceń w Latin-1), a czasowniki bez ogonków nie są rozpoznawane,
+  wiersz poleceń w Latin-1), a czasowniki bez ogonków nie są rozpoznawane
+  (w rzeczywistości wersje `.ulx` nie rozumiały żadnego polecenia; poprawione
+  w pl2),
 - komunikaty są tylko w 2. osobie i w czasie teraźniejszym.

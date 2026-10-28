@@ -67,7 +67,7 @@ Gry są zapisane w formacie maszyny Z (pliki `.z5`) albo Glulx (`.ulx`). Do gran
 - **Gargoyle**, **Lectrote** albo **Spatterlight** – programy okienkowe,
 - **Parchment** – interpreter w przeglądarce.
 
-**Do grania służą pliki `.z5`.** Wersje `.ulx` (Glulx) nie są jeszcze sprawdzone i mogą nie rozumieć poleceń.
+Obie wersje działają tak samo. Jeśli interpreter otwiera oba formaty, wybierz `.z5`: tylko w nim tekst wpisany w cudzysłowie (np. napis na tablicy) zachowa polskie litery.
 
 ---
 

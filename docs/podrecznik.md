@@ -74,7 +74,7 @@ Skrypt kompiluje `games/ruins_pl.inf` do `build/ruins_pl.z5` (maszyna Z, wersja 
 ./build.sh ruins_pl -G
 ```
 
-Glulx oferuje znacznie więcej pamięci, ale **na razie gry pisze się i testuje w maszynie Z**. Gry kompilują się dla Glulx, jednak wersje `.ulx` nie zostały sprawdzone w interpreterze: tokenizer biblioteki 6.12.8 nie obsługuje słownika Unicode, którego wymagają polskie litery, a wiersz poleceń odczytuje w kodowaniu Latin-1. Kompilację dla Glulx warto więc traktować jako sprawdzian przenośności kodu.
+Glulx oferuje znacznie więcej pamięci i działa tak samo jak maszyna Z. Biblioteka 6.12.8 nie radzi sobie w Glulx z polskimi literami (nie obsługuje słownika Unicode i czyta polecenia w Latin-1), dlatego polska wersja zastępuje tam tokenizer i odczyt wiersza. Jedyna widoczna różnica: tekst wpisany przez gracza w cudzysłowie traci w Glulx polskie litery.
 
 ### Uruchamianie
 
@@ -1071,7 +1071,7 @@ Po kompilacji z opcją `-D` (`./build.sh ruins_pl -D`) dostępne są polecenia d
 - **Brak rodzaju.** Bez `female`, `neuter` albo `pluralname` każda nazwa odmienia się jak męska, a komunikaty używają męskich końcówek.
 - **`PolskiZ` nie na początku.** Polskie litery w tekstach skompilowanych przed nim będą zniekształcone.
 - **`~~` bez nawiasów** (rozdział 15).
-- **Glulx.** Wersje `.ulx` się kompilują, ale nie zostały sprawdzone w interpreterze: tokenizer biblioteki 6.12.8 nie obsługuje słownika Unicode. Grę testuje się w maszynie Z.
+- **Glulx.** Kod, który czyta tablice `parse` i `buffer` bezpośrednio, działa tylko w maszynie Z (szczegóły w suplemencie, rozdział 19). `test.sh` przechodzi gry w obu maszynach, jeśli `przygotuj.sh` zbudował interpreter glulxe.
 
 ---
 

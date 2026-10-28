@@ -4,6 +4,7 @@
 #   - biblioteka standardowa Inform 6.12.8  -> narzedzia/inform6lib
 #   - kompilator Inform 6.44                -> narzedzia/bin/inform6
 #   - interpreter dfrotz (Frotz 2.55)       -> narzedzia/bin/dfrotz
+#   - interpreter glulxe (0.6.1, cheapglk)  -> narzedzia/bin/glulxe
 # Wymaga git, kompilatora C i make.  Katalog narzedzia/ nie trafia do repozytorium.
 set -e
 cd "$(dirname "$0")"
@@ -11,6 +12,8 @@ cd "$(dirname "$0")"
 LIB_TAG=6.12.8
 INFORM6_TAG=v6.44
 FROTZ_TAG=2.55
+GLULXE_TAG=glulxe-0.6.1
+CHEAPGLK_TAG=cheapglk-1.0.7a
 
 mkdir -p narzedzia/bin narzedzia/src
 
@@ -31,6 +34,14 @@ echo "Interpreter dfrotz $FROTZ_TAG..."
 pobierz https://gitlab.com/DavidGriffith/frotz.git "$FROTZ_TAG" narzedzia/src/frotz
 ( cd narzedzia/src/frotz && make -s dumb CURSES_CONFIG=true HOMEBREW_PREFIX=/usr >/dev/null )
 cp narzedzia/src/frotz/dfrotz narzedzia/bin/dfrotz
+
+echo "Interpreter glulxe ($GLULXE_TAG, $CHEAPGLK_TAG)..."
+pobierz https://github.com/erkyrath/cheapglk.git "$CHEAPGLK_TAG" narzedzia/src/cheapglk
+pobierz https://github.com/erkyrath/glulxe.git "$GLULXE_TAG" narzedzia/src/glulxe
+( cd narzedzia/src/cheapglk && make -s >/dev/null 2>&1 )
+( cd narzedzia/src/glulxe && make -s GLKINCLUDEDIR=../cheapglk GLKLIBDIR=../cheapglk \
+      GLKMAKEFILE=Make.cheapglk >/dev/null 2>&1 )
+cp narzedzia/src/glulxe/glulxe narzedzia/bin/glulxe
 
 # Pliki biblioteki mają nazwy pisane małymi literami, a gry tradycyjnie
 # dołączają "Parser", "VerbLib", "PolskiZ" itd.  Na systemach rozróżniających

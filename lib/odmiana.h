@@ -535,6 +535,18 @@ Replace Identical PL_IdenticalOryg;
 
 ! MatchWord zastąpione polską wersją (polskig.h): pomija ogonki.
 Replace MatchWord PL_MatchWordOryg;
+
+! Glulx: tokenizer biblioteki 6.12.8 zakłada słownik z jednobajtowymi znakami,
+! a polskie litery wymagają słownika Unicode ($DICT_CHAR_SIZE=4).  Polska wersja
+! Tokenise__ (polskig.h) szuka słów w słowniku Unicode, a KeyboardPrimitive
+! czyta wiersz poleceń w Unicode (biblioteka czyta go w Latin-1, w którym nie
+! ma większości polskich liter).
+#Ifdef TARGET_GLULX;
+#Ifdef DICT_IS_UNICODE;
+Replace Tokenise__ PL_TokeniseOryg;
+Replace KeyboardPrimitive PL_KeyboardPrimitiveOryg;
+#Endif;
+#Endif;
 Replace Locale PL_LocaleOryg;      ! nowa wersja w polskig.h
 
 ! Fałsz, gdy obiekty mają różne nazwy zapisane z "/"; prawda w pozostałych
