@@ -1,5 +1,7 @@
 # inform6-pl
 
+[![testy](https://github.com/zajaczkowski/inform6-pl/actions/workflows/testy.yml/badge.svg)](https://github.com/zajaczkowski/inform6-pl/actions/workflows/testy.yml)
+
 Polska wersja biblioteki standardowej **Inform 6**, napisana od nowa dla biblioteki **6.12.8** (grudzień 2025) i kompilatora **Inform 6.44**. Gry napisane z jej pomocą odmieniają nazwy przedmiotów przez przypadki, rozumieją polecenia wpisane naturalną polszczyzną i działają w maszynie Z oraz w Glulx.
 
 Poprzednia wersja, oparta na bibliotece 6/11, znajduje się w repozytorium [inform-pl](https://github.com/zajaczkowski/inform-pl).
