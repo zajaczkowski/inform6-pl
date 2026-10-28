@@ -1,0 +1,100 @@
+!% -Cu
+!% +language_name=polski
+! ==============================================================================
+!   Minimalna gra testowa dla biblioteki inform6-pl.
+!   Nazwy obiektów są odmieniane automatycznie (zob. lib/odmiana.h).
+! ==============================================================================
+
+Include "PolskiZ";
+
+Constant Story "Test";
+Constant Headline "^Gra testowa biblioteki inform6-pl^";
+
+Include "Parser";
+Include "VerbLib";
+
+Object  Pokoj "Pokój"
+  with  description "Mały, pusty pokój. Na ścianie wisi zegar.",
+  has   light;
+
+Object  -> zegar "zegar/"
+  with  description "Wskazówki zegara stoją w miejscu.",
+  has   static;
+
+Object  -> sciana "ścian/a"
+  with  name 'źdźbło' 'żółć',
+        description "Zwykła ściana. Słowa z ą, ę, ł, ń, ś, ź i ż w słowniku.",
+  has   scenery female;
+
+Object  -> lampa "mosiężn/a lamp/a"
+  has   switchable female;
+
+Object  -> pudelko "drewnian/e pudełk/o"
+  has   container openable neuter;
+
+Object  -> -> kamyk "kamyk/";
+
+Object  -> stol "st/ó=o/ł/+u"
+  has   supporter static;
+
+Object  -> srebrna "srebrn/a lamp/a"
+  has   female;
+
+Object  -> klebek "kłęb/e/k/ wełny"
+  has   male;
+
+Object  -> polka "półk/a nad kominkiem"
+  has   supporter static female;
+
+Object  -> mysz "star/a mysz/"
+  has   animate female;
+
+Object  -> pies "wielk/i p/ie/s/"
+  with  desc_cel "wielkiemu psu",       ! wyjątek: ręczna forma ma pierwszeństwo
+  has   animate male;
+
+Object  -> krolowa "Czarn/a! Królow/a!"
+  has   animate female proper;
+
+! Liczba mnoga
+Object  -> klucze "mosiężn/e klucz/e"
+  has   pluralname;
+
+Object  -> kamyki "kamyk/i"
+  has   pluralname;
+
+Object  -> ksiazki "star/e książk/i+e"
+  has   pluralname female;
+
+Object  -> okna "brudn/e okn/a+ie"
+  has   pluralname neuter scenery;
+
+Object  -> drzwi "dębow/e drzwi/"
+  has   pluralname scenery openable;
+
+Object  -> rybacy "sta/rz=r/y ryba/c=k//y"
+  has   pluralname animate male;
+
+Object  -> kowal "kowal/"
+  with  description "Krzepki kowal w skórzanym fartuchu.",
+        life [;
+            Ask, Tell, Answer: "Kowal tylko kiwa głową.";
+        ],
+        orders [;
+            Take: "~Sam sobie weź~, mruczy kowal.";
+        ],
+  has   animate male proper;
+
+[ Initialise;
+    location = Pokoj;
+];
+
+Include "PolskiG";
+
+! Polecenie testowe: "odmień X" wypisuje nazwę X we wszystkich przypadkach.
+[ OdmienSub;
+    print (mian) noun, " / ", (dop) noun, " / ", (cel) noun, " / ",
+          (bie) noun, " / ", (nar) noun, " / ", (mie) noun, "^";
+];
+
+Verb 'odmień' * noun -> Odmien;

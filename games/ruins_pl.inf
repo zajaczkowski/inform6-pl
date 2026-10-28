@@ -1,0 +1,1064 @@
+!% -Cu
+!% +language_name=polski
+! ==============================================================================
+!   RUINY - polska wersja przykładowej gry "Ruins" z podręcznika DM4.
+!
+!   Tłumaczenie z oryginału angielskiego (wersja Rogera Firtha z maja 2001,
+!   złożona z fragmentów "Ruins" cytowanych w DM4).  Nazwy obiektów są
+!   zapisane w notacji automatycznej odmiany (zob. lib/odmiana.h).
+!
+!                       GRACZ
+!                             lampa, słownik, mapa
+!                       WIELKI PLAC
+!                           | grzyb, skrzynia, aparat, gazeta, schody
+!                           |
+!                       KWADRATOWA KOMNATA ---------------- ROBACZE CHODNIKI
+!                           | inskrypcje, snop światła, (klucz)   kokon
+!                           |
+!                       NISKI KORYTARZ
+!                           | figurka, drzwi
+!                           |
+!   GÓRNY KONIEC        SANKTUARIUM
+!   KANIONU                /     \ malowidła, ołtarz, maska, (kapłan)
+!       | kula     --------       --------
+!       |        /                        \
+!   XIBALBÁ                                PRZEDSIONEK
+!       | stela                                | klatka, szkielety, (guziec)
+!       |                                      |
+!   DOLNY KONIEC KANIONU                     SZYB GROBOWY
+!       | przepaść                               plaster miodu
+!       |
+!   PÓŁKA Z PUMEKSU
+!         kość
+! ==============================================================================
+
+Include "PolskiZ";
+
+Constant Story "RUINY";
+Constant Headline "^Interaktywny przykład z podręcznika^
+                    Copyright (c) 1999 by Angela M. Horns.^
+                    Wersja polska.^";
+
+Constant MAX_CARRIED = 7;       ! DM4 §22
+Constant MAX_SCORE = 30;        ! DM4 §22
+
+Include "Parser";
+Include "VerbLib";
+
+! ------------------------------------------------------------------------------
+!   Klasa SKARB (DM4 §5, zmieniona w §23)
+! ------------------------------------------------------------------------------
+
+Class   Treasure
+  with  before [;
+            Take, Remove:
+                if (self in packing_case)
+                    "Rozpakowywanie tak bezcennego zabytku lepiej zostawić
+                     ludziom z Instytutu Carnegie.";
+                if (self.photographed_in_situ == false)
+                    "Są lata trzydzieste, a nie dawne złe czasy. Zabranie
+                     zabytku bez udokumentowania jego kontekstu to zwykły
+                     rabunek.";
+            Photograph:
+                if (self has moved) "Co, i sfałszować dokumentację wykopalisk?";
+                if (self.photographed_in_situ) "Nie po raz drugi.";
+            ],
+        after [;
+            Insert:
+                if (second == packing_case) {
+                    score = score + self.cultural_value;
+                    if (score == MAX_SCORE) {
+                        deadflag = 2;
+                        print_ret "Gdy ostrożnie pakujesz ", (bie) noun,
+                                  ", z wierzchołków drzew sfruwa ara o
+                                   czerwonym ogonie, z piórami ciężkimi od
+                                   niedawnego deszczu. Łopot jej skrzydeł jest
+                                   niemal ogłuszający, kamień uderza o
+                                   kamień... Gdy niebo się przejaśnia, nad
+                                   spokojną dżunglą wschodzi sierp księżyca.
+                                   Jest koniec marca 1938 roku i czas wracać do
+                                   domu.";
+                    }
+                    print "Bezpiecznie zapakowan"; KoncY(noun); ".";
+                }
+            Photograph:
+                self.photographed_in_situ = true;
+            ],
+        cultural_value 5,
+        photographed_in_situ false;
+
+! ------------------------------------------------------------------------------
+!   WIELKI PLAC - tu zaczyna się gra (DM4 §4, zmieniony w §8, §9 i §23)
+! ------------------------------------------------------------------------------
+
+Object  Forest "~Wielki Plac~"
+  with  description
+            "Tak przynajmniej nazywasz w notatkach tę niską wapienną skarpę,
+             choć las deszczowy dawno już ją sobie odebrał. Ciemne,
+             oliwkowe drzewa napierają ze wszystkich stron, powietrze paruje
+             mgiełką po ciepłym, niedawnym deszczu, w górze wiszą chmary
+             muszek. ~Budowla 10~ to bezładne rumowisko kamieni, które mogło
+             kiedyś być piramidą grobową. Niewiele z niej ocalało poza
+             wykutymi w kamieniu schodami, prowadzącymi w dół, w ciemność.",
+        d_to steps,
+        in_to steps,
+        u_to
+            "Drzewa są kolczaste. Próba wspinaczki skończyłaby się dłońmi
+             pociętymi do krwi.",
+        cant_go
+            "Las deszczowy jest gęsty, a nie po to przedzierasz się przez
+             niego od wielu dni, żeby teraz porzucić swoje odkrycie. Zanim
+             będzie można usprawiedliwić koniec wyprawy, trzeba zabrać do
+             cywilizacji kilka porządnych znalezisk.",
+        before [; Listen: "Wyjce, nietoperze, papugi, ary."; ],
+  has   light;
+
+! DM4 §4, zmieniony w ćwiczeniu 1 i §23
+Object  -> mushroom "cętkowan/y grzyb/"
+  with  name 'grzybek' 'grzybka' 'grzybkowi' 'grzybkiem' 'grzybku'
+             'muchomor' 'muchomora' 'muchomorowi' 'muchomorem' 'muchomorze',
+        initial
+            "Z rozmokłej ziemi wyrasta na długiej nóżce cętkowany grzyb.",
+        description
+            "Kapelusz grzyba pokrywają plamy i wcale nie masz pewności,
+             czy to nie muchomor.",
+        after [;
+            Take:
+                if (self.mushroom_picked)
+                    "Podnosisz powoli rozpadający się grzyb.";
+                self.mushroom_picked = true;
+                "Zrywasz grzyb, zgrabnie przecinając jego cienką nóżkę.";
+            Drop:
+                "Grzyb spada na ziemię, lekko poobijany.";
+            Eat:
+                steps.rubble_filled = false;
+                "Nadgryzasz brzeg kapelusza i nie potrafisz określić, skąd
+                 bierze się ten cierpki smak, bo rozprasza cię ara
+                 przelatująca nad głową - zdaje się wyłaniać prosto ze słońca.
+                 Łopot jej skrzydeł jest niemal ogłuszający, kamień uderza
+                 o kamień.";
+            ],
+        mushroom_picked false,
+  has   edible;
+
+! DM4 §12
+Object  -> packing_case "skrzyni/a transportow/a!"
+  with  name 'skrzynka' 'skrzynki' 'skrzynce' 'skrzynkę' 'skrzynką'
+             'kufer' 'kufra' 'kufrowi' 'kufrem' 'kufrze'
+             'pudło' 'pudła' 'pudłu' 'pudłem' 'pudle',
+        initial
+            "Stoi tu twoja skrzynia transportowa, gotowa pomieścić każde
+             cenne znalezisko, które trzeba będzie odesłać do cywilizacji.",
+        before [;
+            Take, Remove, PushDir:
+                "Skrzynia jest zbyt ciężka, żeby się z nią szarpać, dopóki
+                 wyprawa nie jest zakończona.";
+            ],
+  has   static container open openable female;
+
+! DM4 §6
+Object  -> -> camera "aparat/+u na mokre płyty"
+  with  name 'fotograficzny' 'fotograficznego' 'fotograficznemu'
+             'fotograficznym' 'kamera' 'kamery' 'kamerę' 'kamerą' 'kamerze'
+             'mokre' 'płyty',
+        description
+            "Nieporęczny, solidny i uparty aparat w drewnianej obudowie,
+             na mokre płyty kolodionowe. Jak każdy archeolog, darzysz swój
+             aparat miłością pomieszaną z nienawiścią.";
+
+! DM4 §23
+Object  -> -> newspaper "gazet/a sprzed miesiąca"
+  with  name 'times' 'dziennik' 'dziennika' 'dziennikowi' 'dziennikiem'
+             'dzienniku' 'stara' 'starą' 'starej',
+        description
+            "~The Times~ z 26 lutego 1938 roku. Po miesiącu w tym klimacie
+             gazeta jest zarazem wilgotna i krucha - mniej więcej tak jak ty.
+             Może w Londynie jest mgła. Może spadają bomby.",
+  has   female;
+
+! DM4 §4, zmienione w §5 i §23
+Object  -> steps "kamienn/e schod/y"
+  with  name 'stopnie' 'stopni' 'stopniom' 'stopniami' 'stopniach'
+             'piramida' 'piramidy' 'piramidę' 'piramidzie' 'piramidą'
+             'grobowa' 'grobowej' 'grobową' 'budowla' 'budowli' 'budowlę'
+             'budowlą' 'dziesięć' '10',
+        description [;
+            if (self.rubble_filled)
+                "Już po kilku stopniach drogę tarasuje gruz.";
+            print "Popękane, wytarte stopnie schodzą do mrocznej komnaty.
+                   Być może twoje stopy jako pierwsze od pięciuset lat ";
+            if (Square_Chamber hasnt visited) print "będą je deptać";
+            else print "je deptały";
+            ". Na najwyższym stopniu wyryto glif Q1.";
+            ],
+        door_to [;
+            if (self.rubble_filled)
+                "Już po kilku stopniach drogę tarasuje gruz.";
+            return Square_Chamber;
+            ],
+        door_dir d_to,
+        rubble_filled true,
+  has   scenery door open pluralname;
+
+! ------------------------------------------------------------------------------
+!   KWADRATOWA KOMNATA (DM4 ćwiczenie 2, zmieniona w §8 i §9)
+! ------------------------------------------------------------------------------
+
+Object  Square_Chamber "Kwadratowa Komnata"
+  with  name 'nadproże' 'nadproża' 'nadprożami' 'przejście' 'przejścia'
+             'przejściami',
+        description
+            "Zagłębiona w ziemi, posępna kamienna komnata, szeroka na
+             dziesięć jardów. Od schodów u góry wpada snop słonecznego
+             światła i wypełnia ją rozproszonym blaskiem, ale w cieniu niskie
+             przejścia pod kamiennymi nadprożami prowadzą na wschód i na
+             południe, w głębszy mrok Świątyni.",
+        u_to Forest,
+        e_to Wormcast,
+        s_to Corridor,
+        before [;
+            Insert:
+                if (noun == eggsac && second == sunlight) {
+                    remove eggsac;
+                    move stone_key to self;
+                    "Upuszczasz kokon w jaskrawy snop słonecznego światła.
+                     Kokon obscenicznie bulgocze, nabrzmiewa, po czym pęka,
+                     wypuszczając setkę maleńkich owadów, które rozbiegają się
+                     na wszystkie strony w ciemność. Na posadzce zostają tylko
+                     bryzgi śluzu i dziwny klucz z żółtego kamienia.";
+                }
+            ],
+  has   light;
+
+! DM4 §8
+Object  -> "wyryt/e inskrypcj/e+y"
+  with  name 'rzeźby' 'rzeźb' 'rzeźbom' 'rzeźbami' 'rzeźbach'
+             'znaki' 'znaków' 'znakom' 'znakami' 'znakach'
+             'symbole' 'symboli' 'symbolami' 'napisy' 'napisów' 'napisami',
+        initial
+            "Wyryte inskrypcje pokrywają ściany, posadzkę i sufit.",
+        description
+            "Ilekroć przyglądasz się rzeźbom z bliska, wydają się nieruchome.
+             Gdy jednak odwracasz wzrok, masz nieprzyjemne wrażenie, że
+             przemykają i przebierają odnóżami. Wyróżniają się dwa glify:
+             Strzała i Koło.",
+  has   static pluralname female;
+
+! DM4 §8
+Object  -> sunlight "snop/ światła"
+  with  name 'słońce' 'słońca' 'słońcem' 'promień' 'promienia' 'promieniem'
+             'promienie' 'promieni' 'promieniach' 'słoneczny' 'słonecznego'
+             'słonecznym' 'pyłki' 'pyłków' 'kurz' 'kurzu' 'powietrze',
+        description
+            "Pyłki kurzu migoczą w rozświetlonym powietrzu, tak że snop
+             wydaje się niemal namacalny.",
+        before [;
+            Examine, Search:
+                ;
+            default:
+                "To tylko nieuchwytny snop słonecznego światła.";
+            ],
+  has   scenery;
+
+! ------------------------------------------------------------------------------
+!   NISKI KORYTARZ (DM4 §13)
+! ------------------------------------------------------------------------------
+
+Object  Corridor "Niski Korytarz"
+  with  description
+            "Niski korytarz o kwadratowym przekroju biegnie z północy na
+             południe i zmusza cię do pochylenia głowy.",
+        n_to Square_Chamber,
+        s_to StoneDoor;
+
+! DM4 §5
+Treasure -> statuette "pigmejsk/a figurk/a"
+  with  name 'wąż' 'węża' 'wężem' 'majańska' 'majańskiej' 'majańską'
+             'duch' 'ducha' 'duchem' 'cenna' 'cennej' 'cenną' 'statuetka'
+             'statuetki' 'statuetkę' 'statuetką' 'statuetce',
+        initial
+            "Spoczywa tu cenna majańska figurka!",
+        description
+            "Groźna, niemal karykaturalna figurka pigmejskiego ducha z wężem
+             owiniętym wokół szyi.",
+  has   female;
+
+! DM4 §13
+Object  -> StoneDoor "kamienn/e drzwi/"
+  with  name 'masywne' 'masywnych' 'masywnymi' 'wielkie' 'wielkich'
+             'wielkimi' 'żółte' 'żółtych' 'żółtymi',
+        description
+            "To po prostu wielkie kamienne drzwi.",
+        when_closed
+            "Przejście zagradzają masywne drzwi z żółtego kamienia.",
+        when_open
+            "Wielkie drzwi z żółtego kamienia stoją otworem.",
+        door_to [; if (self in Corridor) return Shrine; return Corridor; ],
+        door_dir [; if (self in Shrine) return n_to; return s_to; ],
+        with_key stone_key,
+        found_in Corridor Shrine,
+  has   static door openable lockable locked pluralname;
+
+! ------------------------------------------------------------------------------
+!   SANKTUARIUM (DM4 §23)
+! ------------------------------------------------------------------------------
+
+Object  Shrine "Sanktuarium"
+  with  description
+            "To wspaniałe sanktuarium wydrążono najwyraźniej w istniejących
+             już wcześniej wapiennych jaskiniach. Najlepiej widać to w
+             zachodnim z dwóch długich skalnych okapów po stronie południowej.",
+        n_to StoneDoor,
+        se_to Antechamber,
+        sw_to
+            "Okap zwęża się w szczelinę, która ciągnęłaby się dalej, gdyby
+             nie była szczelnie zatkana soplami lodu. Lód nie całkiem zakrywa
+             glif Półksiężyca.";
+
+! DM4 §23
+Object  -> paintings "malowidł/a+e"
+  with  name 'malowidło' 'malowidła' 'malowidle' 'obraz' 'obrazy' 'obrazów'
+             'władca' 'władcy' 'władcę' 'jeniec' 'jeńca' 'jeńcu',
+        initial
+            "Jaskrawe, roiące się od postaci malowidła, przedstawiające
+             opancerzonego Władcę depczącego jeńca, są tak barwne, że aż
+             trudno na nie patrzeć - graffiti zorganizowanej tłuszczy.",
+        description
+            "Ciała mają barwę krwistej czerwieni. Znaki Długiej Rachuby datują
+             przedstawione wydarzenie na 10 baktun 4 katun 0 tun 0 uinal
+             0 kin - na rocznicę tego rodzaju, w którą jakiś Władca mógł
+             wreszcie ściąć pojmanego rywala, torturowanego rytualnie przez
+             kilka lat, w zbałkanizowanym szaleństwie majańskich
+             miast-państw.",
+  has   static pluralname neuter;
+
+! DM4 §12 i §15
+Object  -> stone_table "kamienn/y ołtarz/"
+  with  name 'stół' 'stołu' 'stołowi' 'stołem' 'stole'
+             'płyta' 'płyty' 'płycie' 'płytę' 'płytą'
+             'wielki' 'wielkiego' 'wielkim',
+        initial
+            "Sanktuarium dominuje wielka kamienna płyta - stół albo ołtarz.",
+  has   enterable supporter static;
+
+! DM4 §11
+Treasure -> -> mask "mozaikow/a mask/a z jadeitu"
+  with  name 'jadeitowa' 'jadeitowej' 'jadeitową' 'jadeit' 'jadeitu'
+             'twarz' 'twarzy',
+        initial
+            "Na ołtarzu spoczywa mozaikowa maska z jadeitu.",
+        description
+            "Jak wspaniale wyglądałaby w Muzeum.",
+        after [;
+            Wear:
+                move priest to Shrine;
+                if (location == Shrine)
+                    "Gdy patrzysz przez obsydianowe szczeliny oczu mozaikowej
+                     maski, ukazuje ci się upiorna obecność: zmumifikowany
+                     kapłan od kalendarza, oczekujący twojego słowa.";
+            Disrobe:
+                remove priest;
+            ],
+        cultural_value 10,
+  has   clothing female;
+
+! ------------------------------------------------------------------------------
+!   GÓRNY KONIEC KANIONU (DM4 §23)
+! ------------------------------------------------------------------------------
+
+Object  Canyon_N "Górny koniec kanionu"
+  with  description
+            "Wyższy i szerszy, północny kraniec kanionu wznosi się tylko do
+             nierównej ściany wulkanicznego krasu.",
+        s_to Junction,
+        d_to Junction,
+  has   light;
+
+! DM4 §15, zmieniona w ćwiczeniu 24 i §23
+Object  -> huge_ball "ogromn/a kul/a z pumeksu"
+  with  name 'pumeks' 'pumeksu' 'pumeksem' 'pumeksowa' 'pumeksowej'
+             'pumeksową' 'kamień' 'kamienia' 'kamieniem' 'głaz' 'głazu'
+             'głazem',
+        initial
+            "Leży tu ogromna kula z pumeksu, szeroka na osiem stóp.",
+        description
+            "Ma dobre osiem stóp średnicy, choć jest dość lekka.",
+        before [;
+            PushDir:
+                if (location == Junction && second == ne_obj)
+                    "Wejście do sanktuarium jest dużo węższe niż osiem stóp.";
+                AllowPushDir();
+                rtrue;
+            Pull, Push, Turn:
+                "Nie byłoby wcale tak trudno wprawić ją w ruch.";
+            Take, Remove:
+                "W kuli o średnicy ośmiu stóp jest naprawdę dużo kamienia.";
+            ],
+        after [;
+            PushDir:
+                if (second == n_obj) "Z wysiłkiem pchasz kulę pod górę.";
+                if (second == u_obj) <<PushDir self n_obj>>;
+                if (second == s_obj) "Raz rozpędzoną kulę trudno zatrzymać.";
+                if (second == d_obj) <<PushDir self s_obj>>;
+            ],
+  has   static female;
+
+! ------------------------------------------------------------------------------
+!   XIBALBÁ (DM4 §23)
+! ------------------------------------------------------------------------------
+
+Object  Junction "Xibalb@'a"
+  with  description
+            "Pięćdziesiąt metrów pod lasem deszczowym, a szum wody słychać
+             wszędzie: te głębokie, wypłukane wapienne jaskinie rozchodzą się
+             jak korzenie. Wąskie przejście na północny wschód, obok szerokiej,
+             zawalonej kolumny skalnej pokrytej lodem, prowadzi z powrotem do
+             sanktuarium, a coś w rodzaju dna kanionu ciągnie się w górę na
+             północ i w dół na południe, blade jak zęby rekina w rozproszonym
+             świetle sodowej lampy, padającym z góry.",
+        ne_to Shrine,
+        n_to Canyon_N,
+        u_to Canyon_N,
+        s_to Canyon_S,
+        d_to Canyon_S,
+ has    light;
+
+! DM4 §23
+Treasure -> stela "stel/a"
+  with  name 'kamień' 'kamienia' 'kamieniem' 'graniczny' 'granicznego'
+             'granicznym' 'znacznik' 'znacznika' 'znacznikiem',
+        initial
+            "Na skalnej półce, na wysokości głowy, stoi niewielka stela,
+             czyli kamień graniczny.",
+        description
+            "Ryciny zdają się ostrzegać, że granica Xibalb@'a, Miejsca Grozy,
+             jest już blisko. Wyróżnia się glif Ptaka.",
+  has   female;
+
+! ------------------------------------------------------------------------------
+!   DOLNY KONIEC KANIONU (DM4 §23)
+! ------------------------------------------------------------------------------
+
+Object  Canyon_S "Dolny koniec kanionu"
+  with  description
+            "Na niższym i węższym, południowym krańcu kanion urywa się nagle
+             nad przepaścią, której czerń przyprawia o zawrót głowy. Z dołu
+             nic nie widać ani nie słychać.",
+        n_to Junction,
+        u_to Junction,
+        s_to "W przepaść?",
+        d_to nothing,
+  has   light;
+
+! DM4 §12, zmieniona w §21 i §23
+Object  -> chasm "przerażając/a przepa/ść=ści/"
+  with  name 'czerń' 'czerni' 'otchłań' 'otchłani' 'dziura' 'dziury'
+             'dziurę' 'dziurze' 'bezdenna' 'bezdennej' 'bezdenną',
+        before [;
+            Enter:
+                deadflag = 3;
+                "Spadasz w cichą pustkę ciemności i roztrzaskujesz czaszkę
+                 o skalny występ. Pośród bólu i czerwieni niewyraźnie
+                 dostrzegasz Boga w Sowim Pióropuszu...";
+            JumpOver:
+                "Jest o wiele za szeroka.";
+            ],
+        after [;
+            Receive:
+                remove noun;
+                print (CMian) noun, " "; PL(noun, "spada", "spadają");
+                " bezgłośnie w ciemność przepaści.";
+            Search:
+                "Przepaść jest głęboka i mroczna.";
+            ],
+        react_before [;
+            Jump:
+                <<Enter self>>;
+            Go:
+                if (noun == d_obj) <<Enter self>>;
+            ],
+        each_turn [;
+            if (huge_ball in parent(self)) {
+                remove huge_ball;
+                Canyon_S.s_to = On_Ball;
+                Canyon_S.description =
+                    "Południowy koniec kanionu przechodzi teraz w kulę
+                     z pumeksu, zaklinowaną w przepaści.";
+                "^Kula z pumeksu toczy się bezwładnie przez ostatnie stopy
+                 kanionu, po czym z drżeniem wpada w paszczę przepaści, odbija
+                 się lekko i uderza cię w bok czoła. Osuwasz się do przodu,
+                 krwawiąc, i... pumeks maleje, a może to twoja dłoń rośnie,
+                 bo nagle trzymasz go w ręku i patrzysz na Aligatora, syna
+                 Siedem-Ary, po drugiej stronie boiska do gry w piłkę na
+                 Placu. Głowy jego ostatnich przeciwników tkwią nabite na
+                 pale, tłum wyje, domagając się twojej krwi, i nie pozostaje
+                 nic innego, jak mimo wszystko rzucić, i... ale to wszystko
+                 bzdury, a ciebie potwornie boli głowa.";
+            }
+            ],
+  has   scenery open container female;
+
+! ------------------------------------------------------------------------------
+!   PÓŁKA Z PUMEKSU (DM4 §23)
+! ------------------------------------------------------------------------------
+
+Object  On_Ball "Półka z pumeksu"
+  with  description
+            "Prowizoryczna półka, którą tworzy kula z pumeksu zaklinowana
+             w przepaści. Mimo to kanion kończy się tutaj.",
+        n_to Canyon_S,
+        d_to Canyon_S,
+        u_to Canyon_S,
+  has   light;
+
+! DM4 §23
+Treasure -> "rytowan/a ko/ść=ści/"
+  with  name 'rzeźbiona' 'rzeźbionej' 'rzeźbioną' 'kostka' 'kostki'
+             'kostkę' 'kostką',
+        initial
+            "Ze wszystkich ofiar wrzuconych w przepaść być może nic nie da
+             się odzyskać - nic poza rytowaną kością, lżejszą, niż się
+             wydaje, która wystaje z kieszeni mokrego mułu w ścianie kanionu.",
+        description
+            "Z paszczy Itzamn@'a, wynalazcy pisma, przedstawionego pod
+             postacią węża, wyłania się dłoń trzymająca pędzelek.",
+  has   female;
+
+! ------------------------------------------------------------------------------
+!   PRZEDSIONEK (DM4 §23)
+! ------------------------------------------------------------------------------
+
+Object  Antechamber "Przedsionek"
+  with  description
+            "Południowo-wschodni okap sanktuarium tworzy osobliwy przedsionek.",
+        nw_to Shrine;
+
+! DM4 ćwiczenie 22, zmieniona w ćwiczeniu 55
+Object  -> cage "żelazn/a klatk/a"
+  with  name 'kraty' 'krat' 'kratami' 'kratach' 'pręty' 'prętów' 'prętami'
+             'rama' 'ramy' 'ramę' 'ramie' 'glify' 'glifów' 'glifach',
+        description
+            "Glify głoszą: Ptak Strzała Guziec.",
+        inside_description [;
+            if (self.floor_open)
+                "Z dna klatki w głąb komory grobowej prowadzi otwarty
+                 ziemny szyb.";
+            "Otaczają cię pręty klatki.";
+            ],
+        when_open
+            "Złowieszczo majaczy tu klatka z żelaznych prętów, dość duża,
+             by zmieścić się w niej w pochyleniu. Jej drzwiczki są otwarte.
+             Na ramie widnieją jakieś glify.",
+        when_closed
+            "Żelazna klatka jest zamknięta.",
+        after [;
+            Enter:
+                print "Szkielety zamieszkujące klatkę ożywają, zaciskają na
+                       tobie kościste dłonie, miażdżą cię i okładają. Tracisz
+                       przytomność, a gdy ją odzyskujesz, okazuje się, że
+                       wydarzyło się coś groteskowego i niemożliwego...^";
+                move warthog to Antechamber;
+                remove skeletons;
+                give self ~open;
+                give warthog light;
+                self.after = 0;
+                ChangePlayer(warthog, 1);
+                <<Look>>;
+            ],
+        react_before [;
+            Go:
+                if (noun == d_obj && self.floor_open) {
+                    PlayerTo(Burial_Shaft);
+                    rtrue;
+                }
+            ],
+        floor_open false,
+  has   enterable transparent container openable open static female;
+
+! ćwiczenie 55
+Object  -> -> skeletons "obłąkan/e szkielet/y"
+  with  name 'szkielet' 'szkieletu' 'kości' 'kośćmi' 'czaszka' 'czaszki'
+             'czaszek' 'czaszkę' 'czaszkami',
+  has   pluralname static;
+
+! ------------------------------------------------------------------------------
+!   SZYB GROBOWY (ćwiczenie 55)
+! ------------------------------------------------------------------------------
+
+Object  Burial_Shaft "Szyb grobowy"
+  with  description
+            "W twoich przyszłych notatkach terenowych zostanie to zapisane
+             tak: ~Krypta o sklepieniu wspornikowym, zamknięta od góry ubitym
+             ziemnym czopem, z malowanymi postaciami przedstawiającymi
+             przypuszczalnie Dziewięciu Władców Nocy. Rozproszone kości
+             należą najpewniej do jednego starszego mężczyzny i kilkorga dzieci
+             złożonych w ofierze; wśród innych szczątków grobowych są łapy
+             jaguara.~ (W notatkach terenowych nie wolno w żadnym razie
+             zdradzić, kiedy było się śmiertelnie przerażonym.)",
+        n_to Wormcast,
+        u_to [;
+            cage.floor_open = true;
+            self.u_to = self.opened_u_to;
+            move selfobj to self;
+            print "Potężnym skokiem guźca uderzasz łbem w ziemny czop
+                   zamykający komorę od góry i cały twój świat zapada się
+                   w popiół i ziemię. Coś martwego i strasznie ciężkiego spada
+                   prosto na ciebie: tracisz przytomność, a gdy ją odzyskujesz,
+                   okazuje się, że stało się coś niemożliwego
+                   i groteskowego...^";
+            ChangePlayer(selfobj);
+            give warthog ~light;
+            <<Look>>;
+            ],
+        cant_go
+            "Architekci tej komory nie byli zbyt hojni, jeśli chodzi
+             o wyjścia. Wygląda jednak na to, że jakiś guziec wkopał się tu
+             od północy.",
+        before [; Jump: <<Go u_obj>>; ],
+        opened_u_to [; PlayerTo(cage); rtrue; ],
+  has   light;
+
+! DM4 §5
+Treasure -> honeycomb "starożytn/y plast/e/r/ miodu"
+  with  name 'stary' 'starego' 'staremu' 'starym' 'miód' 'miodu' 'miodem',
+        initial
+            "Spoczywa tu przepięknie zachowany, starożytny plaster miodu!",
+        description
+            "Być może to jakaś grobowa ofiara wotywna.",
+        after [;
+            Eat:
+                "Chyba najdroższy posiłek w twoim życiu. Miód smakuje
+                 dziwnie, być może dlatego, że przechowywano w nim wnętrzności
+                 pochowanego tu Władcy, ale wciąż smakuje jak miód.";
+            ],
+  has   edible;
+
+! ------------------------------------------------------------------------------
+!   ROBACZE CHODNIKI (DM4 ćwiczenia 7 i 8, zmienione w ćwiczeniu 54)
+! ------------------------------------------------------------------------------
+
+Object  Wormcast "Robacze Chodniki"
+  with  description
+            "Niepokojące miejsce pełne zagłębień wyżłobionych na kształt
+             pajęczej sieci - pasma pustej przestrzeni zawieszone w kamieniu.
+             Jedyne nory dość szerokie, by się przez nie przeczołgać, biegną
+             na północny wschód, na południe i w górę.",
+        w_to Square_Chamber,
+        s_to [;
+            print "Chodnik robi się wokół ciebie śliski, jakby ciepło twojego
+                   ciała topiło dawno stwardniałe żywice, a ty mocno zaciskasz
+                   oczy, przekopując się przez ciemność.^";
+            if (eggsac in player) return Square_Chamber;
+            return random(Square_Chamber, Corridor, Forest);
+            ],
+        ne_to [; return self.s_to(); ],
+        u_to [; return self.s_to(); ],
+        cant_go [;
+            if (player ~= warthog)
+                "Choć nabierasz pewności, że coś kryje się za tymi chodnikami
+                 i pośród nich, ta droga to w najlepszym razie zwierzęca
+                 ścieżka: o wiele za wąska na brzuszek archeologa zza
+                 biurka.";
+            print "Chodnik robi się śliski wokół twojego ciała guźca,
+                   mimowolnie kwiczysz, przekopując się przez ciemność, aż
+                   wreszcie spadasz na południe, do...^";
+            PlayerTo(Burial_Shaft);
+            rtrue;
+            ],
+        after [;
+            Drop:
+                move noun to Square_Chamber;
+                print (CMian) noun, " "; PL(noun, "wpada", "wpadają");
+                print " do jednej z nor i szybko "; PL(noun, "znika", "znikają");
+                " z oczu.";
+            ],
+  has   light;
+
+! DM4 §23
+Object  -> eggsac "lśniąc/y biał/y kokon/+u"
+  with  name 'jaja' 'jaj' 'jajami' 'jajo' 'skrzek' 'skrzeku'
+             'worek' 'worka' 'workiem' 'worku',
+        initial
+            "Lśniący biały kokon, przypominający grudę żabiego skrzeku
+             wielkości piłki plażowej, przylgnął do czegoś w szczelinie jednej
+             ze ścian.",
+        after [; Take: "O rany."; ],
+        react_before [;
+            Go:
+                if (location == Square_Chamber && noun == u_obj) {
+                    deadflag = true;
+                    "W chwili gdy pada na niego naturalne światło, kokon
+                     obscenicznie bulgocze i nabrzmiewa. Zanim zdążysz go
+                     odrzucić, pęka, wypuszczając setkę maleńkich owadów,
+                     wygłodniałych od chwili narodzin...";
+                }
+            ];
+
+! ------------------------------------------------------------------------------
+!   Obiekty przenoszone na miejsce w trakcie gry.
+! ------------------------------------------------------------------------------
+
+! DM4 §14, zmieniona w §23
+Object  sodium_lamp "lamp/a sodow/a!"
+  with  name 'ciężka' 'ciężkiej' 'ciężką' 'latarnia' 'latarni' 'latarnię'
+             'latarnią',
+        describe [;
+            if (self has on)
+                "^Lampa sodowa przycupnęła na ziemi i płonie.";
+            "^Lampa sodowa ciężko przycupnęła na ziemi.";
+            ],
+        before [;
+            Examine:
+                print "To solidna lampa archeologiczna, ";
+                if (self hasnt on) "obecnie wyłączona.";
+                if (self.battery_power < 10) "świecąca słabym, żółtawym
+                    blaskiem.";
+                "płonąca jaskrawym żółtym światłem.";
+            Burn:
+                <<SwitchOn self>>;
+            SwitchOn:
+                if (self.battery_power <= 0)
+                    "Niestety, bateria chyba się wyczerpała.";
+                if (parent(self) hasnt supporter && self notin location)
+                    "Zanim zapalisz lampę, trzeba ją pewnie postawić.";
+            Take, Remove:
+                if (self has on)
+                    "Żarówka jest zbyt delikatna, a metalowy uchwyt zbyt
+                     gorący, żeby podnosić lampę, gdy jest włączona.";
+            PushDir:
+                if (location == Shrine && second == sw_obj)
+                    "Najdalej możesz dopchnąć lampę sodową do samej krawędzi
+                     sanktuarium, tam gdzie dno jaskini się urywa.";
+                AllowPushDir();
+                rtrue;
+            ],
+        after [;
+            SwitchOn:
+                give self light;
+            SwitchOff:
+                give self ~light;
+            ],
+        daemon [;
+            if (self hasnt on) return;
+            if (--self.battery_power == 0) give self ~light ~on;
+            if (self in location) {
+                switch (self.battery_power) {
+                    10: "^Lampa sodowa przygasa!";
+                    5:  "^Lampa sodowa długo już nie wytrzyma.";
+                    0:  "^Lampa sodowa blednie i nagle gaśnie.";
+                }
+            }
+            ],
+        battery_power 100,
+  has   switchable female;
+
+! DM4 §16
+Object  dictionary "słownik/ dialektu Majów Waldecka"
+  with  name 'przewodnik' 'przewodnika' 'przewodnikiem' 'przewodniku'
+             'książka' 'książki' 'książkę' 'książką' 'księga' 'księgi'
+             'księgę' 'księgą' 'majów' 'waldeck' 'waldecka',
+        description
+            "Opracowany na podstawie niewiarygodnych litografii legendarnego
+             gawędziarza i podróżnika, ~hrabiego~ Jeana Fr@'ed@'erica
+             Maximiliena Waldecka (1766??-1875), ten przewodnik zawiera to
+             niewiele, co wiadomo o glifach starożytnego miejscowego
+             dialektu.",
+        before [ w1 w2 glyph;
+            Consult:
+                wn = consult_from;
+                w1 = NextWord();    ! pierwsze słowo tematu
+                w2 = NextWord();    ! drugie słowo tematu (jeśli jest)
+                if (consult_words == 1 && (~~PL_Glif(w1))) glyph = w1;
+                else if (consult_words == 2 && PL_Glif(w1)) glyph = w2;
+                else if (consult_words == 2 && PL_Glif(w2)) glyph = w1;
+                else "Spróbuj ~sprawdź <nazwa glifu> w słowniku~.";
+                switch (glyph) {
+                    'q1':
+                        "(To jedyny glif, który znasz na pamięć!)^^
+                         Q1: ~miejsce święte~.";
+                    'półksiężyc', 'półksiężyca', 'półksiężycu':
+                        "Półksiężyc: przypuszczalnie wymawiany ~xibalba~,
+                         choć jego znaczenie nie jest znane.";
+                    'strzała', 'strzały', 'strzałę', 'strzale':
+                        "Strzała: ~podróż; stawanie się~.";
+                    'czaszka', 'czaszki', 'czaszkę', 'czaszce':
+                        "Czaszka: ~śmierć, zguba; los (niekoniecznie zły)~.";
+                    'koło', 'koła', 'kole':
+                        "Koło: ~Słońce; także życie, czas życia~.";
+                    'jaguar', 'jaguara', 'jaguarze':
+                        "Jaguar: ~władca~.";
+                    'małpa', 'małpy', 'małpę', 'małpie':
+                        "Małpa: ~kapłan?~.";
+                    'ptak', 'ptaka', 'ptaku':
+                        if (self.correct) "Ptak: ~martwy jak kamień~.";
+                        "Ptak: ~bogaty, zamożny?~.";
+                    default:
+                        "Tego glifu jak dotąd nie odnotowano.";
+                }
+            ],
+        correct false,
+  has   proper;
+
+[ PL_Glif w; return (w == 'glif' or 'glifu' or 'glifie' or 'glify' or 'glifów'); ];
+
+! DM4 §23
+Object  map "szkicow/a map/a Quintana Roo"
+  with  name 'szkic' 'szkicu' 'szkicem' 'quintana' 'roo',
+        description
+            "Mapa nie zaznacza wiele więcej niż strumień, który cię tu
+             przywiódł, z południowo-wschodniego skraju Meksyku w najgłębszy
+             las deszczowy, przerywany jedynie tym wyniesionym płaskowyżem.",
+  has   female;
+
+! DM4 §23
+Object  stone_key "kamienn/y klucz/"
+  with  name 'żółty' 'żółtego' 'żółtym' 'kluczyk' 'kluczyka' 'kluczykiem';
+
+! DM4 §17, zmieniony w §18 i §23
+Object  priest "zmumifikowan/y kapłan/"
+  with  name 'mumia' 'mumii' 'mumię' 'mumią' 'kapłan-kalendarzysta',
+        initial
+            "Za płytą stoi i czeka zmumifikowany kapłan, w najlepszym razie
+             ledwie żywy, niewyobrażalnie sędziwy.",
+        description
+            "Jest wysuszony i trzyma się w całości wyłącznie siłą woli.
+             Choć jego pierwszym językiem był zapewne miejscowy dialekt Majów,
+             masz dziwne przeczucie, że zrozumie twoją mowę.",
+        life [;
+            Answer:
+                "Kapłan kaszle i omal nie rozpada się na kawałki.";
+            Ask: switch (second) {
+                'słownik', 'słownika', 'słowniku', 'książkę', 'książka',
+                'książce', 'księgę', 'księga', 'księdze':
+                    if (dictionary.correct == false)
+                        "~Glif @<<ptak@>>... bardzo zabawne.~";
+                    "~Słownik? Doprawdy?~";
+                'glif', 'glify', 'glifach', 'glifie', 'majów', 'majach',
+                'dialekt', 'dialekcie', 'pismo', 'piśmie':
+                    "~W naszej kulturze kapłani zawsze umieją czytać.~";
+                'władcę', 'władca', 'władcy', 'grób', 'grobie', 'grobowiec',
+                'grobowcu', 'sanktuarium', 'świątynię', 'świątynia',
+                'świątyni':
+                    "~To sprawa prywatna.~";
+                'malowidła', 'malowidło', 'malowidłach', 'malowidle':
+                    "Kapłan od kalendarza marszczy brwi. ~10 baktunów,
+                     4 katuny, to daje 1 468 800 dni od początku czasu:
+                     w waszym kalendarzu 19 stycznia 909 roku.~";
+                'ruiny', 'ruinach', 'ruinę':
+                    "~Ruiny zawsze pokonają złodziei. W podziemnym świecie
+                     rabusie są torturowani przez całą wieczność.~ Pauza.
+                     ~Tak samo jak archeolodzy.~";
+                'sieć', 'sieci', 'chodniki', 'chodnikach', 'robacze',
+                'robaczych':
+                    "~Nikt nie przejdzie przez Robacze Chodniki.~";
+                'xibalba', 'xibalbę', 'xibalbie', 'xibalby':
+                    if (Shrine.sw_to == Junction)
+                        "Kapłan grozi ci kościstym palcem.";
+                    Shrine.sw_to = Junction;
+                    "Kapłan wyciąga kościsty palec na południowy zachód,
+                     w stronę sopli, które znikają jak szron, gdy przemawia.
+                     ~Xibalb@'a, Podziemny Świat.~";
+                }
+                print "~Odpowiedź musisz znaleźć ";
+                Gracz("sam", "sama");
+                ".~";
+            Tell:
+                "Kapłana nie interesuje twoje nędzne życie.";
+            Attack, Kiss:
+                remove self;
+                "Kapłan wysycha i rozsypuje się w pył, aż nic po nim nie
+                 zostaje - ani podmuch, ani kość.";
+            ThrowAt:
+                move noun to location; <<Attack self>>;
+            Show, Give:
+                if (noun == dictionary && dictionary.correct == false) {
+                    dictionary.correct = true;
+                    "Kapłan czyta fragment księgi, śmiejąc się głuchym,
+                     szepczącym śmiechem. Nie mogąc powstrzymać wesołości,
+                     nanosi gdzieś poprawkę, po czym oddaje ci księgę.";
+                }
+                if (noun == newspaper)
+                    "Kapłan spogląda na datę. ~12 baktunów 16 katunów 4 tuny
+                     1 uinal 12 kinów~, oznajmia, po czym przegląda pierwszą
+                     stronę. ~Ach. Postęp, jak widzę.~";
+                "Kapłana nie interesują rzeczy ziemskie.";
+            ],
+        orders [;
+            Go:
+                "~Nie wolno mi opuszczać sanktuarium.~";
+            NotUnderstood:
+                "~Mówisz zagadkami.~";
+            default:
+                "~Nie twoim rozkazom służę.~";
+            ],
+  has   animate male;
+
+! DM4 ćwiczenie 53
+Object  warthog "Gu/zie=ź/c/"
+  with  name 'dzik' 'dzika' 'dzikowi' 'dzikiem' 'dziku'
+             'świnia' 'świni' 'świnię' 'świnią',
+        initial
+            "Guziec węszy i chrząka w popiołach.",
+        description
+            "Ubłocony i chrząkający.",
+        orders [;
+            Go, Look, Examine, Smell, Taste, Touch, Search, Jump, Enter:
+                rfalse;
+            Eat:
+                "Nie masz jeszcze wprawy w wywęszaniu jedzenia.";
+            default:
+                "Guźce nie potrafią robić niczego tak skomplikowanego. Gdyby
+                 nie nocne widzenie i zrzucone kilogramy, byłoby im pod każdym
+                 względem gorzej niż ludziom.";
+            ],
+  has   animate proper male;
+
+! DM4 §8
+Object  low_mist "nisk/a mgł/a"
+  with  name 'kłębiąca' 'kłębiącej' 'kłębiącą' 'mgiełka' 'mgiełki'
+             'mgiełkę' 'mgiełką' 'mgiełce',
+        description "Mgła pachnie trochę jak tortille.",
+        before [;
+            Examine, Search:
+                ;
+            Smell:
+                <<Examine self>>;
+            default:
+                "Mgła jest zbyt nieuchwytna.";
+            ],
+        react_before [; Smell: if (noun == nothing) <<Smell self>>; ],
+        found_in Square_Chamber Forest,
+  has   scenery female;
+
+! DM4 ćwiczenie 46
+Object  tiny_claws "chrobot/+u drobnych pazurków" thedark
+  with  name 'pazurki' 'pazurków' 'pazurkami' 'drobne' 'drobnych'
+             'dźwięk' 'dźwięku' 'odgłos' 'odgłosu' 'stworzenia' 'stworzeń'
+             'stworzeniami' 'potwory' 'potworów' 'owady' 'owadów' 'owadami'
+             'chrobotanie' 'chrobotania',
+        initial
+            "Gdzieś chrobocą drobne pazurki.",
+        before [;
+            Listen:
+                "Jak na zwykłe owady brzmią zaskakująco inteligentnie.";
+            Touch, Taste:
+                "Lepiej nie. Naprawdę.";
+            Smell:
+                "Czujesz jedynie zapach własnego strachu.";
+            Attack:
+                "Bez trudu unikają twoich chaotycznych ciosów.";
+            default:
+                "Stworzenia wymykają ci się, cykając.";
+            ],
+        each_turn [; StartDaemon(self); ],
+        daemon [;
+            if (location ~= thedark) {
+                self.turns_active = 0;
+                StopDaemon(self);
+                rtrue;
+            }
+            switch (++(self.turns_active)) {
+                1:  "^Chrobot zbliża się odrobinę, a twój oddech staje się
+                     głośny i chrapliwy.";
+                2:  "^Pot przerażenia spływa ci z czoła. Stworzenia są już
+                     prawie tutaj!";
+                3:  "^Czujesz łaskotanie w kończynach i odruchowo kopiesz,
+                     strząsając z siebie coś chitynowego. Sam ich odgłos to
+                     złowieszczy zgrzyt.";
+                4:  deadflag = true;
+                    "^Nagle czujesz drobne ukłucie kła, ostrego jak igła
+                     strzykawki, w łydce. Niemal natychmiast kończyny wpadają
+                     w skurcz, barki i kolana sztywnieją, język puchnie...";
+            }
+            ],
+        turns_active 0;
+
+! ------------------------------------------------------------------------------
+!   Procedury pomocnicze
+! ------------------------------------------------------------------------------
+
+! DM4 §4, zmieniona w §21 i §23
+[ Initialise;
+    TitlePage();
+    location = Forest;
+    move map to player;
+    move sodium_lamp to player;
+    move dictionary to player;
+    StartDaemon(sodium_lamp);
+    thedark.description =
+        "Ciemność wieków napiera na ciebie ze wszystkich stron i zaczynasz
+         czuć klaustrofobię.";
+    "^^^Dni poszukiwań, dni przedzierania się przez cierniste zarośla
+     lasu z wyschniętym gardłem, ale w końcu twoja cierpliwość została
+     nagrodzona. Odkrycie!^";
+];
+
+! DM4 ćwiczenie 123 (zamiast opcodów maszyny Z: procedury biblioteki, żeby
+! gra działała także w Glulx)
+[ TitlePage i;
+    ClearScreen(WIN_ALL); print "^^^^^^^^^^^^^";
+    i = ScreenWidth(); if (i > 30) i = (i-30)/2;
+    style bold; font off; spaces(i);
+    print " RUINY^";
+    style roman; print "^^"; spaces(i);
+    print "[Naciśnij SPACJĘ, aby rozpocząć.]^";
+    font on;
+    box "Lecz Aligator nie kopał dna jamy,"
+        "która miała być jego grobem,"
+        "lecz kopał własną jamę,"
+        "by mieć w niej schronienie."
+        ""
+        "-- z Popol Vuh";
+    KeyCharPrimitive();
+    ClearScreen(WIN_ALL);
+];
+
+! DM4 §22
+[ PrintRank;
+    print ", co czyni cię ";
+    if (score == 30) "dyrektorem Instytutu Carnegie.";
+    if (score >= 20) "archeologiem.";
+    if (score >= 10) "poszukiwaczem osobliwości.";
+    if (score >= 5) "odkrywcą.";
+    "turystą.";
+];
+
+! DM4 §21
+[ DeathMessage;
+    if (deadflag == 3) Gracz("Zostałeś pojmany", "Zostałaś pojmana");
+];
+
+! Bezokolicznik czasownika fotografowania w pytaniach parsera ("Co chcesz
+! sfotografować?"). Bez tego parser wypisałby słowo ze słownika, obcięte
+! do 9 znaków: "Co chcesz sfotograf?".
+[ PrintVerb v;
+    if (v == 'sfotografuj' or 'fotografuj' or 'uwiecznij' or 'zrób') {
+        print "sfotografować"; rtrue;
+    }
+    rfalse;
+];
+
+! ------------------------------------------------------------------------------
+
+Include "PolskiG";
+
+! DM4 §6
+[ PhotographSub;
+    if (camera notin player) "Nie bez aparatu.";
+    if (noun == player) "Lepiej nie. Nie golisz się od wyjazdu z Meksyku.";
+    if (children(player) > 1)
+        "Fotografowanie to kłopotliwe zajęcie, wymagające obu rąk. Musisz
+         odłożyć wszystko inne.";
+    if (location == Forest) "W tym przesiąkniętym deszczem lesie lepiej nie.";
+    if (location == thedark) "Jest o wiele za ciemno.";
+    if (AfterRoutines()) return;
+    print_ret "Rozstawiasz ogromny jak słoń, wielkoformatowy aparat na mokre
+               płyty, ustawiasz lampę sodową i cierpliwie naświetlasz zdjęcie ",
+               (dop) noun, ".";
+];
+
+Verb 'sfotografuj' 'fotografuj' 'uwiecznij'
+    * noun                                      -> Photograph;
+
+Verb 'zrób'
+    * 'zdjęcie'/'fotografię' noun               -> Photograph;

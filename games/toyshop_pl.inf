@@ -1,0 +1,950 @@
+!% -Cu
+!% +language_name=polski
+! ==============================================================================
+!   SKLEP Z ZABAWKAMI - polska wersja "Toyshop" (Graham Nelson, wydanie 4,
+!   961111), jednej z przykładowych gier Inform 6.
+!
+!   To nie jest prawdziwa gra, tylko zbiór nietypowych obiektów.  Żeby wygrać,
+!   wystarczy zrobić 6 ciekawych rzeczy i wyjść głównym wyjściem!
+!
+!       Obiekt              Przykład...
+!
+!  >SA  tornister           pojemnik, do którego gra sama odkłada rzeczy
+!  >HE  balonik z helem     przedmiot poruszany przez demona
+!  >CA  samochodzik         pojazd, który można też pchać
+!  >PF  wyściełana podłoga  dekoracja obecna w kilku miejscach naraz
+!  >GR  granat ręczny       zdarzenia z odliczaniem: granat i zawleczka
+!  >MA  pudełko zapałek     ogień i zapałki; własny opis w ekwipunku
+!  >WC  woskowe świece      zapas identycznych przedmiotów
+!  >GL  białe rękawiczki    dwa niezależne przedmioty, które bywają parą
+!  >CO  zielony stożek      proste reguły before i after
+!  >HW  wysokie okno        włączanie i wyłączanie demonów
+!  >BC  przykręcona szafka  typowy pojemnik zamykany na klucz
+!  >GB  szklane pudełko     pojemnik przepuszczający światło
+!  >SB  stalowe pudełko     pojemnik nieprzepuszczający światła
+!  >BL  klocki              złożona klasa; stosy przedmiotów
+!  >CH  Krzysztof           postać, z którą można rozmawiać i którą można
+!                           namówić do różnych rzeczy
+!  >OF  Biuro               reguły ruchu w określonym kierunku
+!  >TB  zębata torba        pojemnik z własnym zdaniem na temat zawartości
+!  >SL  poziomica           przedmiot, który kładzie się na innych
+!  >BB  tablica             tablica, na której można pisać
+!
+!  Nazwy obiektów są zapisane w notacji automatycznej odmiany (lib/odmiana.h).
+! ==============================================================================
+
+Include "PolskiZ";
+
+Constant DEBUG;
+Constant Story "SKLEP Z ZABAWKAMI";
+Constant Headline "^Interaktywna demonstracja^
+             Copyright (c) 1994 by Graham Nelson. All rights given away.^
+             Wersja polska.^";
+Release 4;
+Serial "961111";
+
+!   Zamiast standardowej procedury akcji Burn (podpalanie) będzie nasza:
+
+Replace BurnSub;
+
+Include "Parser";
+
+! ------------------------------------------------------------------------------
+! >SA  Gracz może nieść najwyżej 4 rzeczy, ale ma tornister na resztę...
+! ------------------------------------------------------------------------------
+
+Constant MAX_CARRIED = 4;
+Constant SACK_OBJECT = satchel;
+
+Object  satchel "tornist/e/r/"
+  with  description "Duży, z namalowanym uśmiechem.",
+        when_closed "Na podłodze leży twój tornister.",
+        when_open "Na podłodze leży twój otwarty tornister.",
+  has   container open openable;
+
+!   Najbardziej rozbudowany system punktacji, jaki daje biblioteka (choć
+!   każde z sześciu zadań jest warte tylko jeden punkt):
+
+Constant TASKS_PROVIDED;
+Constant NUMBER_TASKS = 6;
+Array    task_scores  -> 1 1 1 1 1 1;
+Constant MAX_SCORE = 6;
+
+Include "VerbLib";
+
+! ------------------------------------------------------------------------------
+!   Do sklepu z zabawkami...
+! ------------------------------------------------------------------------------
+
+Class   Toyroom
+  has   light;
+
+Toyroom Toyshop "Sklep z zabawkami"
+  with  description
+            "Środek długiej sali biegnącej ze wschodu na zachód. Półki
+             uginają się od zabawek, ze ścian patrzą na ciebie namalowane
+             klauny, a podłogę wyściełają kolorowe maty. Przejście na północy
+             wieńczy czerwony trójkąt ostrzegawczy.",
+        name 'klauny' 'klaunów' 'namalowane' 'półki' 'półkach' 'trójkąt'
+             'trójkąta' 'zabawki' 'zabawek',
+        e_to East_End, w_to West_End, n_to Danger_Zone;
+
+Object  -> chair "wysok/ie krzesełk/o"
+  with  name 'krzesło' 'krzesła' 'krześle',
+  has   supporter enterable neuter;
+
+! ------------------------------------------------------------------------------
+! >HE  Balonik jest samowystarczalny, tylko sam się nie uruchamia: robi to
+!      procedura Initialise().
+!
+!   Reguła after dla Drop zabiera atrybut "moved", żeby zawsze wyświetlał się
+!   opis z "initial".
+! ------------------------------------------------------------------------------
+
+Object  -> balloon "balonik/ z helem"
+  with  description "Niebieski, z żółtym uśmiechem.",
+        name 'balon' 'balonu' 'balonem' 'balonie' 'niebieski' 'niebieskiego'
+             'niebieskim' 'hel' 'helem' 'sznurek' 'sznurka' 'sznurkiem',
+        initial "Pod sufitem kołysze się balonik, z którego zwisa długi
+                 sznurek.",
+        before [;
+            Attack:
+                remove self; StopDaemon(self);
+                "Bez trudu przebijasz balonik. Bum!^^
+                 Szkoda, był w końcu niezastąpiony.";
+        ],
+        after [;
+            Take: "Bierzesz balonik za sznurek. Ciągnie w górę!";
+            Drop: give balloon ~moved;
+                  "Balonik z gracją wznosi się pod sufit.";
+        ],
+        daemon [ from_room to_room;
+            if (random(3) ~= 1) rfalse;
+            from_room = parent(self);
+            if (from_room == East_End or West_End) to_room = Toyshop;
+            if (from_room == Toyshop) {
+                if (random(2) == 1) to_room = East_End;
+                else to_room = West_End;
+            }
+            if (to_room == 0) rfalse;
+            move self to to_room;
+            if (location == from_room)
+                "^Podmuch wiatru unosi balonik ", (DokadWSklepie) to_room, ".";
+            if (location == to_room)
+                "^Podmuch wiatru przywiewa balonik ", (SkadWSklepie) from_room, ".";
+        ];
+
+[ DokadWSklepie r;
+    switch (r) {
+      East_End: print "na wschodni koniec sklepu";
+      West_End: print "na zachodni koniec sklepu";
+      default:  print "na środek sklepu";
+    }
+];
+
+[ SkadWSklepie r;
+    switch (r) {
+      East_End: print "ze wschodniego końca sklepu";
+      West_End: print "z zachodniego końca sklepu";
+      default:  print "ze środka sklepu";
+    }
+];
+
+! ------------------------------------------------------------------------------
+! >CA  Dwa wyjątki od zwykłych reguł before/after - pojazdy i rzeczy, które
+!      można przepychać z miejsca na miejsce - w jednym samochodziku.
+!
+!   Reguła before dla PushDir (pchnij w danym kierunku) musi wywołać
+!   AllowPushDir i zwrócić true.  Reguła before dla Go musi zwrócić true,
+!   żeby jazda pojazdem była dozwolona (pojazd musi też być enterable).
+! ------------------------------------------------------------------------------
+
+Object  -> car "mał/y czerwon/y samochodzik/"
+  with  name 'samochód' 'samochodu' 'samochodem' 'samochodzie' 'auto' 'auta'
+             'autem' 'kar' 'kar1',
+        description "Wystarczająco duży, żeby w nim usiąść. Wśród przełączników
+                     wyróżnia się duży włącznik. Na tablicy rejestracyjnej
+                     widnieje KAR 1.",
+        when_on  "Stoi tu czerwony samochodzik z pracującym silnikiem.",
+        when_off "Zaparkowano tu mały czerwony samochodzik.",
+        before [;
+            PushDir: AllowPushDir(); rtrue;
+            Go: if (car has on) { Achieved(1); "Brrum! Brrum!"; }
+                print "(Zapłon jest w tej chwili wyłączony.)^";
+        ],
+        after [;
+            PushDir: "Samochodzik toczy się bardzo powoli, kiedy go pchasz.";
+        ],
+  has   switchable enterable static container open;
+
+Object  -> -> "karteczk/a"
+  with  name 'kartka' 'kartki' 'kartkę' 'kartce' 'instrukcja' 'instrukcję'
+             'instrukcji',
+        description
+            "  !!!! FROBOZZ MAGIC CAR COMPANY !!!!^
+            ^Witaj, Kierowco!^
+            ^Instrukcja obsługi:^
+            ^Włącz zapłon i w drogę!^
+            ^Gwarancja:^
+            ^Samochód objęty jest gwarancją na wszelkie usterki przez
+             76 milisekund od daty zakupu albo do pierwszego użycia,
+             zależnie od tego, co nastąpi wcześniej.^
+            ^Powodzenia!",
+  has   female;
+
+! ------------------------------------------------------------------------------
+! >PF  Obiekt rozciągnięty na kilka (trzy) miejsca:
+! ------------------------------------------------------------------------------
+
+Object  padded_floor "wyściełan/a podłog/a"
+  with  name 'maty' 'mat' 'matach' 'wyściółka' 'wyściółkę' 'wyściółki',
+        description "Dla ochrony małych dzieci i poszukiwaczy przygód.",
+        before [;
+            Take: "Jest zabezpieczona przed małymi dziećmi i poszukiwaczami
+                   przygód.";
+        ],
+        found_in East_End Toyshop West_End
+  has   scenery female;
+
+! ------------------------------------------------------------------------------
+
+Toyroom Danger_Zone "Strefa Zagrożenia"
+  with  description
+            "To Strefa Zagrożenia, do której naprawdę nie należy wchodzić. Jedyne drzwi prowadzą z powrotem na południe.",
+        s_to Toyshop;
+
+! ------------------------------------------------------------------------------
+! >GR  Klasyczny przykład odliczania (czyli, jak w tym przypadku, zapalnika).
+!      Żeby pokazać zatrzymanie licznika przed czasem, jest też zawleczka:
+! ------------------------------------------------------------------------------
+
+Object  -> grenade "paskudn/y granat/+u ręczn/y!"
+  with  name 'paskudnie' 'wyglądający' 'wyglądającego',
+        initial "Paskudny granat ręczny (innych nie ma) toczy się beztrosko
+                 po podłodze.",
+        description "Niezalecany dla dzieci poniżej 90 roku życia.",
+        before [;
+            Pull: if (self has general) "Na to już za późno.";
+                  StartTimer(self, 5); give self general;
+                  move the_pin to player;
+                  "Wyciągasz zawleczkę. Tego nie da się już cofnąć.";
+        ],
+        time_left 0,
+        time_out [;
+            deadflag = 1;
+            "^Potężny wybuch nagle zrównuje sklep z zabawkami z ziemią!^^
+             Czy ty się nigdy nie nauczysz?";
+        ],
+  has   transparent;
+
+Object  -> -> the_pin "zawleczk/a"
+  with  description "Zawleczkę zaprojektowano tak, żeby łatwo dało się ją
+                     wyciągnąć.",
+        before [;
+            Take, Pull: if (self in grenade) <<Pull grenade>>;
+            Insert:
+                if (self notin grenade && second == grenade) {
+                    StopTimer(grenade); move self to grenade;
+                    give grenade ~general;
+                    "Niesamowite! Udało ci się wsadzić zawleczkę z powrotem
+                     do granatu!";
+                }
+        ],
+  has   female;
+
+! ------------------------------------------------------------------------------
+! >MA  Pudełko pięciu zapałek.  Naraz można mieć tylko jedną zapałkę, ale
+!      poza tym to pełna implementacja.  Opisy zapałki i pudełka w ekwipunku
+!      są zrobione tutaj.  Zapałka wraca do pudełka nawet wtedy, gdy jest ono
+!      puste, żeby parser wciąż rozumiał polecenia o zapałkach - a reguła
+!      before, która sama wyjmuje zapałki, mogła je odrzucić.
+!
+!      Pudełko ma demona, który sprząta zgubione zapałki.  Można by to zrobić
+!      regułą after łapiącą upuszczenie zapałki, ale gdyby w grze była sroka,
+!      która ukradłaby zapałkę, a zostawiła pudełko...  Tak jest porządniej.
+! ------------------------------------------------------------------------------
+
+Object  -> matchbook "pudełk/o zapałek"
+  with  name 'zapałki' 'pudełeczko' 'pudełeczka',
+        number 5,
+        before [;
+            Burn: if (match has light) {
+                      remove match; remove matchbook;
+                      "Co za marnotrawstwo zapałek!";
+                  }
+        ],
+        invent [;
+            if (inventory_stage == 2) {
+                switch (self.number) {
+                  0: print " (puste)";
+                  default:
+                    print " (", (Zostalo) self.number, " ", self.number, " ";
+                    Liczebnik(self.number, "zapałka", "zapałki", "zapałek");
+                    print ")";
+                }
+            }
+        ],
+        description [;
+            print "Na okładce widnieje reklama ~Curses - Adventure of
+                   a Lunchtime~. ";
+            switch (self.number) {
+              0: "Pudełko jest puste.";
+              1: "Została w nim jedna zapałka.";
+              default:
+                print "W środku ";
+                if (self.number < 5) print "są "; else print "jest ";
+                print self.number, " ";
+                Liczebnik(self.number, "zapałka", "zapałki", "zapałek");
+                ".";
+            }
+        ],
+        daemon [;
+            if (match notin matchbook && match notin player) {
+                move match to matchbook;
+                if (match has light) {
+                    give match ~light; StopTimer(match);
+                    match.short_name = "niezapalon/a zapałk/a";
+                }
+                StopDaemon(self);
+            }
+        ],
+  has   transparent neuter;
+
+! Forma czasownika "zostać" zgodna z liczbą: została 1, zostały 3, zostało 5.
+[ Zostalo n;
+    if (n == 1) { print "została"; return; }
+    if (n%10 >= 2 && n%10 <= 4 && (n%100 < 12 || n%100 > 14)) print "zostały";
+    else print "zostało";
+];
+
+Object  -> -> match
+  with  short_name "niezapalon/a zapałk/a",
+        before [ i;
+            if (self in matchbook) {
+                i = matchbook.number;
+                if (i == 0) "W pudełku nie ma już zapałek.";
+                i--; matchbook.number = i;
+                move self to player; StartDaemon(matchbook);
+                print "(wyjmujesz zapałkę z pudełka, w którym ";
+                if (i == 0) print "nie ma już ani jednej)^";
+                if (i == 1) print "została jeszcze jedna)^";
+                if (i > 1)  print (Zostalo) i, " jeszcze ", i, ")^";
+            }
+            Take, Remove: if (self in player) "Gotowe.";
+            Rub: <<Burn self>>;
+            Burn:
+                if (self has light) "Zapałka już się pali.";
+                if (matchbook notin player)
+                    "Do potarcia zapałki potrzebujesz pudełka.";
+                give self light; StartTimer(self, 2+random(3));
+                self.short_name = "płonąc/a zapałk/a";
+                "Pocierasz zapałkę.";
+        ],
+        time_left,
+        time_out [;
+            move self to matchbook; give self ~light;
+            self.short_name = "niezapalon/a zapałk/a";
+            "^Upuszczasz zapałkę, kiedy płomień dochodzi do palców.";
+        ],
+  has   female;
+
+! ------------------------------------------------------------------------------
+! >WC  Pudełko ośmiu świec.
+!
+!      Prosty sposób na identyczne przedmioty.  Polecenie "weź świece" weźmie
+!      wszystkie (słowa z //p są w liczbie mnogiej), a lista w opisie miejsca
+!      wypisuje je razem: "osiem woskowych świec" (list_together).
+!
+!      Gdyby świec było o wiele więcej, można by tworzyć i niszczyć obiekty
+!      w czasie gry - zob. klasę "Ticket" z przykładowej gry "Balances".
+! ------------------------------------------------------------------------------
+
+Class   Candle
+  with  short_name "woskow/a świec/a",
+        name 'świece//p' 'świec//p' 'świecom//p' 'świecami//p' 'świecach//p'
+             'świeczka' 'świeczki' 'świeczkę' 'świeczką',
+        description "Wygląda zupełnie jak wszystkie inne świece.",
+        list_together [ n o;
+            if (inventory_stage == 1) {
+                objectloop (o ofclass Candle && parent(o) == parent(parser_one)) n++;
+                if (n < 2) rfalse;
+                if (n == 2) print "dwie"; else LanguageNumber(n);
+                print " ";
+                Liczebnik(n, "woskowa świeca", "woskowe świece", "woskowych świec");
+                if (c_style & NEWLINE_BIT) new_line;
+                rtrue;
+            }
+            rfalse;
+        ],
+        before [;
+            Burn: "Niestety, knot ani myśli się zapalić.";
+        ],
+  has   female;
+
+Object  -> "szar/e blaszan/e pudełk/o"
+  with  name 'puszka' 'puszki' 'puszkę' 'puszce',
+        description
+            "Szare blaszane pudełko ze ~Świecami Majora~.",
+  has   container openable neuter;
+
+Candle  -> ->;
+Candle  -> ->;
+Candle  -> ->;
+Candle  -> ->;
+Candle  -> ->;
+Candle  -> ->;
+Candle  -> ->;
+Candle  -> ->;
+
+Toyroom East_End "Wschodni koniec"
+  with  name 'lalki' 'lalek' 'lalkami' 'pielęgniarki' 'pielęgniarek',
+        description
+            "Wschodni koniec sklepu jest różowy, a lalki i pielęgniarki stoją
+             na półkach aż po wysokie okno. Ciemne przejście prowadzi na
+             północ, do bocznej komórki.",
+        w_to Toyshop, n_to DarkRoom;
+
+! ------------------------------------------------------------------------------
+! >GL  Przykład zaproponowany autorowi przez Richarda Tuckera: przedmioty
+!      złożone z części.  Para białych rękawiczek zachowuje się jak każde
+!   inne ubranie, ale gracz może też używać lewej i prawej rękawiczki osobno,
+!   zabrać albo założyć tylko jedną itd.  Kiedy rękawiczki znów są razem
+!   (nawet w szafce albo na półce), znów są parą.
+!
+!   Wystarczą trzy obiekty, jeden demon i jedna reguła.  Gdy rękawiczki są
+!   razem, a gracz wspomni o jednej z nich, reguła before rozdziela parę
+!   i uruchamia demona, który co turę próbuje połączyć je z powrotem.
+!
+!   Obiekt pary ma atrybut "general" dokładnie wtedy, gdy rękawiczki są
+!   osobno.  W przeciwnym razie zawiera obie rękawiczki i ma "transparent",
+!   żeby parser wiedział, że gracz je widzi.
+! ------------------------------------------------------------------------------
+
+Object  -> gloves "biał/e rękawiczk/i+e"
+  with  name 'para' 'pary' 'parę' 'parą',
+        daemon [;
+            if (parent(right_glove) ~= parent(left_glove)) return;
+            if ((left_glove has worn && right_glove hasnt worn)
+                || (left_glove hasnt worn && right_glove has worn)) return;
+            if (left_glove has worn) give gloves worn; else give gloves ~worn;
+            move gloves to parent(right_glove); give gloves ~general;
+
+            move right_glove to gloves; move left_glove to gloves;
+            give right_glove ~worn;     give left_glove ~worn;
+
+            StopDaemon(self);
+        ],
+  has   clothing transparent pluralname female;
+
+Class   Glove
+  with  name 'biała' 'białej' 'białą',
+        before [;
+            if (self notin gloves) rfalse;
+            move left_glove to parent(gloves); move right_glove to parent(gloves);
+            if (gloves has worn) {
+                give left_glove worn; give right_glove worn;
+            }
+            give gloves general; remove gloves;
+            StartDaemon(gloves);
+        ],
+  has   clothing female;
+
+Glove   -> -> left_glove "lew/a rękawiczk/a"
+  with  description "Biały jedwab z wyhaftowanym szkarłatnym monogramem R.";
+Glove   -> -> right_glove "praw/a rękawiczk/a"
+  with  description "Biały jedwab z wyhaftowanym szkarłatnym monogramem T.";
+
+! ------------------------------------------------------------------------------
+!   ...i to wszystko: kod rękawiczek jest samowystarczalny.
+!
+!   Ćwiczenie dla czytelnika: ukryj (ostry) klejnot w lewej rękawiczce.
+! ------------------------------------------------------------------------------
+
+! ------------------------------------------------------------------------------
+! >CO  Tradycyjny przykładowy obiekt Inform:
+! ------------------------------------------------------------------------------
+
+Object  -> cone "zielon/y stoż/e/k/"
+  with  name 'szmaragdowy' 'szmaragdowego' 'szmaragdowym' 'marcepan'
+             'marcepanu' 'marcepanem' 'marcepanowy' 'marcepanowego',
+        describe [;
+            if (cone has moved)
+                "^Leży tu rozpłaszczony stożek zielonego marcepanu.";
+            "^Obok stoi szmaragdowozielony stożek, wysoki na stopę.";
+        ],
+        description "Stożek wygląda na zrobiony ze szmaragdowozielonego
+                     marcepanu.",
+        before [;
+            Eat: if (random(100) <= 30) {
+                     deadflag = 1;
+                     "Niestety, chyba masz uczulenie na migdały.";
+                 }
+                 "Nadgryzasz brzeg stożka.";
+        ],
+        after [;
+            Take: "Wzięte. (Masz teraz ręce upaprane marcepanem.)";
+            Drop: cone.description = "Stożek to teraz bezkształtna zielona
+                                      masa.";
+                  "Stożek spada na podłogę i trochę się zapada.";
+        ],
+  has   edible;
+
+! ------------------------------------------------------------------------------
+! >HW  To przeciąg z tego nieco ukrytego okna pcha balonik:
+! ------------------------------------------------------------------------------
+
+Object  -> "wysok/ie okn/o"
+  with  name 'okienko' 'okienka' 'okienku',
+        description [;
+            print "Wąskie, wysokie okno, ";
+            if (self has open) "przez które wpada przeciąg.";
+            "teraz zamknięte.";
+        ],
+        after [;
+            Open: StartDaemon(balloon);
+            Close: Achieved(2); StopDaemon(balloon);
+        ],
+  has   scenery openable open neuter;
+
+! ------------------------------------------------------------------------------
+! >BC  Typowy pojemnik zamykany na klucz, z dość marną nagrodą...
+! ------------------------------------------------------------------------------
+
+Object  -> "przykręcon/a szafk/a"
+  with  name 'szafa' 'szafy' 'szafę' 'szafie' 'kredens' 'kredensu',
+        describe [;
+            if (self hasnt open) "^Do jednej ze ścian przykręcono zamkniętą
+                                  szafkę.";
+            "^Na jednej ze ścian wisi przykręcona, otwarta szafka.";
+        ],
+        with_key key
+  has   locked container openable lockable static female;
+
+Object  -> -> "landrynk/a"
+  with  name 'cukierek' 'cukierka' 'cukierkowi' 'cukierkiem' 'cukierku'
+             'słodycz' 'słodycze',
+        after [;
+            Eat: Achieved(0);
+                 "Ssie się ją irytująco długo.";
+        ],
+  has   edible female;
+
+! ------------------------------------------------------------------------------
+! >GB  Pokaz atrybutu "transparent".  Zamknięcie świecącej piłeczki
+! >SB  w szklanym pudełku nie pogrąża pokoju w ciemności, w stalowym -
+!      owszem.  Rzeczy w zamkniętym szklanym pudełku można też oglądać.
+!   (Ciemny Pokój ma jawnie odebrane "light", które odziedziczyłby po
+!   klasie Toyroom.)
+! ------------------------------------------------------------------------------
+
+Toyroom DarkRoom "Ciemny Pokój"
+  with  description "Bezbarwna komórka, której nawet nie warto oświetlać.",
+        cant_go "Jedyne wyjście prowadzi z powrotem na południe.",
+        s_to East_End
+  has   ~light;
+
+Object  -> "szklan/e pudełk/o z pokrywką"
+  with  name 'pokrywka' 'pokrywki' 'pokrywkę',
+  has   container transparent openable open neuter;
+
+Object  -> "stalow/e pudełk/o z pokrywką"
+  with  name 'pokrywka' 'pokrywki' 'pokrywkę',
+  has   container openable open neuter;
+
+
+Toyroom West_End "Zachodni koniec"
+  with  name 'żołnierzyki' 'żołnierzyków' 'modele' 'modeli' 'samoloty'
+             'samolotów' 'samoloci' 'samolociki' 'samolocików',
+        description
+            "Zachodni koniec sklepu jest niebieski, a na półkach stoją
+             żołnierzyki i modele samolotów. Na południu znajduje się małe
+             biuro.",
+        e_to Toyshop, s_to Office;
+
+! ------------------------------------------------------------------------------
+! >BL  Klasa Block: klocki, które można układać jeden na drugim.
+!
+!   Bez procedury describe gra też poprawnie opisywałaby stosy klocków,
+!   tylko trochę mniej zgrabnie.
+! ------------------------------------------------------------------------------
+
+Class   Block
+  with  description "Zwykły dziecięcy klocek o boku czterech cali.",
+
+        !   Procedura parse_name sprawia, że "weź klocki" działa poprawnie:
+
+        parse_name [ i j;
+            for (::) {
+                j = NextWord();
+                if (j == 'klocki' or 'klocków' or 'klockom' or 'klockami'
+                    or 'klockach' or 'sześciany' or 'sześcianów') {
+                    parser_action = ##PluralFound; i++;
+                }
+                else if (j == 'sześcian' or 'sześcianu' or 'sześcianem'
+                         or 'kostka' or 'kostkę' or 'kostki' || Refers(self, wn-1))
+                    i++;
+                else return i;
+            }
+        ],
+
+        describe [ c d e;
+            d = child(self);
+            while (d ~= 0 && d ofclass Block) { c++; e = d; d = child(d); }
+            if (c == 0) rfalse;
+            print "^Stoi tu stos klocków: ", (mian) e;
+            e = parent(e);
+            while (c > 0) { print " na ", (mie) e; c--; e = parent(e); }
+            ".";
+        ],
+        before [ c;
+          PutOn:
+            if (second ofclass Block) {
+                if (child(second) ~= 0 && child(second) ofclass Block)
+                    "Na jednym klocku nie zmieszczą się obok siebie dwa
+                     kolejne.";
+            }
+            else
+                print "(Właściwie służą do układania jeden na drugim.)^";
+            c = second; while (c ofclass Block) c = parent(c);
+            if (c ~= location or mantelpiece) "Zbyt chwiejna podstawa.";
+        ],
+        after [ c stack;
+          PutOn:
+            stack = noun;
+            while (parent(stack) ofclass Block) { stack = parent(stack); c++; }
+            if (c < 2) {
+                if (Chris has general) rtrue;
+                rfalse;
+            }
+            if (c == 2) "Stos trzech klocków się chwieje, ale jakoś się trzyma.";
+            if (Chris has general) {
+                Achieved(3);
+                "^Krzysztof wprawnie utrzymuje stos czterech klocków
+                 w równowadze.";
+            }
+            stack = noun;
+            while (parent(stack) ofclass Block) {
+                c = stack; stack = parent(stack); move c to location;
+            }
+            "Stos czterech klocków chwieje się, chwieje, uspokaja... i nagle
+             się rozsypuje!";
+          Take:
+            stack = child(noun); if (stack == 0) rfalse;
+            while (stack ~= 0) {
+                c = stack; stack = child(stack); move c to location;
+            }
+            "Przez to twój stos klocków się rozsypuje.";
+        ],
+  has   supporter;
+
+Block   -> "zielon/y kloc/e/k/";
+Block   -> "czerwon/y kloc/e/k/";
+Block   -> "żółt/y kloc/e/k/";
+Block   -> "niebiesk/i kloc/e/k/";
+
+! ------------------------------------------------------------------------------
+! >CH  Gościnny występ mojego kuzyna Krzysztofa, lat sześć (*), który bawi się
+!      jedną rzeczą naraz (i łatwo zapomina którą).  Jest "transparent"
+!      (to nie przytyk!), więc parser pozwala graczowi oglądać to, czym się
+!      bawi... ale nie zabrać mu tego.
+!      (* W 1993 roku, kiedy powstała ta gra.)
+! ------------------------------------------------------------------------------
+
+Object  -> Chris "Krzysztof/"
+  with  name 'chłopiec' 'chłopca' 'chłopcu' 'chłopcem' 'chłopcze'
+             'dziecko' 'dziecka' 'dziecku' 'dzieckiem' 'krzysztofie'
+             'krzyś' 'krzysia' 'krzysiowi' 'krzysiem' 'krzysiu' 'chris',
+        describe [;
+            print "^Siedzi tu chłopiec imieniem Krzysztof";
+            if (child(Chris) ~= nothing)
+                print " i bawi się ", (nar) child(Chris);
+            ".";
+        ],
+        life [ x;
+            Ask:
+                switch (second) {
+                  'piłka', 'piłkę', 'piłce', 'piłeczka', 'piłeczkę',
+                  'piłeczce', 'żonglowanie', 'żonglowaniu',
+                  'fluorescencyjna', 'fluorescencyjną':
+                      "~To moje!~";
+                  'balon', 'balonik', 'baloniku', 'balonie', 'hel':
+                      "Krzysztof ziewa.";
+                  'klocek', 'klocki', 'klockach', 'klocku', 'wieżę', 'wieży':
+                      "~Założę się, że zbuduję wyższą wieżę niż ty.~";
+                  'zabawki', 'zabawkach', 'sklep', 'sklepie':
+                      "~Fajnie tu, prawda?~";
+                  default: "~Nie wiem.~";
+                }
+            Answer:
+                switch (noun) {
+                  'cześć', 'hej', 'witaj', 'siema', 'dzień', 'hejka':
+                      "~Cześć~ - odpowiada wesoło Krzysztof.";
+                  default: "Krzysztof wydaje się zajęty czymś innym.";
+                }
+            Attack:
+                remove self;
+                "Krzysztof rzuca się do ucieczki i bez trudu przemyka obok
+                 ciebie!";
+            Kiss: "~Fuj, ale ckliwe.~";
+            Give:
+                if (noun == balloon) "Balonik zupełnie go nie interesuje.";
+                x = child(Chris);
+                if (x ~= 0) {
+                    move x to location;
+                    print "Zapomina o ", (mie) x, " i skwapliwie chwyta ";
+                }
+                else print "Skwapliwie chwyta ";
+                print (bie) noun; move noun to Chris; ".";
+        ],
+        orders [;
+            Drop: if (noun in Chris) "~Nie! To moje!~";
+            Take: "Krzysztofowi się nie chce.";
+            Give: if (second == player) "~Weź sobie własne!~";
+            Go: "~Ale mi się tu podoba!~";
+            PutOn: if (noun notin Chris) "Krzysztof zupełnie nie wie, o co chodzi.";
+                   if (~~(noun ofclass Block && second ofclass Block))
+                       "Krzysztof nie widzi w tym sensu.";
+                   print "Krzysztof pochyla się w wielkim skupieniu i robi,
+                          o co prosisz.^";
+                   move noun to player; give self general;
+                   <PutOn noun second>;
+                   give self ~general; rtrue;
+        ],
+        each_turn [;
+            if (random(3) ~= 1) rtrue;
+            print "^Krzysztof ";
+            switch (random(4)) {
+              1: "ziewa.";      2: "marszczy brwi.";
+              3: "przeciąga się."; 4: "nuci coś bez melodii.";
+            }
+        ],
+  has   animate proper transparent male;
+
+Object  "fluorescencyjn/a piłeczk/a do żonglowania" Chris
+  with  initial "Na podłodze leży fluorescencyjna piłeczka do żonglowania!",
+        name 'piłka' 'piłki' 'piłkę' 'piłką' 'piłce',
+        description "Świeci łagodnym światłem."
+  has   light female;
+
+! ------------------------------------------------------------------------------
+! >OF  Prosta reguła ruchu.
+! ------------------------------------------------------------------------------
+
+Toyroom Office "Biuro"
+  with  description
+            "Małe, szare biuro z szeroką kamienną półką nad kominkiem. We
+             wschodniej ścianie są drzwi z napisem ~Wyjście~, a sklep
+             z zabawkami leży oczywiście na północy.",
+        cant_go "Sala sklepu leży na północy.",
+        n_to West_End,
+        e_to [;
+            if (score ~= MAX_SCORE)
+                "Rozlega się gong. ~Nie możesz opuścić sklepu z zabawkami,
+                 dopóki nie zrobisz sześciu ciekawych rzeczy!~";
+            deadflag = 2;
+            "Rozlega się gong. ~Gratulacje! Możesz już opuścić sklep
+             z zabawkami i zacząć pisać własną grę w Informie!~";
+        ];
+
+! ------------------------------------------------------------------------------
+! >TB  Dość zachłanny pojemnik... ale da się go nauczyć manier.
+! ------------------------------------------------------------------------------
+
+Object  -> "zębat/a torb/a"
+  with  name 'worek' 'worka' 'workiem' 'worku',
+        initial "W kącie leży dziwna, zębata torba.",
+        description "Pojemna torba z otworem pełnym zębów.",
+        before [;
+            LetGo: "Torba zatrzaskuje się wyzywająco na twojej dłoni, dopóki
+                    nie dasz za wygraną.";
+        ],
+        after [;
+            Receive:
+                if (noun == cone) {
+                    self.before = 0; self.after = 0;
+                    "Torba bez końca wije się, usiłując połknąć ogromną masę
+                     marcepanu. To ją czegoś nauczy.";
+                }
+                "Torba wije się ohydnie, połykając ", (bie) noun, ".";
+        ],
+  has   container open female;
+
+! ------------------------------------------------------------------------------
+! >SL  Poziomicę można położyć na półce nad kominkiem: za pierwszym razem gra
+!      losuje, który koniec jest wyżej, i trzyma się tej decyzji.
+! ------------------------------------------------------------------------------
+
+Object  -> -> spirit_level "poziomic/a"
+  with  name 'drewno' 'drewna' 'fiolka' 'fiolkę' 'fiolki' 'libella' 'libellę',
+        number 0,
+        description "Drewniana listwa z fiolką gęstego zielonego płynu,
+                     w którym uwięziony jest pęcherzyk powietrza.",
+        before [;
+            Examine:
+                if (spirit_level in mantelpiece) {
+                    print "Pęcherzyk jest przy ";
+                    if (self.number == 1) "północno-wschodnim końcu.";
+                    "południowo-zachodnim końcu.";
+                }
+        ],
+        after [;
+            PutOn: if (second ~= mantelpiece) rfalse;
+                if (spirit_level hasnt general) self.number = random(2);
+                give spirit_level general; Achieved(4);
+                print "Kładziesz poziomicę na półce nad kominkiem, a pęcherzyk
+                       powoli przesuwa się na ";
+                if (self.number == 1) "północny wschód.";
+                "południowy zachód.";
+        ],
+  has   female;
+
+Object  -> mantelpiece "półk/a nad kominkiem"
+  with  name 'gzyms' 'gzymsu' 'gzymsie' 'kominek' 'kominka' 'kominku',
+  has   scenery supporter female;
+
+Object  -> -> key "żelazn/y klucz/";
+
+! ------------------------------------------------------------------------------
+! >BB  Tablica, na której można pisać i którą można wycierać.
+! ------------------------------------------------------------------------------
+
+Object  -> -> chalk "kawał/e/k/ kredy"
+  with  name 'kreda' 'kredę' 'kredą';
+
+Array boardtext string 64;
+
+Object  -> blackboard "tablic/a"
+  with  name 'czarna' 'czarną' 'czarnej',
+        describe [; <<Examine self>>; ],
+        before [ i f;
+            Examine:
+                for (i=1 : i<=boardtext->0 : i++)
+                    if (boardtext->i ~= ' ' or 0) f = 1;
+                if (f == 0) {
+                    print "^Tablica w biurze jest czysto wytarta.^";
+                    if (self hasnt general) {
+                        give self general;
+                        "^[Żeby coś na niej napisać, spróbuj   > napisz ~tekst...~]";
+                    }
+                    rtrue;
+                }
+                print "^Na tablicy w biurze widnieje napis:^    ";
+                for (i=1 : i<=boardtext->0 : i++) {
+                    f = boardtext->i;
+                    if (f ~= 0) print (char) f;
+                }
+                new_line; rtrue;
+            Rub:
+                for (i=1 : i<=boardtext->0 : i++) boardtext->i = ' ';
+                "Wycierasz tablicę do czysta.";
+        ],
+  has   static female;
+
+Global from_char; Global to_char;
+
+[ QuotedText i j f last;
+    i = WordAddress(wn++); i = i-buffer;
+    #Ifdef TARGET_ZCODE;
+    last = buffer->1 + 1;
+    #Ifnot; ! TARGET_GLULX
+    last = buffer-->0 + WORDSIZE - 1;
+    #Endif; ! TARGET_
+    if (buffer->i == '"') {
+        for (j=i+1 : j<=last : j++)
+            if (buffer->j == '"') f = j;
+        if (f == 0) return -1;
+        from_char = i+1; to_char = f-1;
+        if (from_char > to_char) return -1;
+        while (buffer+f > WordAddress(wn)) wn++; wn++;
+        return 1;
+    }
+    return -1;
+];
+
+[ WriteSub i j;
+    if (chalk notin player) "Nie masz czym pisać.";
+    if (blackboard notin location) "Tablica jest gdzie indziej.";
+    for (i=from_char,j=1 : i<=to_char && j<boardtext->0 : i++,j++)
+        boardtext->j = buffer->i;
+    for (: j<boardtext->0 : j++) boardtext->j = 0;
+    Achieved(5);
+    <<Examine blackboard>>;
+];
+
+! ------------------------------------------------------------------------------
+!   Koniec definicji obiektów.  Procedury i punkty wejścia.
+! ------------------------------------------------------------------------------
+
+[ Initialise;
+    location = chair; move satchel to player;
+
+    print "^^^^~Co jest takiego wyjątkowego w tym Informie?~ - tyle
+           pamiętasz z rozmowy z szalonym alchemikiem. Wielki błąd...^^";
+
+    StartDaemon(balloon);
+];
+
+! Nazwy zadań (biblioteka numeruje je od 0 do NUMBER_TASKS-1).
+
+[ PrintTaskName achievement;
+    switch (achievement) {
+      0: "zjedzenie landrynki";
+      1: "przejażdżka samochodzikiem";
+      2: "zatrzymanie przeciągu";
+      3: "zbudowanie wieży z czterech klocków";
+      4: "sprawdzenie, w którą stronę przechyla się półka";
+      5: "napisanie czegoś na tablicy";
+    }
+];
+
+[ PrintRank;
+    print ", co czyni cię ";
+    if (score >= 6) "kierownikiem sklepu z zabawkami.";
+    if (score >= 5) "stażystą w kierownictwie.";
+    if (score >= 4) "studentem.";
+    if (score >= 3) "uczniem.";
+    if (score >= 2) "przedszkolakiem.";
+    if (score >= 1) "brzdącem.";
+    "noworodkiem.";
+];
+
+! Zastępcza procedura BurnSub, dostosowana do zasad sklepu z zabawkami:
+
+[ BurnSub;
+    if (match hasnt light) "Nie masz czym tego podpalić.";
+    if (noun has animate) <<Attack noun>>;
+    if (noun == padded_floor) {
+        deadflag = 1;
+        "Rozlega się gong, ale zanim grobowy głos skończy odchrząkiwać, cała
+         wyściełana podłoga staje w płomieniach.";
+    }
+    "Rozlega się gong i grobowy, nieco rozczarowany głos oznajmia:
+     ~W sklepie z zabawkami nie wolno bawić się ogniem.~";
+];
+
+! Nowa akcja Burst (przebij), która po prostu przechodzi w Attack, oraz
+! pisanie na tablicy:
+
+[ BurstSub; <<Attack noun>>; ];
+
+! Bezokoliczniki nowych czasowników w pytaniach parsera ("Co chcesz przebić?").
+[ PrintVerb v;
+    switch (v) {
+      'przebij':     print "przebić";
+      'przekłuj':    print "przekłuć";
+      'nakłuj':      print "nakłuć";
+      'dźgnij':      print "dźgnąć";
+      'przedziuraw': print "przedziurawić";
+      default:       rfalse;
+    }
+    rtrue;
+];
+
+Include "PolskiG";
+
+Verb 'przebij' 'przekłuj' 'nakłuj' 'dźgnij' 'przedziuraw'
+    * noun                                      -> Burst;
+
+Verb 'napisz' 'pisz' 'wypisz'
+    * QuotedText                                -> Write
+    * QuotedText 'na' noun                      -> Write;

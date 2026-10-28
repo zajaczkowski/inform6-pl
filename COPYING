@@ -1,0 +1,52 @@
+Licencja / License
+==================
+
+Biblioteka (katalog lib/) i skrypty projektu
+--------------------------------------------
+
+Pliki lib/polskiz.h, lib/polski.h, lib/odmiana.h i lib/polskig.h oraz
+skrypty build.sh, przygotuj.sh i test.sh są udostępnione na tych samych
+warunkach co biblioteka standardowa Inform 6, na której się opierają
+(lib/polski.h i lib/polskig.h powstały z jej plików english.h i grammar.h).
+Użytkownik może wybrać jedną z dwóch licencji:
+
+  1) tradycyjną licencję Inform, opisaną w The Inform Designer's Manual
+     (4. wydanie) – jej treść przytacza plik COPYING biblioteki Inform 6,
+  2) Artistic License 2.0 – pełny tekst w pliku LICENSE.
+
+Gra skompilowana z tą biblioteką należy do jej autora i może być
+rozpowszechniana na dowolnych warunkach, także odpłatnie, o ile nagłówek
+gry podaje, że skompilowano ją Informem, wraz z numerem wersji (warunek
+tradycyjnej licencji Inform).
+
+Dokumentacja (katalog docs/, README.md, POCHODZENIE.md)
+-------------------------------------------------------
+
+Na tych samych warunkach co biblioteka.
+
+Gry przykładowe (katalog games/)
+--------------------------------
+
+Gry *_pl.inf są polskimi tłumaczeniami przykładowych gier Inform 6 z IF
+Archive. Prawa do oryginałów należą do ich autorów (zob. POCHODZENIE.md);
+tłumaczenia są rozpowszechniane bezpłatnie, na warunkach, na jakich
+udostępniono oryginały:
+
+  - ruins_pl, toyshop_pl, balances_pl, museum_pl, adventureland_pl,
+    advent_pl – wersje Inform Grahama Nelsona, rozpowszechniane z Informem
+    na warunkach tradycyjnej licencji Inform (DM4); „Adventureland” to gra
+    Scotta Adamsa, a „Adventure” – Willa Crowthera i Dona Woodsa,
+  - alice_pl – samouczek Garetha Reesa, „All rights given away”.
+
+Skrypty przejść (*.przejscie) i gra testowa test.inf: na warunkach
+biblioteki.
+
+-------------------------------------------------------------------------
+
+The Polish library files and project scripts are dual-licensed, like the
+Inform 6 Standard Library they derive from: the traditional Inform license
+(as described in the DM4) or the Artistic License 2.0 (see LICENSE), at
+the user's choice. The example games are Polish translations of the
+Inform 6 example games from the IF Archive; the originals remain the
+property of their authors and the translations are distributed free of
+charge under the same terms as the originals.

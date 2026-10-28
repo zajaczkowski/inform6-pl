@@ -1,0 +1,493 @@
+!% -Cu
+!% +language_name=polski
+! ==============================================================================
+!   PO DRUGIEJ STRONIE LUSTRA - polska wersja "Through the Looking-Glass"
+!   (samouczek Inform Garetha Reesa, wersja 3, 5/1/2003; All rights given away).
+!
+!   Pierwszy pokój gry według "Po drugiej stronie lustra" Lewisa Carrolla.
+!   Nazwy obiektów są zapisane w notacji automatycznej odmiany
+!   (zob. lib/odmiana.h).  Gracz jest Alicją, więc ma rodzaj żeński.
+! ==============================================================================
+
+Include "PolskiZ";
+
+Constant Story "PO DRUGIEJ STRONIE LUSTRA";
+Constant Headline "^Interaktywny samouczek^Gareth Rees^Wersja polska.^";
+
+Include "Parser";
+Include "VerbLib";
+
+[ Initialise;
+    location = Drawing_Room;
+    give player female;
+    StartDaemon(white_kitten);
+    StartDaemon(black_kitten);
+    print "^^^^^Na dworze jest zimny zimowy dzień, ale w domu po drugiej
+        stronie lustra jest lato. Wystarczy tylko udawać, że da się tam
+        jakoś przejść...^^";
+];
+
+! ------------------------------------------------------------------------------
+!   Nowe akcje: zwijanie wełny i oglądanie w lustrze
+! ------------------------------------------------------------------------------
+
+[ UntangleSub; "Co za dziwne pomysły przychodzą ci do głowy!"; ];
+
+[ ReflectSub;
+    if (second ~= mirror) "Co za dziwny pomysł!";
+    if (noun == hearth or mirror || (player notin mantelpiece &&
+        player notin armchair))
+        "Tego nie widać w lustrze.";
+    print "Odbicie ";
+    if (noun == player) print "Alicji"; else print (dop) noun;
+    if (player in mantelpiece) " w lustrze jest bardzo mgliste i rozmazane.";
+    " w lustrze wygląda zupełnie jak w rzeczywistości, tylko wszystko jest
+     odwrócone, lewe na prawe.";
+];
+
+! ------------------------------------------------------------------------------
+!   Salon
+! ------------------------------------------------------------------------------
+
+Object  Drawing_Room "Salon"
+ has    light
+ with   name 'śnieg' 'śniegu' 'śniegiem',
+        description "Cichy szelest śniegu o szybę mówi, że na dworze jest
+            zimno, a ty cieszysz się, że jesteś tu, w cieple. Salon odbija
+            się w dużym lustrze na ścianie nad półką nad kominkiem; to
+            bardzo przytulny pokój, z ciepłym kominkiem, miękkim dywanikiem
+            i fotelem, w którym można się zwinąć w kłębek i zasnąć.",
+        before [;
+            if (player in mantelpiece && (action == ##Exit ||
+                (action == ##Go && noun == d_obj or out_obj)))
+                "Z półki nad kominkiem nie schodzi się w ten sposób!";
+            if (player in mantelpiece &&
+                action ~= ##Examine or ##Enter or ##Go &&
+                action ~= ##ThrownAt or ##ThrowAt or ##Reflect)
+                if ((noun > 0 && noun notin mantelpiece &&
+                    noun ~= mantelpiece or mirror && noun notin player) ||
+                    (second > 0 && second notin mantelpiece &&
+                    second ~= mantelpiece or mirror && second notin player))
+                    "Stąd tego nie dosięgniesz!";
+        ];
+
+Object  red_queen "czerwon/a! królow/a!"
+ has    female
+ with   name 'figura' 'figury' 'figurę' 'figurą' 'figurka' 'figurki' 'figurkę'
+            'figurką' 'hetman' 'hetmana' 'hetmanem',
+        describe [;
+            if (white_kitten.state == 1 || black_kitten.state == 1)
+                rtrue;
+        ],
+        description "To groźna mała figurka szachowa.",
+        after [;
+         Take:
+            if (white_kitten.state == 1)
+                white_kitten.state = 3;
+            if (black_kitten.state == 1)
+                black_kitten.state = 3;
+         PutOn, Transfer, Insert:
+            if (second == chess_board)
+                "Sama na szachownicy czerwona królowa jest panią wszystkiego,
+                na co spojrzy.";
+        ];
+
+Object  chess_board "szachownic/a" Drawing_Room
+ has    supporter female
+ with   name 'szachy' 'szachów' 'szachach' 'plansza' 'planszy' 'planszę'
+            'planszą',
+        initial "Na podłodze leży porzucona szachownica.",
+        description "Została tu po partii, którą przed chwilą grałaś, ale
+            wszystkie figury zniknęły - kotki uparcie się nimi bawią.";
+
+Object  hearth "komin/e/k/" Drawing_Room
+ has    scenery
+ with   name 'palenisko' 'paleniska' 'palenisku' 'ogień' 'ognia' 'ogniem'
+            'ogniu';
+
+Object  rug "dywanik/ przed kominkiem" Drawing_Room
+ has    concealed static supporter enterable
+        ! general, jeśli pod dywanikiem znaleziono już czerwoną królową
+ with   name 'dywan' 'dywanu' 'dywanie' 'dywanem' 'indyjski' 'indyjskiego'
+            'arabski' 'arabskiego' 'piękny' 'pięknego' 'miękki' 'miękkiego'
+            'miękkim',
+        description "To piękny dywanik, zrobiony w jakimś dalekim kraju, może
+            w Indiach albo w Arabii, gdziekolwiek one są.",
+        before [;
+         Take: "Dywanik jest o wiele za duży i za ciężki, żebyś mogła go
+            unieść.";
+         Push, Pull: "Ale przecież dywanik przed kominkiem powinien leżeć
+            przed kominkiem!";
+         LookUnder:
+            if (player in mantelpiece || player in armchair)
+                "Nie dosięgniesz stąd dywanika.";
+            if (player in self)
+                "Próbujesz unieść róg dywanika, ale nic z tego. Po chwili
+                orientujesz się, że to dlatego, że na nim stoisz. Jaki ten
+                świat jest dziwny!";
+            if (self hasnt general) {
+                give self general;
+                move red_queen to player;
+                "Unosisz róg dywanika i, zaglądając pod spód, znajdujesz
+                czerwoną królową z kompletu szachów.";
+            }
+        ];
+
+Object  armchair "fotel/" Drawing_Room
+ has    static concealed supporter enterable
+        ! general, jeśli fotel stoi przy kominku
+ with   name 'krzesło' 'krzesła' 'krześle' 'fotelik' 'fotelika' 'foteliku',
+        description [;
+            print "To ogromny fotel, wymarzone miejsce dla kotka albo małej
+                dziewczynki, żeby zwinąć się w kłębek i zdrzemnąć. Stoi
+                przysunięty do ";
+            if (self has general) "kominka.";
+            "okna.";
+        ],
+        before [ i;
+         Push, Pull:
+            if (player notin Drawing_Room)
+                print_ret "Najpierw musisz zejść z ", (dop) parent(player), ".";
+            if (white_kitten in player || black_kitten in player)
+                "Nie z kotkiem na rękach!";
+            if (white_kitten.state == 3) i = white_kitten;
+            else if (black_kitten.state == 3) i = black_kitten;
+            if (i ~= 0)
+                print_ret "Już masz przesuwać fotel, kiedy zauważasz, że ",
+                    (mian) i, " stoi ci na drodze. Całe szczęście, że go
+                    zauważyłaś, bo mogłabyś zgnieść biedne maleństwo na
+                    placek.";
+            if (self has general) {
+                give self ~general;
+                "Odsuwasz fotel od kominka.";
+            }
+            give self general;
+            "Przysuwasz fotel do kominka.";
+         Climb, Enter:
+            move player to armchair;
+            "Wskakujesz na ciepły, wygodny fotel.";
+        ];
+
+Object  mantelpiece "półk/a nad kominkiem" Drawing_Room
+ has    concealed supporter enterable female
+ with   name 'gzyms' 'gzymsu' 'gzymsie' 'gzymsem',
+        description "Jest wyżej niż twoja głowa, ale wygląda na dość szeroką
+            i mocną, żeby cię utrzymać.",
+        before [;
+         Enter, Climb:
+            if (player notin armchair)
+                "Półka nad kominkiem jest o wiele za wysoko, żeby się na nią
+                wdrapać.";
+            if (armchair hasnt general)
+                "Stąd nie dosięgniesz półki nad kominkiem.";
+            if (children(player) > 0)
+                "Masz zajęte ręce.";
+            move player to mantelpiece;
+            "Wdrapujesz się na półkę nad kominkiem.";
+         PutOn, LetGo:
+            if (player notin self && (player notin armchair ||
+                armchair hasnt general))
+                "Półka nad kominkiem jest tak wysoko, że nie dosięgasz.";
+        ];
+
+Object  mirror "lustr/o" Drawing_Room
+ has    static concealed neuter
+ with   name 'zwierciadło' 'zwierciadła' 'zwierciadle' 'zwierciadłem'
+            'szkło' 'szkła' 'szkle',
+        description [;
+            if (player in mantelpiece)
+                "Dziwne, ale szkło zaczyna się rozpływać, zupełnie jak
+                jasna, srebrzysta mgiełka.";
+            if (player in armchair)
+                "W lustrze widać salon domu po drugiej stronie lustra.
+                Wygląda prawie tak samo jak ten salon, tylko wszystko jest
+                odwrócone, lewe na prawe. Ale jesteś pewna, że tam, w rogach
+                lustra, których stąd nie widać, świat po drugiej stronie jest
+                zupełnie inny niż twój.";
+            "W lustrze widać sufit salonu domu po drugiej stronie lustra.
+            Wygląda prawie tak samo jak sufit twojego salonu.";
+        ],
+        before [;
+            if (action ~= ##Examine or ##ThrownAt or ##Reflect &&
+                player notin mantelpiece)
+                "Nie dosięgniesz lustra z miejsca, w którym stoisz.";
+         Touch, Pull, Push:
+            "Dłoń przechodzi ci prosto przez srebrzystą mgiełkę!";
+         ThrownAt: "Chyba nie chcesz siedmiu lat nieszczęścia?";
+         Enter:
+            ! Właściwie: przenieś Alicję do domu po drugiej stronie lustra.
+            deadflag = 2;
+            "Dłoń przechodzi ci prosto przez srebrzystą mgiełkę, a w
+            następnej chwili cała reszta ciebie podąża za nią i jesteś po
+            drugiej stronie lustra...";
+        ];
+
+Object  worsted "kłęb/e/k/ wełny" Drawing_Room
+        ! general, jeśli kłębek jest splątany
+ with   name 'włóczka' 'włóczki' 'włóczkę' 'włóczką' 'wełna' 'wełnę' 'wełną'
+            'niebieska' 'niebieskiej' 'niebieską' 'cienka' 'cienkiej'
+            'nitki' 'nitek' 'nici',
+        describe [;
+            if (white_kitten.state ~= 2 &&
+                black_kitten.state ~= 2)
+                "^Na podłodze leży porzucony kłębek wełny.";
+            rtrue;
+        ],
+        description [;
+            if (self has general)
+                "Jest okropnie splątany. Tyle czasu go zwijałaś, a teraz
+                popatrz tylko!";
+            "To kłębek cienkiej niebieskiej wełny, starannie zwinięty
+            i gotowy do haftowania.";
+        ],
+        before [;
+         Untangle:
+            give self ~general;
+            "Nikt nie zwija kłębków tak szybko jak ty - choć mówisz to
+            o sobie sama! Wkrótce kłębek jest znów porządny i zgrabny.";
+        ],
+        after [;
+         Take:
+            if (white_kitten.state == 2)
+                white_kitten.state = 3;
+            if (black_kitten.state == 2)
+                black_kitten.state = 3;
+        ];
+
+Object  chess_pieces "figur/y szachow/e!" Drawing_Room
+ has    scenery pluralname female
+ with   parse_name [ w colour n;
+            w = NextWord();
+            if (w == 'biały' or 'biała' or 'białego' or 'białą' or 'białej' ||
+                w == 'czerwony' or 'czerwona' or 'czerwonego' or 'czerwoną'
+                or 'czerwonej') {
+                n ++;
+                colour = w;
+                w = NextWord();
+            }
+            if (w == 'pion' or 'piona' or 'pionek' or 'pionka' or 'wieża' ||
+                w == 'wieżę' or 'wieży' or 'skoczek' or 'skoczka' or 'koń' ||
+                w == 'konia' or 'goniec' or 'gońca' or 'laufer' or 'laufra' ||
+                w == 'król' or 'króla' ||
+                (w == 'królowa' or 'królową' or 'królowej' or 'hetman' or
+                 'hetmana' && (colour == 'biały' or 'biała' or 'białego'
+                 or 'białą' or 'białej' || rug hasnt general)))
+                return n + 1;
+            return 0;
+        ],
+        before [;
+            "Niestety, tej figury nigdzie nie ma. Te niegrzeczne kotki!";
+        ];
+
+Object  window "okn/o" Drawing_Room
+ has    scenery neuter
+ with   name 'szyba' 'szyby' 'szybę' 'szybie' 'okienko' 'okienka',
+        description "Za oknem cicho pada śnieg, a ty cieszysz się, że jesteś
+            tu, w cieple.",
+        before [;
+         Open: "Chyba nie chcesz się przeziębić, prawda? Lepiej zostawić okno
+            zamknięte.";
+         Search: <<Examine self>>;
+        ];
+
+! ------------------------------------------------------------------------------
+!   Kotki
+! ------------------------------------------------------------------------------
+
+Property other_kitten;
+Property state; ! 1=czerwona królowa, 2=kłębek wełny, 3=fotel, 0=na rękach
+
+Class   Kitten_Class
+ has    animate male
+        ! general, jeśli w tej turze kotek został już opisany
+ with   parse_name [ w ok n;
+            do {
+                ok = 0;
+                w = NextWord();
+                if (w == 'kotki' or 'kotków' or 'kotkom' or 'kotkami' ||
+                    w == 'kotkach' or 'koty' or 'kotów' or 'kociaki' ||
+                    w == 'kociaków' or 'kociakami') {
+                    ok = 1; n++; parser_action = ##PluralFound;
+                }
+                if (w == 'kot' or 'kota' or 'kotu' or 'kotem' or 'kocie' ||
+                    w == 'kociak' or 'kociaka' or 'kociakowi' or 'kociakiem' ||
+                    w == 'kociaku' or 'kicia' or 'kici' or 'kicię' or 'kiciu' ||
+                    Refers(self, wn-1)) {
+                    ok = 1; n++;
+                }
+            } until (ok == 0);
+            return n;
+        ],
+        state 3,
+        describe [ i;
+            switch (self.state) {
+             1: print_ret "^", (CMian) self, " bawi się czerwoną królową.";
+             2: print_ret "^", (CMian) self, " bawi się kłębkiem wełny.";
+             3: if (self has general) rtrue;
+                if ((self.other_kitten).state == 3) {
+                    i = self.other_kitten;
+                    give i general;
+                    "^Dwa kotki, biały i czarny, bawią się razem przy
+                    fotelu.";
+                }
+                print_ret "^", (CMian) self, " bawi się przy fotelu.";
+             default: rtrue;
+            }
+        ],
+        description [;
+            print_ret "Jaki śliczny jest ", (mian) self, "! To bez wątpienia
+                twój ulubieniec z tej pary, o wiele ładniejszy od tego
+                niegrzecznego ", (dop) self.other_kitten, ".";
+        ],
+        life [;
+         Ask, Answer, Order:
+            print_ret (CMian) self, " porusza wąsikami i patrzy na ciebie
+                z tak mądrą miną, że jesteś pewna, iż rozumie każde twoje
+                słowo.";
+         Kiss:
+            print_ret "Dajesz ", (cel) self, " małego całusa w nosek, a kotek
+                patrzy na ciebie słodko i skromnie.";
+         Attack: "Nigdy nie zrobiłabyś czegoś tak okropnego takiemu
+            bezbronnemu zwierzątku!";
+         Show:
+            print_ret (CMian) self, " trąca łapką ", (bie) noun, ".";
+         Give, ThrowAt:
+            if (noun ~= red_queen or worsted) {
+                if (action == ##ThrowAt) {
+                    move noun to Drawing_Room;
+                    print "Rzucasz ", (bie) noun, " na podłogę, ale ",
+                        (mian) self;
+                }
+                else print (CMian) self;
+                print_ret " tylko przygląda się ", (cel) noun, " z zaciekawioną
+                    miną.";
+            }
+            print "Rzucasz ", (bie) noun, " na podłogę, a ", (mian) self;
+            if (self in player)
+                print " wyrywa ci się z rąk i";
+            move noun to Drawing_Room;
+            move self to Drawing_Room;
+            print " rusza w pogoń za ", (nar) noun;
+            if (noun == worsted) {
+                give worsted general;
+                self.state = 2;
+                print ", w mig zamieniając zgrabny kłębek w splątany kłąb";
+            }
+            else self.state = 1;
+            ".";
+        ],
+        before [;
+         Take:
+            if (self.other_kitten in player)
+                "Nie dasz rady trzymać dwóch kotków naraz!";
+            self.state = 0;
+            move self to player;
+            print_ret "Podnosisz ", (bie) self, ". Co za śliczne stworzenie!";
+        ],
+        after [;
+         Drop:
+            self.state = 3;
+            move self to Drawing_Room;
+            print_ret (CMian) self, " wyrywa ci się z rąk i ucieka.";
+         Transfer, PutOn, Insert:
+            self.state = 3;
+            print (CMian) self, " zeskakuje z ", (dop) parent(self);
+            move self to Drawing_Room;
+            ", ląduje lekko na podłodze i ucieka.";
+        ],
+        daemon [ i;
+            give self ~general;
+            self.number = 1 - self.number;
+            if (self.number == 1 || random(3) == 2) rtrue;
+            new_line;
+            print (CMian) self;
+            switch (self.state) {
+             0: switch (random(5)) {
+                 1: " miauczy żałośnie.";
+                 2: " cichutko mruczy do siebie.";
+                 3: " mruczy z zadowoleniem.";
+                 4: " ociera się o ciebie uszkami.";
+                 5: move self to Drawing_Room;
+                    self.state = 3;
+                    " wyrywa ci się z rąk i ucieka.";
+                }
+             1: switch (random(5)) {
+                 1: " trąca łapką czerwoną królową.";
+                 2: " przestaje się bawić i siada prosto, udając, że nie ma
+                    żadnych kocich skłonności.";
+                 3: " przetacza czerwoną królową po podłodze i goni ją.";
+                 4: " przerywa zabawę, żeby się umyć.";
+                 5: " gryzie czerwoną królową i potrząsa nią, żeby się upewnić,
+                    że nie żyje.";
+                }
+             2: give worsted general;
+                switch (random(5)) {
+                 1: " trąca łapką kłębek wełny.";
+                 2: " popycha kłębek wełny po podłodze i goni go.";
+                 3: " skacze na kłębek wełny i dzielnie się z nim mocuje.";
+                 4: " wskakuje w kłębek wełny i zaplątuje się w gąszcz
+                    nitek.";
+                 5: " przestaje się bawić i drapie się za uchem.";
+                }
+             3: if ((self.other_kitten).state == 3 && random(2) == 1) {
+                    i = random(5);
+                    switch (i) {
+                     1: print " goni ";
+                     2: print " skacze na ";
+                     3: print " myje ";
+                     4: print " obiega fotel, a potem goni ";
+                     5: print " trąca łapką ";
+                    }
+                    print (bie) self.other_kitten;
+                    switch (i) {
+                     2: " i razem tarzają się po podłodze.";
+                     default: ".";
+                    }
+                }
+                switch (random(5)) {
+                 1: " goni drobinkę kurzu.";
+                 2: " tarza się po podłodze.";
+                 3: " siada i myje sobie ogon.";
+                 4: " drapie się łebkiem o fotel.";
+                 5: " goni własny ogon.";
+                }
+            }
+        ];
+
+Object  white_kitten "biał/y kot/e/k/" Drawing_Room
+ class  Kitten_Class
+ with   number 0,
+        other_kitten black_kitten;
+
+Object  black_kitten "czarn/y kot/e/k/" Drawing_Room
+ class  Kitten_Class
+ with   number 1,
+        other_kitten white_kitten;
+
+! ------------------------------------------------------------------------------
+!   Gramatyka
+! ------------------------------------------------------------------------------
+
+! Bezokoliczniki nowych czasowników w pytaniach parsera ("Co chcesz zwinąć?").
+[ PrintVerb v;
+    switch (v) {
+      'zwiń', 'zwijaj': print "zwinąć";
+      'rozplącz':       print "rozplątać";
+      'rozsupłaj':      print "rozsupłać";
+      'nawiń':          print "nawinąć";
+      default:          rfalse;
+    }
+    rtrue;
+];
+
+Include "PolskiG";
+
+! "zbadaj kotka w lustrze", "spójrz na kotka w lustrze"
+Extend 'obejrzyj'
+    * noun 'w//' noun                           -> Reflect;
+
+Extend 'spójrz'
+    * 'na' noun 'w//' noun                      -> Reflect;
+
+Verb 'zwiń' 'rozplącz' 'rozsupłaj' 'nawiń' 'zwijaj'
+    * noun                                      -> Untangle;

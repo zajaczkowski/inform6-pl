@@ -1,0 +1,6 @@
+build/
+narzedzia/
+*.z5
+*.z8
+*.ulx
+.DS_Store

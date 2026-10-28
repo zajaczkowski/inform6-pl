@@ -1,0 +1,33 @@
+name: testy
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  testy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Narzędzia z pamięci podręcznej
+        uses: actions/cache@v4
+        with:
+          path: narzedzia
+          key: narzedzia-${{ runner.os }}-${{ hashFiles('przygotuj.sh') }}
+
+      - name: Pobranie i budowa narzędzi
+        run: ./przygotuj.sh
+
+      - name: Kompilacja i przejścia gier
+        run: ./test.sh
+
+      - name: Skompilowane gry
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gry
+          path: |
+            build/*.z5
+            build/*.ulx
+            !build/advent_test.z5

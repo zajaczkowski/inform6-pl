@@ -1,0 +1,4285 @@
+!% -Cu
+!% +language_name=polski
+!% -S~D
+! ==============================================================================
+!   PRZYGODA - polska wersja "Advent" (wydanie 9, 060321), klasycznej
+!   Colossal Cave Adventure i jednej ze standardowych przykładowych gier
+!   Inform 6.
+!
+!                                  Przeniesione do Inform 5: 17.05.1994-24.05.1994
+!                 Unowocześnione do Inform 5.5 i biblioteki 5/12 lub nowszej: 20.12.1995
+!                    Unowocześnione do Inform 6 i biblioteki 6/1 lub nowszej: 11.11.1996
+!                     Usunięte błędy i przepisany tekst towarzyszący: 09.12.1996
+!                                Usunięte drobne błędy: 24.02.1997 i 04.09.1997
+!                 [RF] Przeformatowane źródło, usunięty drobny błąd: 02.09.2004
+!                     [RF] Dodana teleportacja, drobne poprawki: 21.03.2006
+!
+!   Nazwy obiektów są zapisane w notacji automatycznej odmiany (lib/odmiana.h).
+! ==============================================================================
+
+! Constant TEST_VERSION;
+
+Include "PolskiZ";
+
+Constant Story "PRZYGODA";
+Constant Headline
+    "^Interaktywny oryginał^
+      Will Crowther (1976) i Don Woods (1977)^
+      Odtworzona w trzech krokach przez:^
+      Donalda Ekmana, Davida M. Baggetta (1993) i Grahama Nelsona (1994)^
+      [In memoriam Stephen Bishop (1820?-1857): GN]^
+      Wersja polska.^^";
+Serial "060321";
+Release 9;
+
+! IFID gry Adventure -- zob. http://babel.ifarchive.org/
+Array UUID_ARRAY string "UUID://E9FD3D87-DD2F-4005-B332-23557780B64E//"; #Ifdef UUID_ARRAY; #Endif;
+
+Constant AMUSING_PROVIDED;
+Constant MAX_CARRIED   = 7;
+Constant MAX_SCORE     = 350;
+Constant MAX_TREASURES = 15;
+
+Include "Parser";
+Include "VerbLib";
+
+Attribute nodwarf;                      ! krasnoludy tu nie wchodzą
+Attribute treasure_found;               ! skarb został już znaleziony
+Attribute multitude;                    ! używane tylko przez POLICZ
+
+Global caves_closed;                    ! true, gdy jaskinia się zamyka
+Global canyon_from;                     ! do którego kanionu wrócić
+Global treasures_found;                 ! liczba znalezionych skarbów
+Global deaths;                          ! liczba śmierci i wskrzeszeń
+Global dark_warning;                    ! true po ostrzeżeniu o jamach w ciemności
+Global feefie_count;                    ! licznik fee/fie/foe/foo
+
+! ------------------------------------------------------------------------------
+!   Reguły dla skarbów, rozrzuconych po całej grze
+! ------------------------------------------------------------------------------
+
+Class   Treasure
+  with  after [;
+          Take:
+            if (location == Inside_Building)
+                score = score - self.depositpoints;
+            score = score + 5;
+            if (noun hasnt treasure_found) {
+                give noun treasure_found;
+                treasures_found++;
+                score = score + 2;
+            }
+            "Wzięte!";
+          Insert:
+            score = score - 5;  ! (na wypadek włożenia do wiklinowej klatki)
+          Drop:
+            score = score - 5;
+            if (location == Inside_Building) {
+                score = score + self.depositpoints;
+                print "Bezpiecznie złożon"; KoncY(noun); ".";
+            }
+        ],
+        depositpoints 10;
+
+! ------------------------------------------------------------------------------
+!   Świat na powierzchni
+! ------------------------------------------------------------------------------
+
+Class   Room;
+
+Class   Aboveground
+  class Room
+  has   light nodwarf;
+
+Class   Scenic
+  has   scenery;
+
+Aboveground At_End_Of_Road "Koniec drogi"
+  with  name 'koniec' 'drogi' 'ulicy' 'parowu',
+        description
+            "Stoisz na końcu drogi, przed małym budynkiem z cegły. Dookoła
+             rośnie las. Z budynku wypływa niewielki strumień i spływa w dół
+             parowem.",
+        w_to At_Hill_In_Road,
+        u_to At_Hill_In_Road,
+        e_to Inside_Building,
+        d_to In_A_Valley,
+        s_to In_A_Valley,
+        n_to In_Forest_1,
+        in_to Inside_Building;
+
+Scenic  "mał/y budyn/e/k/+u z cegły"
+  with  name 'dom' 'domu' 'domek' 'domku' 'studnia' 'studni' 'studnią'
+             'ceglany' 'ceglanego' 'ceglanym' 'cegła' 'cegły',
+        description "To mały budynek z cegły. Wygląda na domek nad studnią.",
+        found_in At_End_Of_Road At_Hill_In_Road Inside_Building,
+        before [;
+          Enter:
+            if (location == At_Hill_In_Road && Inside_Building hasnt visited)
+                "Jest za daleko.";
+            <<Teleport Inside_Building>>;
+        ];
+
+Scenic  Stream "strumie/ń=ni/"
+  with  name 'woda' 'wody' 'wodę' 'wodą' 'wodzie' 'potok' 'potoku' 'potokiem'
+             'rzeka' 'rzeki' 'rzekę' 'rzece' 'jezioro' 'jeziora' 'jeziorze'
+             'zbiornik' 'zbiornika' 'zbiorniku' 'mały' 'małego' 'małym'
+             'szumiący' 'szumiącego' 'rwący' 'rwącego' 'bystry' 'bystrego',
+        found_in At_End_Of_Road In_A_Valley At_Slit_In_Streambed In_Pit
+                 In_Cavern_With_Waterfall At_Reservoir Inside_Building,
+        before [;
+          Drink:
+            "Pijesz wodę ze strumienia. Ma wyraźny posmak minerałów, ale nie
+             jest nieprzyjemna. Jest lodowato zimna.";
+          Take:
+            if (bottle notin player)
+                "Nie masz w czym nieść wody.";
+            <<Fill bottle>>;
+          Insert:
+            if (second == bottle) <<Fill bottle>>;
+            "Nie masz w czym nieść wody.";
+          Receive:
+            if (noun == ming_vase) {
+                remove ming_vase;
+                move shards to location;
+                score = score - 5;
+                "Nagła zmiana temperatury roztrzaskała delikatną wazę.";
+            }
+            if (noun == bottle) <<Fill bottle>>;
+            remove noun;
+            if (noun ofclass Treasure) score = score - 5;
+            print (CMian) noun, " "; PL(noun, "odpływa", "odpływają");
+            " z nurtem strumienia.";
+        ],
+  has   male;
+
+Scenic  "drog/a"
+  with  name 'ulica' 'ulicy' 'ulicę' 'ścieżka' 'ścieżki' 'ścieżkę' 'ścieżce'
+             'gruntowa' 'gruntowej' 'gruntową',
+        description "Droga jest gruntowa, a nie wyłożona żółtą cegłą.",
+        found_in At_End_Of_Road At_Hill_In_Road In_Forest_2,
+  has   female;
+
+Scenic  "las/+u"
+  with  name 'drzewo' 'drzewa' 'drzew' 'dąb' 'dęby' 'klon' 'klony' 'gaj'
+             'sosna' 'sosny' 'świerk' 'świerki' 'brzoza' 'brzozy' 'jesion'
+             'jesiony' 'młodniak' 'krzaki' 'krzaków' 'krzewy' 'krzewów'
+             'liście' 'liści' 'jagoda' 'jagody' 'jagód' 'zarośla' 'zarośli',
+        description
+            "Las to duże drzewa liściaste, dęby i klony, gdzieniegdzie
+             przetykane gajem sosen albo świerków. Podszyt jest dość gęsty:
+             to głównie młode brzozy i jesiony, a do tego najróżniejsze
+             krzaki. O tej porze roku liście mocno ograniczają widoczność,
+             ale chodzi się całkiem łatwo, jeśli omija się świerki i krzaki
+             jagód.",
+        found_in At_End_Of_Road At_Hill_In_Road In_A_Valley In_Forest_1 In_Forest_2,
+  has   multitude;
+
+! ------------------------------------------------------------------------------
+
+Aboveground At_Hill_In_Road "Wzgórze na drodze"
+  with  name 'wzgórze' 'wzgórza' 'pagórek',
+        description
+            "Wchodzisz na wzgórze, wciąż w lesie. Po drugiej stronie wzgórza
+             droga znów opada. W oddali widać jakiś budynek.",
+        e_to At_End_Of_Road,
+        n_to At_End_Of_Road,
+        d_to At_End_Of_Road,
+        s_to In_Forest_1;
+
+Scenic  -> "wzgórz/e"
+  with  name 'pagórek' 'pagórka' 'pagórku' 'wzniesienie' 'wzniesienia'
+             'wzniesieniu',
+        description "Zwyczajne wzgórze.",
+  has   neuter;
+
+Scenic  -> "drug/a stron/a wzgórza"
+  with  name 'strona' 'stronę' 'stronie',
+        description "Może sam to zbadasz?",
+  has   female;
+
+! ------------------------------------------------------------------------------
+
+Aboveground Inside_Building "W budynku"
+  with  name 'budynek' 'budynku' 'domek' 'domku' 'studnia' 'studni',
+        description
+            "Jesteś w budynku - w domku zbudowanym nad dużym źródłem.",
+        cant_go
+            "Strumień wypływa przez dwie rury kanalizacyjne o średnicy
+             jednej stopy. Jedyne wyjście prowadzi na zachód.",
+        before [;
+          Enter:
+            if (noun == Spring or SewerPipes)
+                "Strumień wypływa przez dwie rury kanalizacyjne o średnicy
+                 jednej stopy. Lepiej skorzystać z wyjścia.";
+          Xyzzy:
+            if (In_Debris_Room hasnt visited) rfalse;
+            PlayerTo(In_Debris_Room);
+            rtrue;
+          Plugh:
+            if (At_Y2 hasnt visited) rfalse;
+            PlayerTo(At_Y2);
+            rtrue;
+        ],
+        w_to At_End_Of_Road,
+        out_to At_End_Of_Road,
+        in_to "Rury są za małe.";
+
+Scenic  -> Spring "źródł/o"
+  with  name 'duże' 'dużego' 'dużym' 'zdrój' 'zdroju',
+        description
+            "Strumień wypływa przez dwie rury kanalizacyjne o średnicy
+             jednej stopy.",
+  has   neuter;
+
+Scenic  -> SewerPipes "par/a rur kanalizacyjnych"
+  with  name 'rury' 'rur' 'rurami' 'rurach' 'rura' 'rurę' 'rurze'
+             'kanalizacyjna' 'kanalizacyjne' 'ściek' 'ścieku',
+        description "Za małe. Jedyne wyjście prowadzi na zachód.",
+  has   female;
+
+Object  -> set_of_keys "pęk/+u kluczy"
+  with  name 'klucze' 'kluczy' 'kluczami' 'klucz' 'klucza' 'kluczem'
+             'breloczek' 'kółko' 'kółku',
+        description "Zwyczajnie wyglądający pęk kluczy.",
+        initial "Na ziemi leżą jakieś klucze.",
+        before [;
+          Count:
+            "Kilkanaście kluczy.";
+        ];
+
+Object  -> tasty_food "smaczn/e jedzeni/e"
+  with  name 'żywność' 'żywności' 'prowiant' 'prowiantu' 'racje' 'racji'
+             'flaki' 'flaków' 'pyszne' 'pysznego' 'wyborne' 'wybornego',
+        description "Wygląda naprawdę apetycznie!",
+        initial "Leży tu smaczne jedzenie.",
+        after [;
+          Eat:
+            "Pyszne!";
+        ],
+  has   edible neuter;
+
+Object  -> brass_lantern "mosiężn/a lamp/a"
+  with  name 'lampa' 'lampka' 'lampkę' 'lampki' 'latarka' 'latarkę'
+             'latarki' 'latarnia' 'latarnię' 'latarni' 'czołówka' 'czołówkę'
+             'światło' 'światła' 'błyszcząca' 'błyszczącą' 'błyszczącej',
+        when_off "W pobliżu leży błyszcząca mosiężna lampa.",
+        when_on "Leży tu twoja lampa i jasno świeci.",
+        daemon [ t;
+            if (self hasnt on) {
+                StopDaemon(self);
+                rtrue;
+            }
+            t = --(self.power_remaining);
+            if (t == 0) give self ~on ~light;
+            if (self in player || self in location) {
+                if (t == 0) {
+                    print "W lampie wyczerpały się baterie.";
+                    if (fresh_batteries notin player && location hasnt light) {
+                        deadflag = 3;
+                        " Bez lampy nie da się badać jaskini. Na tym
+                         chyba skończymy.";
+                    }
+                    else
+                        self.replace_batteries();
+                    new_line;
+                    rtrue;
+                }
+                if (t == 30) {
+                    print "Lampa zaczyna przygasać.";
+                    if (fresh_batteries.have_been_used)
+                        " Nie masz już też zapasowych baterii. Najlepiej
+                         zacznij to wszystko kończyć.";
+                    if (fresh_batteries in VendingMachine && Dead_End_14 has visited)
+                        " Najlepiej zacznij to wszystko kończyć, chyba że
+                         znajdziesz świeże baterie. Coś mi świta, że
+                         w labiryncie jest automat. Weź ze sobą trochę
+                         monet.";
+                    if (fresh_batteries notin VendingMachine or player or location)
+                        " Lepiej wróć po tamte baterie.";
+                    new_line;
+                    rtrue;
+                }
+            }
+        ],
+        before [;
+          Examine:
+            print "To błyszcząca mosiężna lampa";
+            if (self hasnt on) ". W tej chwili nie świeci.";
+            if (self.power_remaining < 30) ", świecąca słabym blaskiem.";
+            ", świecąca jasnym blaskiem.";
+          Burn:
+            <<SwitchOn self>>;
+          Rub:
+            "Pocieranie elektrycznej lampy nie daje szczególnej satysfakcji.
+             W każdym razie nic ciekawego się nie dzieje.";
+          SwitchOn:
+            if (self.power_remaining <= 0)
+                "Niestety, baterie chyba się wyczerpały.";
+          Receive:
+            if (noun == old_batteries)
+                "Te baterie są wyczerpane; na nic się nie przydadzą.";
+            if (noun == fresh_batteries) {
+                self.replace_batteries();
+                rtrue;
+            }
+            "Jedyne, co można by z pożytkiem włożyć do lampy, to para
+             świeżych baterii.";
+        ],
+        after [;
+          SwitchOn:
+            give self light;
+            StartDaemon(self);
+          SwitchOff:
+            give self ~light;
+        ],
+        replace_batteries [;
+            if (fresh_batteries in player or location) {
+                remove fresh_batteries;
+                fresh_batteries.have_been_used = true;
+                move old_batteries to location;
+                self.power_remaining = 2500;
+                "Pozwalam sobie wymienić baterie.";
+            }
+        ],
+        power_remaining 330,
+  has   switchable female;
+
+Object  -> bottle "mał/a butelk/a"
+  with  name 'flaszka' 'flaszkę' 'flaszki' 'słoik' 'słoika' 'słoik'
+             'manierka' 'manierkę' 'manierki',
+        initial "Stoi tu pusta butelka.",
+        before [;
+          LetGo:
+            if (noun in bottle)
+                "Przecież już to trzymasz (w butelce).";
+          Receive:
+            if (noun == stream or Oil)
+                <<Fill self>>;
+            else
+                "Butelka jest przeznaczona tylko na płyny.";
+          Fill:
+            if (child(bottle) ~= nothing)
+                "Butelka jest już pełna.";
+            if (stream in location || Spring in location) {
+                move water_in_the_bottle to bottle;
+                "Butelka jest teraz pełna wody.";
+            }
+            if (Oil in location) {
+                move oil_in_the_bottle to bottle;
+                "Butelka jest teraz pełna oleju.";
+            }
+            "Nie ma tu niczego, czym można by napełnić butelkę.";
+          Empty:
+            if (child(bottle) == nothing)
+                "Butelka jest już pusta!";
+            remove child(bottle);
+            "Butelka jest teraz pusta, a ziemia mokra.";
+        ],
+  has   container open female;
+
+Object  water_in_the_bottle "wod/a w butelce"
+  with  name 'h2o' 'butelkowana' 'butelkowaną' 'butelkowanej',
+        description "Moim zdaniem wygląda jak zwykła woda.",
+        before [;
+          Drink:
+            remove water_in_the_bottle;
+            <<Drink Stream>>;
+        ],
+  has   female;
+
+Object  oil_in_the_bottle "olej/+u w butelce"
+  with  name 'smar' 'smaru' 'smarem' 'oliwa' 'oliwy' 'oliwę',
+        description "Moim zdaniem wygląda jak zwykły olej.",
+        before [;
+          Drink:
+            <<Drink Oil>>;
+        ];
+
+! ------------------------------------------------------------------------------
+
+Aboveground In_Forest_1 "W lesie"
+  with  name 'las' 'lesie',
+        description "Jesteś w otwartym lesie; z jednej strony ciągnie się
+                     głęboka dolina.",
+        e_to In_A_Valley,
+        d_to In_A_Valley,
+        n_to In_Forest_1,
+        w_to In_Forest_1,
+        s_to In_Forest_1,
+        initial [;
+            if (random(2) == 1) PlayerTo(In_Forest_2, 1);
+        ];
+
+Aboveground In_Forest_2 "W lesie"
+  with  description "Jesteś w otwartym lesie, niedaleko doliny i drogi.",
+        n_to At_End_Of_Road,
+        e_to In_A_Valley,
+        w_to In_A_Valley,
+        d_to In_A_Valley,
+        s_to In_Forest_1;
+
+Aboveground In_A_Valley "W dolinie"
+  with  description
+            "Jesteś w leśnej dolinie, nad strumieniem pieniącym się na
+             kamienistym dnie.",
+        n_to At_End_Of_Road,
+        e_to In_Forest_1,
+        w_to In_Forest_1,
+        u_to In_Forest_1,
+        s_to At_Slit_In_Streambed,
+        d_to At_Slit_In_Streambed,
+        name 'dolina' 'dolinie';
+
+Scenic  -> "koryt/o strumienia"
+  with  name 'dno' 'dna' 'dnie' 'skała' 'skały' 'skale' 'kamieniste'
+             'kamienistego' 'suche' 'suchego' 'gołe' 'gołego',
+  has   neuter;
+
+! ------------------------------------------------------------------------------
+
+Aboveground At_Slit_In_Streambed "Szczelina w korycie strumienia"
+  with  name 'szczelina' 'szczelinie' 'koryto' 'korycie',
+        description
+            "U twoich stóp cała woda strumienia wpada do dwucalowej szczeliny
+             w skale. Niżej koryto jest już tylko gołą skałą.",
+        n_to In_A_Valley,
+        e_to In_Forest_1,
+        w_to In_Forest_1,
+        s_to Outside_Grate,
+        d_to "Nie zmieścisz się w dwucalowej szczelinie!",
+        in_to "Nie zmieścisz się w dwucalowej szczelinie!";
+
+Scenic  -> "dwucalow/a szczelin/a"
+  with  name 'szpara' 'szpary' 'szparę' 'szparze' 'dwa' 'cale' 'cali',
+        description
+            "To po prostu dwucalowa szczelina w skale, przez którą płynie
+             strumień.",
+        before [;
+          Enter:
+            "Nie zmieścisz się w dwucalowej szczelinie!";
+        ],
+  has   female;
+
+! ------------------------------------------------------------------------------
+
+Aboveground Outside_Grate "Przed kratą"
+  with  name 'przed' 'kratą',
+        description
+            "Jesteś w zagłębieniu głębokim na dwadzieścia stóp, o dnie z gołej
+             ziemi. W ziemi osadzono mocną stalową kratę zatopioną w betonie.
+             Do zagłębienia prowadzi suche koryto strumienia.",
+        e_to In_Forest_1,
+        w_to In_Forest_1,
+        s_to In_Forest_1,
+        n_to At_Slit_In_Streambed,
+        d_to [;
+            if (Grate hasnt locked && Grate hasnt open) {
+                print "(najpierw otwierasz kratę)^";
+                give Grate open;
+            }
+            return Grate;
+        ];
+
+Scenic  -> "zagłębieni/e"
+  with  name 'ziemia' 'ziemi' 'ziemię' 'dwudziestostopowe' 'dół' 'dołu'
+             'dole' 'niecka' 'niecce' 'niecki',
+        description "Właśnie w nim stoisz.",
+  has   neuter;
+
+Object  -> Grate "stalow/a krat/a"
+  with  name 'zamek' 'zamka' 'brama' 'bramy' 'bramę' 'krata' 'kratka' 'kratkę'
+             'kratownica' 'kratownicę' 'metalowa' 'metalową' 'metalowej'
+             'mocna' 'mocną' 'mocnej',
+        description "Wygląda jak zwykła krata zatopiona w betonie.",
+        with_key set_of_keys,
+        door_dir [;
+            if (location == Below_The_Grate) return u_to;
+            return d_to;
+        ],
+        door_to [;
+            if (location == Below_The_Grate) return Outside_Grate;
+            return Below_The_Grate;
+        ],
+        describe [;
+            if (self has open) "^Krata stoi otworem.";
+            if (self hasnt locked) "^Krata jest odblokowana, ale zamknięta.";
+            rtrue;
+        ],
+        found_in Below_The_Grate Outside_Grate,
+  has   static door openable lockable locked female;
+
+! ------------------------------------------------------------------------------
+!   Facilis descensus Averno...
+! ------------------------------------------------------------------------------
+
+Room    Below_The_Grate "Pod kratą"
+  with  name 'pod' 'kratą',
+        description
+            "Jesteś w niewielkiej komorze pod stalową kratą wymiarów 3 na 3
+             stopy, prowadzącą na powierzchnię. Na zachód, w głąb, wiedzie
+             niskie przejście po kocich łbach.",
+        w_to In_Cobble_Crawl,
+        u_to Grate,
+  has   light;
+
+Scenic  "koci/e łb/y"
+  with  name 'kamienie' 'kamieni' 'kamieniach' 'kamień' 'kamienia'
+             'bruk' 'bruku' 'brukowce' 'brukowców' 'kocimi' 'koci' 'łeb'
+             'łba',
+        description "Zwykłe kocie łby.",
+        found_in In_Cobble_Crawl In_Debris_Room Below_The_Grate,
+  has   multitude pluralname;
+
+! ------------------------------------------------------------------------------
+
+Room    In_Cobble_Crawl "Przejście po kocich łbach"
+  with  name 'przejście' 'przejściu',
+        description
+            "Pełzniesz po kocich łbach niskim korytarzem. Na wschodnim końcu
+             korytarza widać słabe światło.",
+        e_to Below_The_Grate,
+        w_to In_Debris_Room,
+  has   light;
+
+Object  -> wicker_cage "wiklinow/a klatk/a"
+  with  name 'mała' 'małą' 'małej' 'wiklina' 'wikliny' 'klatka',
+        description "To mała wiklinowa klatka.",
+        initial "W pobliżu leży porzucona mała wiklinowa klatka.",
+        after [;
+          Open:
+            if (little_bird notin self) rfalse;
+            print "(wypuszczasz ptaszka)^";
+            <<Release little_bird>>;
+        ],
+  has   container open openable transparent female;
+
+! ------------------------------------------------------------------------------
+
+Room    In_Debris_Room "Komnata z rumowiskiem"
+  with  name 'komnata' 'komnacie' 'rumowisko' 'rumowisku',
+        description
+            "Jesteś w komnacie zawalonej rumowiskiem naniesionym z powierzchni.
+             Niski, szeroki korytarz z kocimi łbami jest tu zatkany błotem
+             i śmieciami, ale w górę i na zachód prowadzi niewygodny kanion.
+             ^^
+             Na ścianie wisi kartka: ~Magiczne słowo XYZZY.~",
+        e_to In_Cobble_Crawl,
+        u_to In_Awkward_Sloping_E_W_Canyon,
+        w_to In_Awkward_Sloping_E_W_Canyon,
+        before [;
+          Xyzzy:
+            PlayerTo(Inside_Building);
+            rtrue;
+        ],
+  has   nodwarf;
+
+Scenic  -> "rumowisk/o"
+  with  name 'śmieci' 'śmieciami' 'błoto' 'błota' 'błotem' 'gruz' 'gruzu',
+        description "Fuj.",
+  has   neuter;
+
+Scenic  -> "kartk/a"
+  with  name 'kartka' 'notatka' 'notatkę' 'notatki' 'napis' 'napisu',
+        description "Na kartce jest napisane ~Magiczne słowo XYZZY~.",
+  has   female;
+
+Object  -> black_rod "czarn/y pręt/ z zardzewiałą gwiazdą"
+  with  name 'gwiazda' 'gwiazdą' 'gwiazdę' 'gwiazdy' 'zardzewiała'
+             'zardzewiałą' 'zardzewiałej' 'żelazny' 'żelaznego' 'żelaznym'
+             'trzystopowy' 'trzystopowego' 'różdżka' 'różdżkę' 'różdżki'
+             'kij' 'kija' 'kijem' 'laska' 'laskę' 'laski',
+        description "To czarny pręt długości trzech stóp, z zardzewiałą
+                     gwiazdą na jednym końcu.",
+        initial
+            "Niedaleko leży czarny pręt długości trzech stóp, z zardzewiałą
+             gwiazdą na jednym końcu.",
+        before [;
+          Wave:
+            if (location == West_Side_Of_Fissure or On_East_Bank_Of_Fissure) {
+                if (caves_closed) "Dziwne. Nic się nie dzieje.";
+                if (CrystalBridge notin nothing) {
+                    remove CrystalBridge;
+                    give CrystalBridge absent;
+                    West_Side_Of_Fissure.e_to = nothing;
+                    On_East_Bank_Of_Fissure.w_to = nothing;
+                    "Kryształowy most zniknął!";
+                }
+                else {
+                    move CrystalBridge to location;
+                    give CrystalBridge ~absent;
+                    West_Side_Of_Fissure.e_to = CrystalBridge;
+                    On_East_Bank_Of_Fissure.w_to = CrystalBridge;
+                    "Nad rozpadliną rozpina się teraz kryształowy most.";
+                }
+            }
+            "Nic się nie dzieje.";
+        ];
+
+! ------------------------------------------------------------------------------
+
+Room    In_Awkward_Sloping_E_W_Canyon "Opadający kanion wschód-zachód"
+  with  name 'opadający' 'kanion' 'kanionie',
+        description "Jesteś w niewygodnym, opadającym kanionie biegnącym ze
+                     wschodu na zachód.",
+        d_to In_Debris_Room,
+        e_to In_Debris_Room,
+        u_to In_Bird_Chamber,
+        w_to In_Bird_Chamber,
+  has   nodwarf;
+
+! ------------------------------------------------------------------------------
+!   Ptaszek w swoim naturalnym środowisku
+! ------------------------------------------------------------------------------
+
+Room    In_Bird_Chamber "Komnata Pomarańczowej Rzeki"
+  with  name 'pomarańczowa' 'pomarańczowej' 'rzeka' 'rzeki' 'komnata'
+             'komnacie',
+        description
+            "Jesteś we wspaniałej komnacie wysokiej na trzydzieści stóp.
+             Ściany to zamarznięte rzeki pomarańczowego kamienia. Ze wschodniej
+             i zachodniej strony komnaty wychodzą niewygodny kanion i porządny
+             korytarz.",
+        e_to In_Awkward_Sloping_E_W_Canyon,
+        w_to At_Top_Of_Small_Pit,
+  has   nodwarf;
+
+Object  -> little_bird "mał/y ptasz/e/k/"
+  with  name 'ptak' 'ptaka' 'ptakiem' 'ptaku' 'ptakowi' 'wesoły' 'wesołego'
+             'wesołym' 'smutny' 'smutnego' 'smutnym' 'ptaszyna' 'ptaszynę'
+             'ptaszyny',
+        initial "Siedzi tu wesoły ptaszek i śpiewa.",
+        before [;
+          Examine:
+            if (self in wicker_cage)
+                "Ptaszek wygląda na nieszczęśliwego w klatce.";
+            "Wesoły ptaszek siedzi tu i śpiewa.";
+          Insert:
+            if (second == wicker_cage)
+                <<Catch self>>;
+            else
+                "Nie wkładaj biednego ptaszka do ", (dop) second, "!";
+          Drop, Remove:
+            if (self in wicker_cage) {
+                print "(Ptaszek wylatuje z klatki.)^^";
+                <<Release self>>;
+            }
+          Take, Catch:
+            if (self in wicker_cage)
+                "Przecież już masz ptaszka. Jeśli wyjmiesz go z klatki,
+                 pewnie ci odleci.";
+            if (wicker_cage notin player)
+                "Ptaszka da się złapać, ale nie da się go nieść.";
+            if (black_rod in player)
+                "Kiedy wchodzisz, ptaszek się nie boi, ale gdy się zbliżasz,
+                 zaczyna się niepokoić i nie udaje ci się go złapać.";
+            move self to wicker_cage;
+            give wicker_cage ~open;
+            "Łapiesz ptaszka do wiklinowej klatki.";
+          Release:
+            if (self notin wicker_cage)
+                "Ptaszek nie jest teraz w klatce.";
+            give wicker_cage open;
+            move self to location;
+            if (Snake in location) {
+                remove Snake;
+                "Ptaszek atakuje zielonego węża i w zdumiewającym trzepocie
+                 skrzydeł przepędza go.";
+            }
+            if (Dragon in location) {
+                remove self;
+                "Ptaszek atakuje zielonego smoka i w zdumiewającym trzepocie
+                 skrzydeł spala się na popiół. Popiół rozwiewa wiatr.";
+            }
+            "Ptaszek odlatuje na wolność.";
+        ],
+        life [;
+          Give:
+            "Nie jest głodny. (On tylko tęskni za fiordami.) Poza tym
+             podejrzewam, że wolałby ptasie ziarno.";
+          Order, Ask, Answer:
+            "Ćwir! Ćwir!";
+          Attack:
+            if (self in wicker_cage)
+                "Och, zostaw w spokoju biednego, nieszczęśliwego ptaszka.";
+            remove self;
+            "Ptaszek nie żyje. Jego ciało znika.";
+        ],
+  has   animate male;
+
+! ------------------------------------------------------------------------------
+
+Room    At_Top_Of_Small_Pit "Nad małą jamą"
+  with  name 'nad' 'małą' 'jamą',
+        description
+            "U twoich stóp jest mała jama, z której unoszą się smużki białej
+             mgły. Korytarz z zachodu kończy się tutaj, jeśli nie liczyć
+             wąskiej szpary prowadzącej dalej.
+             ^^
+             W dół jamy prowadzą nierówne kamienne stopnie.",
+        e_to In_Bird_Chamber,
+        w_to "Szpara jest o wiele za wąska, żeby się przez nią przecisnąć.",
+        d_to [;
+            if (large_gold_nugget in player) {
+                deadflag = 1;
+                "Leżysz na dnie jamy ze skręconym karkiem.";
+            }
+            return In_Hall_Of_Mists;
+        ],
+        before [;
+          Enter:
+            if (noun == PitCrack)
+                "Szpara jest o wiele za wąska, żeby się przez nią przecisnąć.";
+        ],
+  has   nodwarf;
+
+Scenic  -> "mał/a jam/a"
+  with  name 'dziura' 'dziurę' 'dziury' 'dół' 'dołu' 'dole',
+        description "Z jamy unoszą się smużki białej mgły.",
+  has   female;
+
+Scenic  -> PitCrack "wąsk/a szpar/a"
+  with  name 'szczelina' 'szczelinę' 'szczeliny' 'pęknięcie' 'pęknięcia',
+        description "Szpara jest bardzo wąska - o wiele za wąska, żeby się
+                     przez nią przecisnąć.",
+  has   female;
+
+Scenic  "mgł/a"
+  with  name 'opary' 'oparów' 'para' 'pary' 'smużki' 'smużek' 'biała' 'białą'
+             'białej' 'mgiełka' 'mgiełkę',
+        description
+            "Mgła to biała para, zwykle wodna, którą od czasu do czasu widuje
+             się w jaskiniach. Może pojawić się wszędzie, ale często zdradza
+             głęboką jamę, która prowadzi w dół, do wody.",
+        found_in
+            At_Top_Of_Small_Pit In_Hall_Of_Mists On_East_Bank_Of_Fissure
+            At_Window_On_Pit_1 At_West_End_Of_Hall_Of_Mists In_Misty_Cavern
+            In_Mirror_Canyon At_Reservoir At_Window_On_Pit_2 On_Sw_Side_Of_Chasm,
+  has   female;
+
+! ------------------------------------------------------------------------------
+!   Jaskinie się otwierają: Sala Mgieł
+! ------------------------------------------------------------------------------
+
+Room    In_Hall_Of_Mists "Sala Mgieł"
+  with  name 'sala' 'sali' 'mgieł',
+        description
+            "Jesteś na jednym końcu ogromnej sali, która ciągnie się na zachód,
+             aż poza zasięg wzroku. Po obu stronach są otwory. Niedaleko
+             w dół prowadzą szerokie kamienne schody. Salę wypełniają smużki
+             białej mgły, które kołyszą się tam i z powrotem, prawie jakby
+             żyły. Od schodów wieje w górę zimny wiatr. Za tobą, na szczycie
+             kopuły, jest jakiś korytarz.
+             ^^
+             Na kopułę prowadzą nierówne kamienne stopnie.",
+        initial [;
+            if (self has visited) rfalse;
+            score = score + 25;
+        ],
+        s_to In_Nugget_Of_Gold_Room,
+        w_to On_East_Bank_Of_Fissure,
+        d_to In_Hall_Of_Mt_King,
+        n_to In_Hall_Of_Mt_King,
+        u_to [;
+            if (large_gold_nugget in player) "Na kopułę nie da się wspiąć.";
+            return At_Top_Of_Small_Pit;
+        ];
+
+Scenic  -> "szerok/ie kamienn/e schod/y"
+  with  name 'stopnie' 'stopni' 'schodki' 'schodków' 'klatka' 'klatce',
+        description "Schody prowadzą w dół.",
+  has   pluralname;
+
+Scenic  -> "nierówn/e kamienn/e stopni/e"
+  with  name 'schody' 'schodów' 'schodach' 'schodki' 'schodków',
+        description "Nierówne kamienne stopnie prowadzą na kopułę.",
+  has   multitude pluralname;
+
+Scenic  -> "kopuł/a"
+  with  name 'sklepienie' 'sklepienia' 'sklepieniu',
+        before [;
+          Examine:
+            if (large_gold_nugget in player)
+                "Nie jestem pewien, czy dasz radę wspiąć się na nią z tym,
+                 co niesiesz.";
+            "Wygląda na to, że można by się na nią wspiąć.";
+          Climb:
+            MovePlayer(u_obj);
+            rtrue;
+        ],
+  has   female;
+
+! ------------------------------------------------------------------------------
+
+Room    In_Nugget_Of_Gold_Room "Niska komnata"
+  with  name 'niska' 'niskiej' 'komnata' 'komnacie',
+        description
+            "To niska komnata z prymitywnym napisem na ścianie:
+             ^^
+             ~Nie wniesiesz tego po schodach~.",
+        n_to In_Hall_Of_Mists;
+
+Scenic  -> "prymitywn/y napis/+u"
+  with  name 'kartka' 'kartki' 'kartkę' 'notatka' 'notatkę',
+        description "Napis głosi: ~Nie wniesiesz tego po schodach~.";
+
+Treasure -> large_gold_nugget "duż/y samorod/e/k/ złota"
+  with  name 'złoto' 'złota' 'złotem' 'bryłka' 'bryłkę' 'bryłki' 'ciężki'
+             'ciężkiego' 'ciężkim' 'samorodek',
+        description "To duży, lśniący samorodek złota!",
+        initial "Leży tu duży, lśniący samorodek złota!";
+
+! ------------------------------------------------------------------------------
+
+Class   FissureRoom
+  class Room
+  with  before [;
+          Jump:
+            if (CrystalBridge hasnt absent)
+                "Z szacunkiem sugeruję, żeby przejść przez most, zamiast
+                 skakać.";
+            deadflag = 1;
+            "Nie udało się.";
+        ],
+        d_to "Rozpadlina jest zbyt przerażająca!";
+
+FissureRoom On_East_Bank_Of_Fissure "Wschodni brzeg rozpadliny"
+  with  name 'wschodni' 'brzeg' 'brzegu' 'rozpadliny',
+        description
+            "Jesteś na wschodnim brzegu rozpadliny, która przecina salę na
+             wskroś. Mgła jest tu dość gęsta, a rozpadlina za szeroka, żeby
+             ją przeskoczyć.",
+        e_to In_Hall_Of_Mists,
+        w_to "Rozpadlina jest za szeroka.";
+
+FissureRoom West_Side_Of_Fissure "Zachodnia strona rozpadliny"
+  with  name 'zachodnia' 'strona' 'stronie' 'rozpadliny',
+        description
+            "Jesteś po zachodniej stronie rozpadliny w Sali Mgieł.",
+        w_to At_West_End_Of_Hall_Of_Mists,
+        e_to "Rozpadlina jest za szeroka.",
+        n_to At_West_End_Of_Hall_Of_Mists,
+        before [;
+          Go:
+            if (location == West_Side_Of_Fissure && noun == n_obj)
+                print
+                    "Przeczołgujesz się bardzo niskim, szerokim korytarzem,
+                     biegnącym równolegle do Sali Mgieł, na północ od niej.^";
+        ];
+
+Treasure -> "diament/y"
+  with  name 'diament' 'diamentu' 'brylant' 'brylanty' 'brylantów' 'kilka'
+             'najwyższej' 'jakości',
+        description "Wyglądają na najwyższej jakości!",
+        initial "Leżą tu diamenty!",
+  has   multitude pluralname;
+
+Object  CrystalBridge "kryształow/y most/+u"
+  with  name 'kryształ' 'kryształu' 'mostek' 'mostku',
+        description "Rozpina się nad rozpadliną, więc możesz po nim przejść.",
+        initial "Nad rozpadliną rozpina się teraz kryształowy most.",
+        door_dir [;
+            if (location == West_Side_Of_Fissure) return e_to;
+            return w_to;
+        ],
+        door_to [;
+            if (location == West_Side_Of_Fissure) return On_East_Bank_Of_Fissure;
+            return West_Side_Of_Fissure;
+        ],
+        found_in On_East_Bank_Of_Fissure West_Side_Of_Fissure,
+  has   static door open absent;
+
+Scenic  "szerok/a rozpadlin/a"
+  with  name 'szczelina' 'szczeliny' 'szczelinę' 'przepaść' 'przepaści',
+        description "Rozpadlina wydaje się o wiele za szeroka, żeby ją
+                     przeskoczyć.",
+        found_in On_East_Bank_Of_Fissure West_Side_Of_Fissure,
+  has   female;
+
+! ------------------------------------------------------------------------------
+
+Room    At_West_End_Of_Hall_Of_Mists "Zachodni koniec Sali Mgieł"
+  with  name 'zachodni' 'koniec' 'końcu' 'sali' 'mgieł',
+        description
+            "Jesteś na zachodnim końcu Sali Mgieł. Niskie, szerokie przejście
+             ciągnie się dalej na zachód, a drugie biegnie na północ. Na
+             południu, sześć stóp nad podłogą, jest niewielki korytarz.",
+        s_to Alike_Maze_1,
+        u_to Alike_Maze_1,
+        e_to West_Side_Of_Fissure,
+        w_to At_East_End_Of_Long_Hall,
+        n_to West_Side_Of_Fissure,
+        before [;
+          Go:
+            if (noun == n_obj)
+                print
+                    "Przeczołgujesz się bardzo niskim, szerokim korytarzem,
+                     biegnącym równolegle do Sali Mgieł, na północ od niej.^";
+        ];
+
+! ------------------------------------------------------------------------------
+!   Długa Sala na zachód od Sali Mgieł
+! ------------------------------------------------------------------------------
+
+Room    At_East_End_Of_Long_Hall "Wschodni koniec Długiej Sali"
+  with  name 'wschodni' 'koniec' 'końcu' 'długiej' 'sali',
+        description
+            "Jesteś na wschodnim końcu bardzo długiej sali, najwyraźniej bez
+             bocznych komnat. Na wschód w górę pnie się niskie, szerokie
+             przejście. Na północ w dół opada okrągła dziura o średnicy dwóch
+             stóp.",
+        e_to At_West_End_Of_Hall_Of_Mists,
+        u_to At_West_End_Of_Hall_Of_Mists,
+        w_to At_West_End_Of_Long_Hall,
+        n_to Crossover,
+        d_to Crossover;
+
+! ------------------------------------------------------------------------------
+
+Room    At_West_End_Of_Long_Hall "Zachodni koniec Długiej Sali"
+  with  name 'zachodni' 'koniec' 'końcu' 'długiej' 'sali',
+        description
+            "Jesteś na zachodnim końcu bardzo długiej, pozbawionej
+             charakteru sali. Sala łączy się tu z wąskim korytarzem biegnącym
+             z północy na południe.",
+        e_to At_East_End_Of_Long_Hall,
+        s_to Different_Maze_1,
+        n_to Crossover;
+
+! ------------------------------------------------------------------------------
+
+Room    Crossover "Skrzyżowanie korytarzy"
+  with  name 'skrzyżowanie' 'skrzyżowaniu' 'korytarzy',
+        description
+            "Jesteś na skrzyżowaniu wysokiego korytarza północ-południe
+             z niskim korytarzem wschód-zachód.",
+        w_to At_East_End_Of_Long_Hall,
+        n_to Dead_End_7,
+        e_to In_West_Side_Chamber,
+        s_to At_West_End_Of_Long_Hall;
+
+Scenic  -> "skrzyżowani/e"
+  with  name 'krzyżówka' 'krzyżówkę' 'krzyżówce',
+        description "W tej chwili wiesz o nim tyle samo co ja.",
+  has   neuter;
+
+! ------------------------------------------------------------------------------
+!   W labiryncie będzie potrzeba wielu ślepych zaułków, więc klasa:
+! ------------------------------------------------------------------------------
+
+Class   DeadendRoom
+  with  short_name "Ślepy zaułek",
+        description "Docierasz do ślepego zaułka.",
+        cant_go "Musisz wrócić tą samą drogą.";
+
+DeadendRoom Dead_End_7
+  with  s_to Crossover,
+        out_to Crossover;
+
+! ------------------------------------------------------------------------------
+!   Sala Króla Gór i boczne komnaty
+! ------------------------------------------------------------------------------
+
+Room    In_Hall_Of_Mt_King "Sala Króla Gór"
+  with  name 'sala' 'sali' 'króla' 'gór',
+        description
+            "Jesteś w Sali Króla Gór, z której we wszystkich kierunkach
+             odchodzą korytarze.",
+        cant_go "No, może nie całkiem we wszystkich kierunkach.",
+        u_to In_Hall_Of_Mists,
+        e_to In_Hall_Of_Mists,
+        n_to Low_N_S_Passage,
+        s_to In_South_Side_Chamber,
+        w_to In_West_Side_Chamber,
+        sw_to In_Secret_E_W_Canyon,
+        before [;
+          Go:
+            if (Snake in self && (noun == n_obj or s_obj or w_obj ||
+                                 (noun == sw_obj && random(100) <= 35)))
+                "Nie przejdziesz obok węża.";
+        ];
+
+Object  -> Snake "ogromn/y zielon/y w/ą=ę/ż/"
+  with  name 'kobra' 'kobry' 'kobrę' 'kobrą' 'żmija' 'żmii' 'żmiję' 'żmiją'
+             'gad' 'gada' 'gadem' 'groźny' 'groźnego' 'groźnym' 'jadowity'
+             'jadowitego' 'jadowitym' 'wielki' 'wielkiego' 'wielkim'
+             'zabójczy' 'zabójczego' 'wężyk',
+        description "Na twoim miejscu nie zadzierałbym z nim.",
+        initial "Drogę zagradza ogromny, groźny zielony wąż!",
+        life [;
+          Order, Ask, Answer:
+            "Sssss!";
+          ThrowAt:
+            if (noun == axe) <<Attack self>>;
+            <<Give noun self>>;
+          Give:
+            if (noun == little_bird) {
+                remove little_bird;
+                "Wąż pożarł twojego ptaszka.";
+            }
+            "Nie ma tu nic, co chciałby zjeść (może poza tobą).";
+          Attack:
+            "Atakowanie węża nic nie da, a do tego jest bardzo
+             niebezpieczne.";
+          Take:
+            deadflag = 1;
+            "To on bierze ciebie. Chlup!";
+        ],
+  has   animate male;
+
+! ------------------------------------------------------------------------------
+
+Room    Low_N_S_Passage "Niski korytarz północ-południe"
+  with  name 'niski' 'korytarz' 'korytarzu',
+        description
+            "Jesteś w niskim korytarzu biegnącym z północy na południe, przy
+             dziurze w podłodze. Dziura prowadzi w dół, do korytarza
+             wschód-zachód.",
+        s_to In_Hall_Of_Mt_King,
+        d_to In_Dirty_Passage,
+        n_to At_Y2;
+
+Treasure -> "sztab/y srebra"
+  with  name 'srebro' 'srebrem' 'sztaba' 'sztabę' 'sztabka' 'sztabki'
+             'sztabek' 'srebrne' 'srebrnych',
+        description "Muszą być warte fortunę!",
+        initial "Leżą tu sztaby srebra!",
+  has   pluralname female;
+
+! ------------------------------------------------------------------------------
+
+Room    In_South_Side_Chamber "Południowa komnata boczna"
+  with  name 'południowa' 'boczna' 'komnata' 'komnacie',
+        description "Jesteś w południowej komnacie bocznej.",
+        n_to In_Hall_Of_Mt_King;
+
+Treasure -> "drogocenn/a biżuteri/a"
+  with  name 'klejnot' 'klejnoty' 'klejnotów' 'klejnotami' 'kosztowności'
+             'kosztownościami' 'wyborna' 'wyborną' 'wybornej',
+        description "Wszystko to jest naprawdę wyborne!",
+        initial "Leży tu drogocenna biżuteria!",
+  has   female;
+
+! ------------------------------------------------------------------------------
+
+Room    In_West_Side_Chamber "Zachodnia komnata boczna"
+  with  name 'zachodnia' 'boczna' 'komnata' 'komnacie',
+        description
+            "Jesteś w zachodniej komnacie bocznej Sali Króla Gór. Korytarz
+             biegnie stąd dalej na zachód i w górę.",
+        w_to Crossover,
+        u_to Crossover,
+        e_to In_Hall_Of_Mt_King;
+
+Treasure -> rare_coins "rzadk/ie monet/y"
+  with  name 'moneta' 'monetę' 'monety' 'monet' 'pieniądze' 'pieniędzy',
+        description "To marzenie każdego numizmatyka!",
+        initial "Leży tu mnóstwo monet!",
+  has   multitude pluralname female;
+
+! ------------------------------------------------------------------------------
+!   Komnata ze skałą Y2 i okolice, nieco niżej
+! ------------------------------------------------------------------------------
+
+Room    At_Y2 "Przy ~Y2~"
+  with  name 'y2',
+        description
+            "Jesteś w dużej komnacie z korytarzem na południe, korytarzem na
+             zachód i ścianą z pokruszonej skały na wschodzie. Na skale
+             pośrodku komnaty widnieje wielki napis ~Y2~.",
+        after [;
+          Look:
+            if (random(100) <= 25) print "^Głuchy głos mówi: ~Plugh.~^";
+        ],
+        before [;
+          Plugh:
+            PlayerTo(Inside_Building);
+            rtrue;
+          Plover:
+            if (In_Plover_Room hasnt visited) rfalse;
+            if (egg_sized_emerald in player) {
+                move egg_sized_emerald to In_Plover_Room;
+                score = score - 5;
+            }
+            PlayerTo(In_Plover_Room);
+            rtrue;
+        ],
+        s_to Low_N_S_Passage,
+        e_to Jumble_Of_Rock,
+        w_to At_Window_On_Pit_1;
+
+Scenic  -> "skał/a z napisem Y2"
+  with  name 'kamień' 'kamienia' 'kamieniu' 'głaz' 'głazu' 'głazie' 'napis'
+             'napisu',
+        description "Na skale namalowano wielki napis ~Y2~.",
+  has   supporter female;
+
+! ------------------------------------------------------------------------------
+
+Room    Jumble_Of_Rock "Rumowisko skalne"
+  with  name 'rumowisko' 'rumowisku' 'skalne',
+        description "Jesteś w rumowisku skalnym; wszędzie pełno szczelin.",
+        d_to At_Y2,
+        u_to In_Hall_Of_Mists;
+
+! ------------------------------------------------------------------------------
+
+Room    At_Window_On_Pit_1 "Przy oknie nad jamą"
+  with  name 'okno' 'oknie' 'jamą',
+        description
+            "Stoisz przy niskim oknie, które wychodzi na ogromną jamę ginącą
+             w górze poza zasięgiem wzroku. Ponad pięćdziesiąt stóp niżej
+             niewyraźnie widać dno. Dno jamy pokrywają smużki białej mgły,
+             gęstniejące w prawo. Ślady w kurzu wokół okna wskazują, że ktoś
+             niedawno tu był. Dokładnie naprzeciwko, po drugiej stronie jamy,
+             dwadzieścia pięć stóp dalej, jest podobne okno wychodzące na
+             oświetloną komnatę. Widać w nim mroczną postać, która ci się
+             przygląda.",
+        before [;
+          WaveHands:
+            "Mroczna postać macha ci w odpowiedzi!";
+        ],
+        cant_go "Jedyne przejście prowadzi z powrotem na wschód, do Y2.",
+        e_to At_Y2;
+
+Class   PitScenic
+  with  found_in At_Window_On_Pit_1 At_Window_On_Pit_2,
+  has   scenery;
+
+PitScenic "nisk/ie okn/o"
+  with  name 'okienko' 'okienka' 'okienku',
+        description "Wygląda jak zwykłe okno.",
+  has   openable neuter;
+
+PitScenic "ogromn/a jam/a"
+  with  name 'dół' 'dołu' 'dole' 'głęboka' 'głębokiej' 'głęboką' 'duża'
+             'dużej' 'dużą',
+        description
+            "Jest tak głęboka, że ledwie widać dno, a górnej krawędzi nie
+             widać wcale.",
+  has   female;
+
+PitScenic "ślad/y w kurzu"
+  with  name 'ślad' 'śladu' 'kurz' 'kurzu' 'odciski' 'odcisków',
+        description "Najwyraźniej nie jesteś tu sam.",
+  has   multitude pluralname;
+
+PitScenic "mroczn/a posta/ć=ci/"
+  with  name 'cień' 'cienia' 'cieniem' 'osoba' 'osobę' 'osoby' 'osobnik'
+             'osobnika' 'tajemnicza' 'tajemniczą' 'tajemniczej' 'sylwetka'
+             'sylwetkę' 'sylwetki',
+        description
+            "Mroczna postać najwyraźniej próbuje zwrócić twoją uwagę.",
+  has   female;
+
+! ------------------------------------------------------------------------------
+
+Room    In_Dirty_Passage "Brudny korytarz"
+  with  name 'brudny' 'korytarz' 'korytarzu',
+        description
+            "Jesteś w brudnym, poszarpanym korytarzu. Na wschodzie jest niskie
+             przejście, na zachodzie duży korytarz. Nad tobą jest dziura
+             prowadząca do innego korytarza.",
+        e_to On_Brink_Of_Pit,
+        u_to Low_N_S_Passage,
+        w_to In_Dusty_Rock_Room;
+
+! ------------------------------------------------------------------------------
+
+Room    On_Brink_Of_Pit "Na krawędzi jamy"
+  with  name 'krawędź' 'krawędzi' 'jamy',
+        description
+            "Stoisz na krawędzi niewielkiej, czystej jamy, do której da się
+             zejść. Na zachód prowadzi niskie przejście.",
+        w_to In_Dirty_Passage,
+        d_to In_Pit,
+        in_to In_Pit;
+
+Scenic  -> "mał/a jam/a"
+  with  name 'dół' 'dołu' 'dole' 'czysta' 'czystą' 'czystej',
+        description "Wygląda na to, że można by do niej zejść.",
+        before [;
+          Climb, Enter:
+            MovePlayer(d_obj);
+            rtrue;
+        ],
+  has   female;
+
+! ------------------------------------------------------------------------------
+
+Room    In_Pit "W jamie"
+  with  name 'jama' 'jamie',
+        description
+            "Jesteś na dnie niewielkiej jamy, przez którą płynie strumyczek;
+             wpływa i wypływa przez maleńkie szczeliny.",
+        u_to On_Brink_Of_Pit,
+        d_to "Nie zmieścisz się w maleńkich szczelinach!",
+  has   nodwarf;
+
+Scenic  -> "maleńk/ie szczelin/y"
+  with  name 'szczelina' 'szczelinę' 'szpary' 'szpar',
+        description "Szczeliny tworzą w skale skomplikowany wzór.",
+  has   multitude pluralname female;
+
+! ------------------------------------------------------------------------------
+
+Room    In_Dusty_Rock_Room "Komnata zakurzonych głazów"
+  with  name 'komnata' 'komnacie' 'zakurzonych' 'głazów',
+        description
+            "Jesteś w dużej komnacie pełnej zakurzonych głazów. W podłodze
+             jest wielka dziura. Wszędzie są szczeliny, a na wschód prowadzi
+             korytarz.",
+        e_to In_Dirty_Passage,
+        d_to At_Complex_Junction;
+
+Scenic  -> "zakurzon/e głaz/y"
+  with  name 'głaz' 'głazu' 'kamienie' 'kamieni' 'kamień' 'kamienia'
+             'skały' 'skał' 'skała' 'brudne' 'brudnych',
+        description "To po prostu głazy. (Zakurzone, ściśle mówiąc.)",
+        before [;
+          LookUnder, Push, Pull:
+            "Trzeba by je wysadzić.";
+        ],
+  has   multitude pluralname;
+
+! ------------------------------------------------------------------------------
+!   Labirynt krętych korytarzyków, wszystkich jednakowych...
+! ------------------------------------------------------------------------------
+
+Class   MazeRoom
+  with  short_name "Labirynt",
+        description "Jesteś w labiryncie krętych korytarzyków, wszystkich
+                     jednakowych.",
+        out_to "Łatwiej powiedzieć, niż zrobić.";
+
+MazeRoom Alike_Maze_1
+  with  u_to At_West_End_Of_Hall_Of_Mists,
+        n_to Alike_Maze_1,
+        e_to Alike_Maze_2,
+        s_to Alike_Maze_4,
+        w_to Alike_Maze_11;
+
+MazeRoom Alike_Maze_2
+  with  w_to Alike_Maze_1,
+        s_to Alike_Maze_3,
+        e_to Alike_Maze_4;
+
+MazeRoom Alike_Maze_3
+  with  e_to Alike_Maze_2,
+        d_to Dead_End_3,
+        s_to Alike_Maze_6,
+        n_to Dead_End_13;
+
+MazeRoom Alike_Maze_4
+  with  w_to Alike_Maze_1,
+        n_to Alike_Maze_2,
+        e_to Dead_End_1,
+        s_to Dead_End_2,
+        u_to Alike_Maze_14,
+        d_to Alike_Maze_14;
+
+MazeRoom Alike_Maze_5
+  with  e_to Alike_Maze_6,
+        w_to Alike_Maze_7;
+
+MazeRoom Alike_Maze_6
+  with  e_to Alike_Maze_3,
+        w_to Alike_Maze_5,
+        d_to Alike_Maze_7,
+        s_to Alike_Maze_8;
+
+DeadendRoom Dead_End_1
+  with  w_to Alike_Maze_4,
+        out_to Alike_Maze_4;
+
+DeadendRoom Dead_End_2
+  with  w_to Alike_Maze_4,
+        out_to Alike_Maze_4;
+
+DeadendRoom Dead_End_3
+  with  u_to Alike_Maze_3,
+        out_to Alike_Maze_3;
+
+MazeRoom Alike_Maze_7
+  with  w_to Alike_Maze_5,
+        u_to Alike_Maze_6,
+        e_to Alike_Maze_8,
+        s_to Alike_Maze_9;
+
+MazeRoom Alike_Maze_8
+  with  w_to Alike_Maze_6,
+        e_to Alike_Maze_7,
+        s_to Alike_Maze_8,
+        u_to Alike_Maze_9,
+        n_to Alike_Maze_10,
+        d_to Dead_End_12;
+
+MazeRoom Alike_Maze_9
+  with  w_to Alike_Maze_7,
+        n_to Alike_Maze_8,
+        s_to Dead_End_4;
+
+DeadendRoom Dead_End_4
+  with  w_to Alike_Maze_9,
+        out_to Alike_Maze_9;
+
+MazeRoom Alike_Maze_10
+  with  w_to Alike_Maze_8,
+        n_to Alike_Maze_10,
+        d_to Dead_End_5,
+        e_to At_Brink_Of_Pit;
+
+DeadendRoom Dead_End_5
+  with  u_to Alike_Maze_10,
+        out_to Alike_Maze_10;
+
+! ------------------------------------------------------------------------------
+
+Room    At_Brink_Of_Pit "Na krawędzi jamy"
+  with  name 'krawędź' 'krawędzi' 'jamy',
+        description
+            "Stoisz na krawędzi jamy głębokiej na trzydzieści stóp; wzdłuż
+             jednej ze ścian biegnie w dół masywna pomarańczowa kolumna.
+             Można by tędy zejść, ale nie dałoby się wrócić. Labirynt ciągnie
+             się dalej na tym poziomie.",
+        d_to In_Bird_Chamber,
+        w_to Alike_Maze_10,
+        s_to Dead_End_6,
+        n_to Alike_Maze_12,
+        e_to Alike_Maze_13;
+
+Scenic  -> "masywn/a pomarańczow/a kolumn/a"
+  with  name 'filar' 'filaru' 'wielka' 'wielką' 'wielkiej' 'ogromna'
+             'ogromną' 'ogromnej',
+        description "Wygląda na to, że dałoby się po niej zejść.",
+        before [;
+          Climb:
+            MovePlayer(d_obj);
+            rtrue;
+        ],
+  has   female;
+
+Scenic  -> "jam/a"
+  with  name 'dół' 'dołu' 'dole' 'trzydziestostopowa' 'trzydziestostopową',
+        description "Żeby dowiedzieć się czegoś więcej, trzeba by zejść na
+                     dół...",
+        before [;
+          Climb:
+            MovePlayer(d_obj);
+            rtrue;
+        ],
+  has   female;
+
+DeadendRoom Dead_End_6
+  with  e_to At_Brink_Of_Pit,
+        out_to At_Brink_Of_Pit;
+
+! ------------------------------------------------------------------------------
+!   Trzy ważne skrzyżowania w linii, ze wschodu na zachód
+! ------------------------------------------------------------------------------
+
+Room    At_Complex_Junction "Złożone skrzyżowanie"
+  with  name 'złożone' 'skrzyżowanie' 'skrzyżowaniu',
+        description
+            "Jesteś na złożonym skrzyżowaniu. Niski korytarz od północy, którym
+             trzeba iść na czworakach, łączy się z wyższym przejściem od
+             wschodu w korytarz, którym można iść na zachód. Wyżej jest też
+             duża komnata. Powietrze jest tu wilgotne.",
+        u_to In_Dusty_Rock_Room,
+        w_to In_Bedquilt,
+        n_to In_Shell_Room,
+        e_to In_Anteroom;
+
+! ------------------------------------------------------------------------------
+
+Room    In_Bedquilt "Pikowana Kołdra"
+  with  name 'pikowana' 'pikowanej' 'kołdra' 'kołdrze',
+        description
+            "Jesteś w Pikowanej Kołdrze, długim korytarzu wschód-zachód
+             pełnym dziur. Jeśli chcesz zwiedzać na chybił trafił, wybierz
+             północ, południe, górę albo dół.",
+        e_to At_Complex_Junction,
+        w_to In_Swiss_Cheese_Room,
+        s_to In_Slab_Room,
+        u_to In_Dusty_Rock_Room,
+        n_to At_Junction_Of_Three,
+        d_to In_Anteroom,
+        before [ destiny;
+          Go:
+            if (noun == s_obj or d_obj && random(100) <= 80) destiny = 1;
+            if (noun == u_obj && random(100) <= 80)          destiny = 1;
+            if (noun == u_obj && random(100) <= 50) destiny = In_Secret_N_S_Canyon_1;
+            if (noun == n_obj && random(100) <= 60)          destiny = 1;
+            if (noun == n_obj && random(100) <= 75) destiny = In_Large_Low_Room;
+            if (destiny == 1)
+                "Przeczołgujesz się przez jakieś małe dziury i lądujesz
+                 z powrotem w głównym korytarzu.";
+            if (destiny == 0) rfalse;
+            PlayerTo(destiny);
+            rtrue;
+        ];
+
+! ------------------------------------------------------------------------------
+
+Room    In_Swiss_Cheese_Room "Komnata Szwajcarskiego Sera"
+  with  name 'komnata' 'komnacie' 'szwajcarskiego' 'sera',
+        description
+            "Jesteś w komnacie, której ściany przypominają ser szwajcarski.
+             Widoczne korytarze prowadzą na zachód, wschód, północny wschód
+             i północny zachód. Część komnaty zajmuje wielki blok litej skały.",
+        w_to At_East_End_Of_Twopit_Room,
+        s_to In_Tall_E_W_Canyon,
+        ne_to In_Bedquilt,
+        nw_to In_Oriental_Room,
+        e_to In_Soft_Room,
+        before [;
+          Go:
+            if ((noun == s_obj && random(100) <= 80) ||
+                (noun == nw_obj && random(100) <= 50))
+                "Przeczołgujesz się przez jakieś małe dziury i lądujesz
+                 z powrotem w głównym korytarzu.";
+        ];
+
+Scenic  -> "blok/+u litej skały"
+  with  name 'skała' 'skały' 'skałę' 'lita' 'litej' 'wielki' 'wielkiego',
+        description "To po prostu ogromny blok.",
+        before [;
+          LookUnder, Push, Pull, Take:
+            "Chyba żartujesz.";
+        ];
+
+! ------------------------------------------------------------------------------
+!   Sala Dwóch Jam
+! ------------------------------------------------------------------------------
+!   Możliwe wysokości rośliny:
+! ------------------------------------------------------------------------------
+
+Constant TINY_P = 0;
+Constant TALL_P = 1;
+Constant HUGE_P = 2;
+
+Room    At_West_End_Of_Twopit_Room "Zachodni koniec Sali Dwóch Jam"
+  with  name 'zachodni' 'koniec' 'końcu' 'sali' 'dwóch' 'jam',
+        description
+            "Jesteś na zachodnim końcu Sali Dwóch Jam. Na tym końcu sali,
+             w ścianie nad jamą, jest duża dziura.",
+        e_to At_East_End_Of_Twopit_Room,
+        w_to In_Slab_Room,
+        d_to In_West_Pit,
+        u_to "To za wysoko, nie dosięgniesz.",
+        before [;
+          Enter:
+            if (noun == HoleAbovePit_1) "To za wysoko, nie dosięgniesz.";
+        ];
+
+Object  PlantStickingUp "łodyg/a fasoli"
+  with  name 'roślina' 'rośliny' 'roślinę' 'roślinie' 'roślinką' 'łodyżka'
+             'łodyżkę' 'fasola' 'fasolę' 'pnącze' 'pnącza' 'olbrzymia'
+             'olbrzymią' 'olbrzymiej' 'malutka' 'malutką' 'mała' 'małą'
+             'dwunastostopowa' 'dwunastostopową' 'wysoka' 'wysoką',
+        describe [;
+            if (Plant.height == TALL_P)
+                "Z zachodniej jamy wystaje wierzchołek łodygi fasoli
+                 wysokiej na dwanaście stóp.";
+            "Z zachodniej jamy wyrasta ogromna łodyga fasoli, sięgająca aż
+             do dziury.";
+        ],
+        before [;
+          Examine:
+            RunRoutines(self, describe);
+            rtrue;
+          Climb:
+            if (Plant.height == HUGE_P) <<Climb Plant>>;
+        ],
+        found_in At_West_End_Of_Twopit_Room At_East_End_Of_Twopit_Room,
+  has   absent static female;
+
+Scenic  HoleAbovePit_1 "dziur/a nad jamą"
+  with  name 'duża' 'dużą' 'dużej' 'otwór' 'otworu' 'otworze',
+        description
+            "Dziura jest w ścianie nad jamą, na tym końcu sali.",
+        found_in In_West_Pit At_West_End_Of_Twopit_Room,
+  has   female;
+
+! ------------------------------------------------------------------------------
+
+Room    In_West_Pit "W zachodniej jamie"
+  with  name 'zachodnia' 'zachodniej' 'jama' 'jamie',
+        description
+            "Jesteś na dnie zachodniej jamy w Sali Dwóch Jam. Jakieś
+             dwadzieścia pięć stóp nad tobą jest w ścianie duża dziura.",
+        before [;
+          Climb:
+            if (noun == Plant) rfalse;
+            if (Plant.height == TINY_P)
+                "Nie ma tu na co się wspinać. Żeby wyjść z jamy, wpisz
+                 ~do góry~ albo ~wyjdź~.";
+        ],
+        u_to At_West_End_Of_Twopit_Room,
+  has   nodwarf;
+
+Object  -> Plant "roślin/a"
+  with  name 'łodyga' 'łodygi' 'łodygę' 'łodydze' 'łodygą' 'fasola' 'fasoli'
+             'fasolę' 'pnącze' 'pnącza' 'roślinka' 'roślinkę' 'roślinki'
+             'olbrzymia' 'olbrzymią' 'olbrzymiej' 'malutka' 'malutką' 'mała'
+             'małą' 'mruczącą' 'dwunastostopowa' 'dwunastostopową' 'wysoka'
+             'wysoką' 'ryczącą',
+        describe [;
+            switch (self.height) {
+              TINY_P:
+                "W jamie rośnie malutka roślinka i mruczy: ~Wody, wody...~";
+              TALL_P:
+                "Z jamy wyrasta łodyga fasoli wysoka na dwanaście stóp
+                 i ryczy: ~Wody!! Wody!!~";
+              HUGE_P:
+                "Olbrzymia łodyga fasoli sięga aż do samej dziury.";
+            }
+        ],
+        before [;
+          Climb:
+            switch (self.height) {
+              TINY_P:
+                "To przecież tylko mała roślinka!";
+              TALL_P:
+                print
+                    "Wspinasz się po roślinie i wychodzisz z jamy.^";
+                PlayerTo(At_West_End_Of_Twopit_Room);
+                rtrue;
+              HUGE_P:
+                print
+                    "Wdrapujesz się po roślinie i przemykasz przez dziurę
+                     na górze.^";
+                PlayerTo(In_Narrow_Corridor);
+                rtrue;
+            }
+          Take:
+            "Roślina ma wyjątkowo głębokie korzenie i nie da się jej wyrwać.";
+          Water:
+            if (bottle notin player)
+                "Nie masz czym podlać rośliny.";
+            switch (child(bottle)) {
+              nothing:
+                "Butelka jest pusta.";
+              oil_in_the_bottle:
+                remove oil_in_the_bottle;
+                "Roślina z oburzeniem strząsa olej z liści i pyta: ~Wody?~";
+            }
+            remove water_in_the_bottle;
+            switch ((self.height)++) {
+              TINY_P:
+                print
+                    "Roślina przez kilka sekund rośnie jak szalona.^^";
+                give PlantStickingUp ~absent;
+              TALL_P:
+                print
+                    "Roślina wystrzeliwuje w górę i wypełnia niemal całe
+                     dno jamy.^^";
+              HUGE_P:
+                print
+                    "Za dużo wody! Roślina więdnie! Ona... ona...^^";
+                give PlantStickingUp absent;
+                remove PlantStickingUp;
+                self.height = TINY_P;
+            }
+            <<Examine self>>;
+          Oil:
+            <<Water self>>;
+          Examine:
+            self.describe();
+            rtrue;
+        ],
+        height TINY_P,
+  has   female;
+
+! ------------------------------------------------------------------------------
+
+Room    At_East_End_Of_Twopit_Room "Wschodni koniec Sali Dwóch Jam"
+  with  name 'wschodni' 'koniec' 'końcu' 'sali' 'dwóch' 'jam',
+        description
+            "Jesteś na wschodnim końcu Sali Dwóch Jam. Podłogę zaścielają tu
+             cienkie płyty skalne, po których łatwo zejść do jam. Ścieżka
+             omija jamy i łączy korytarze od wschodu i zachodu. Wszędzie są
+             dziury, ale jedyna duża jest w ścianie bezpośrednio nad
+             zachodnią jamą, gdzie nie da się do niej dostać.",
+        e_to In_Swiss_Cheese_Room,
+        w_to At_West_End_Of_Twopit_Room,
+        d_to In_East_Pit;
+
+Scenic  -> "cienk/ie płyt/y skaln/e!"
+  with  name 'płyta' 'płytę' 'płycie' 'skały' 'skał' 'schody' 'schodów',
+        description "Tworzą niemal naturalne schody w dół jamy.",
+        before [;
+          LookUnder, Push, Pull, Take:
+            "Chyba żartujesz. Trzeba by je wysadzić.";
+        ],
+  has   multitude pluralname female;
+
+! ------------------------------------------------------------------------------
+
+Room    In_East_Pit "We wschodniej jamie"
+  with  name 'wschodnia' 'wschodniej' 'jama' 'jamie',
+        description
+            "Jesteś na dnie wschodniej jamy w Sali Dwóch Jam. W jednym kącie
+             jamy jest mała kałuża oleju.",
+        u_to At_East_End_Of_Twopit_Room,
+  has   nodwarf;
+
+Scenic  -> Oil "kałuż/a oleju"
+  with  name 'olej' 'oleju' 'olejem' 'mała' 'małą' 'małej' 'smar' 'smaru',
+        description "Wygląda jak zwykły olej.",
+        before [;
+          Drink:
+            "W żadnym wypadku.";
+          Take:
+            if (bottle notin player)
+                "Nie masz w czym nieść oleju.";
+            <<Fill bottle>>;
+          Insert:
+            if (second == bottle) <<Fill bottle>>;
+            "Nie masz w czym nieść oleju.";
+        ],
+  has   female;
+
+Scenic  "dziur/a nad jamą"
+  with  name 'duża' 'dużą' 'dużej' 'otwór' 'otworu' 'otworze',
+        description "Dziura jest w ścianie nad tobą.",
+        found_in In_East_Pit At_East_End_Of_Twopit_Room,
+  has   female;
+
+! ------------------------------------------------------------------------------
+
+Room    In_Slab_Room "Komnata z płytą"
+  with  name 'komnata' 'komnacie' 'płytą',
+        description
+            "Jesteś w dużej, niskiej, okrągłej komnacie, której podłogą jest
+             ogromna płyta, która spadła ze stropu (stąd nazwa). Na wschodzie
+             i zachodzie były kiedyś duże korytarze, ale teraz zawalają je
+             głazy. Na północ i południe prowadzą niskie, wąskie przejścia;
+             południowe szybko skręca na zachód, omijając głazy.",
+        s_to At_West_End_Of_Twopit_Room,
+        u_to In_Secret_N_S_Canyon_0,
+        n_to In_Bedquilt;
+
+Scenic  -> "płyt/a"
+  with  name 'ogromna' 'ogromną' 'ogromnej',
+        description "Teraz jest tu podłogą.",
+        before [;
+          LookUnder, Push, Pull, Take:
+            "Chyba żartujesz.";
+        ],
+  has   female;
+
+Scenic  -> "głaz/y"
+  with  name 'głaz' 'głazu' 'kamienie' 'kamieni' 'skały' 'skał',
+        description "To zwykłe głazy.",
+  has   multitude pluralname;
+
+! ------------------------------------------------------------------------------
+!   Mała sieć kanionów, przeważnie tajnych
+! ------------------------------------------------------------------------------
+
+Room    In_Secret_N_S_Canyon_0 "Tajny kanion północ-południe"
+  with  name 'tajny' 'kanion' 'kanionie',
+        description
+            "Jesteś w tajnym kanionie biegnącym z północy na południe, nad
+             dużą komnatą.",
+        d_to In_Slab_Room,
+        s_to In_Secret_Canyon,
+        n_to In_Mirror_Canyon,
+        before [;
+          Go:
+            if (noun == s_obj) canyon_from = self;
+        ];
+
+Room    In_Secret_N_S_Canyon_1 "Tajny kanion północ-południe"
+  with  name 'tajny' 'kanion' 'kanionie',
+        description "Jesteś w tajnym kanionie biegnącym z północy na
+                     południe, nad sporym korytarzem.",
+        n_to At_Junction_Of_Three,
+        d_to In_Bedquilt,
+        s_to Atop_Stalactite;
+
+Room    At_Junction_Of_Three "Rozwidlenie trzech tajnych kanionów"
+  with  name 'rozwidlenie' 'rozwidleniu' 'trzech' 'tajnych' 'kanionów',
+        description
+            "Jesteś w tajnym kanionie, na rozwidleniu trzech kanionów
+             biegnących na północ, południe i południowy wschód. Północny
+             jest tak wysoki jak dwa pozostałe razem wzięte.",
+        se_to In_Bedquilt,
+        s_to In_Secret_N_S_Canyon_1,
+        n_to At_Window_On_Pit_2;
+
+Room    In_Large_Low_Room "Duża niska komnata"
+  with  name 'duża' 'niska' 'komnata' 'komnacie',
+        description
+            "Jesteś w dużej, niskiej komnacie. Niskie przejścia prowadzą na
+             północ, południowy wschód i południowy zachód.",
+        sw_to In_Sloping_Corridor,
+        se_to In_Oriental_Room,
+        n_to Dead_End_Crawl;
+
+Room    Dead_End_Crawl "Ślepe przejście"
+  with  name 'ślepe' 'przejście' 'przejściu',
+        description "To niskie przejście kończy się ślepo.",
+        s_to In_Large_Low_Room,
+        out_to In_Large_Low_Room;
+
+Room    In_Secret_E_W_Canyon "Tajny kanion nad wąskim kanionem"
+  with  name 'tajny' 'kanion' 'kanionie' 'wąskim',
+        description
+            "Jesteś w tajnym kanionie, który biegnie tu ze wschodu na zachód.
+             Piętnaście stóp niżej przecina bardzo wąski kanion. Jeśli
+             zejdziesz na dół, możesz już nie dać rady wrócić na górę.",
+        e_to In_Hall_Of_Mt_King,
+        w_to In_Secret_Canyon,
+        before [;
+          Go:
+            if (noun == w_obj) canyon_from = self;
+        ],
+        d_to In_N_S_Canyon;
+
+Room    In_N_S_Canyon "Kanion północ-południe"
+  with  name 'kanion' 'kanionie',
+        description "Jesteś w szerszym miejscu bardzo wąskiego kanionu
+                     biegnącego z północy na południe.",
+        s_to Canyon_Dead_End,
+        n_to In_Tall_E_W_Canyon;
+
+Room    Canyon_Dead_End "Ślepy koniec kanionu"
+  with  description "Kanion robi się tu zbyt wąski, żeby iść dalej na
+                     południe.",
+        n_to In_N_S_Canyon;
+
+Room    In_Tall_E_W_Canyon "Wysoki kanion wschód-zachód"
+  with  name 'wysoki' 'kanion' 'kanionie',
+        description
+            "Jesteś w wysokim kanionie biegnącym ze wschodu na zachód. Niskie,
+             ciasne przejście prowadzi trzy stopy na północ i chyba się tam
+             rozszerza.",
+        e_to In_N_S_Canyon,
+        w_to Dead_End_8,
+        n_to In_Swiss_Cheese_Room;
+
+! ------------------------------------------------------------------------------
+
+Room    Atop_Stalactite "Na stalaktycie"
+  with  name 'stalaktyt' 'stalaktycie',
+        description
+            "Ze stropu zwisa wielki stalaktyt, sięgający prawie do podłogi.
+             Można by po nim zejść i zeskoczyć na podłogę, ale potem nie
+             dałoby się do niego sięgnąć, żeby wspiąć się z powrotem.",
+        n_to In_Secret_N_S_Canyon_1,
+        d_to [;
+            if (random(100) <= 40) return Alike_Maze_6;
+            if (random(100) <= 50) return Alike_Maze_9;
+            return Alike_Maze_4;
+        ],
+        before [;
+          Jump, Climb:
+            <<Go d_obj>>;
+        ];
+
+Scenic  -> "stalaktyt/+u"
+  with  name 'stalagmit' 'stalagmitu' 'wielki' 'wielkiego' 'wielkim',
+        description
+            "Pewnie dałoby się po nim zejść, ale o powrocie na górę możesz
+             zapomnieć.",
+        before [;
+          LookUnder, Push, Take:
+            "Weź się w garść.";
+        ];
+
+! ------------------------------------------------------------------------------
+!   Tu mieszkają smoki
+! ------------------------------------------------------------------------------
+
+Room    In_Secret_Canyon "Tajny kanion"
+  with  name 'tajny' 'kanion' 'kanionie',
+        description
+            "Jesteś w tajnym kanionie, z którego wychodzi się na północ i na
+             wschód.",
+        e_to [;
+            if (canyon_from == In_Secret_E_W_Canyon) return canyon_from;
+            if (Dragon in location)
+                "Smok wygląda dość paskudnie. Lepiej nie próbuj się obok niego
+                 przemykać.";
+            return In_Secret_E_W_Canyon;
+        ],
+        n_to [;
+            if (canyon_from == In_Secret_N_S_Canyon_0) return canyon_from;
+            if (Dragon in location)
+                "Smok wygląda dość paskudnie. Lepiej nie próbuj się obok niego
+                 przemykać.";
+            return In_Secret_N_S_Canyon_0;
+        ],
+        out_to [;
+            return canyon_from;
+        ],
+        before [;
+            if (action == ##Yes && Dragon.is_being_attacked) {
+                remove Dragon;
+                move DragonCorpse to location;
+                Dragon.is_being_attacked = false;
+                "Gratulacje! Właśnie pokonał", (nop) Gracz("eś", "aś"), " smoka gołymi rękami! (Niewiarygodne, prawda?)";
+            }
+            if (action == ##No && Dragon.is_being_attacked) {
+                Dragon.is_being_attacked = false;
+                "Też tak sądzę.";
+            }
+            Dragon.is_being_attacked = false;
+        ];
+
+Object  -> Dragon "ogromn/y zielon/y smok/"
+  with  name 'potwór' 'potwora' 'potworem' 'bestia' 'bestię' 'bestii'
+             'jaszczur' 'jaszczura' 'jaszczurem' 'groźny' 'groźnego'
+             'groźnym' 'łuskowaty' 'łuskowatego' 'olbrzymi' 'olbrzymiego'
+             'dziki' 'dzikiego',
+        description "Na twoim miejscu nie zadzierałbym z nim.",
+        initial "Drogę zagradza ogromny, groźny zielony smok!",
+        life [;
+          Attack:
+            self.is_being_attacked = true;
+            "Czym? Gołymi rękami?";
+          Give:
+            "Smok jest nieprzejednany.";
+          ThrowAt:
+            if (noun ~= axe)
+                "Gołe ręce byłyby chyba lepsze niż to coś!";
+            move axe to location;
+            "Topór odbija się nieszkodliwie od grubych łusek smoka.";
+        ],
+        is_being_attacked false,
+  has   animate male;
+
+Treasure -> "persk/i dywan/+u"
+  with  name 'dywanik' 'dywanika' 'kobierzec' 'kobierca' 'kobiercu' 'piękny'
+             'pięknego' 'pięknym' 'najpiękniejszy' 'smoczy' 'smoczego',
+        describe [;
+            if (Dragon in location)
+                "Smok rozwalił się na perskim dywanie!";
+            "Na podłodze rozłożony jest perski dywan.";
+        ],
+        before [;
+          Take:
+            if (Dragon in location)
+                "Najpierw trzeba by skłonić smoka, żeby się przesunął!";
+        ],
+        depositpoints 14;
+
+Object  DragonCorpse "ciał/o smoka"
+  with  name 'smok' 'smoka' 'smokiem' 'smoku' 'zwłoki' 'zwłok' 'trup'
+             'trupa' 'martwy' 'martwego' 'martwym' 'smocze' 'smoczego',
+        initial "Z boku leży ciało ogromnego, martwego zielonego smoka.",
+        before [;
+          Attack:
+            "Szkód narobiono już dość!";
+        ],
+  has   static neuter;
+
+! ------------------------------------------------------------------------------
+!   I dalsza część jednakowego labiryntu
+! ------------------------------------------------------------------------------
+
+DeadendRoom Dead_End_8
+  with  description "Kanion kończy się zwałem głazów - ślepy zaułek.",
+        s_to In_Tall_E_W_Canyon,
+        out_to In_Tall_E_W_Canyon;
+
+MazeRoom Alike_Maze_11
+  with  n_to Alike_Maze_1,
+        w_to Alike_Maze_11,
+        s_to Alike_Maze_11,
+        e_to Dead_End_9,
+        ne_to Dead_End_10;
+
+DeadendRoom Dead_End_9
+  with  w_to Alike_Maze_11,
+        out_to Alike_Maze_11;
+
+DeadendRoom Dead_End_10
+  with  s_to Alike_Maze_3,
+        out_to Alike_Maze_3;
+
+MazeRoom Alike_Maze_12
+  with  s_to At_Brink_Of_Pit,
+        e_to Alike_Maze_13,
+        w_to Dead_End_11;
+
+MazeRoom Alike_Maze_13
+  with  n_to At_Brink_Of_Pit,
+        w_to Alike_Maze_12,
+        nw_to Dead_End_13;
+
+DeadendRoom Dead_End_11
+  with  e_to Alike_Maze_12,
+        out_to Alike_Maze_12;
+
+DeadendRoom Dead_End_12
+  with  u_to Alike_Maze_8,
+        out_to Alike_Maze_8;
+
+MazeRoom Alike_Maze_14
+  with  u_to Alike_Maze_4,
+        d_to Alike_Maze_4;
+
+DeadendRoom Dead_End_13
+  class Room
+  with  name 'ślepy' 'zaułek' 'zaułku' 'pirata',
+        se_to Alike_Maze_13,
+        out_to Alike_Maze_13,
+        description "To ślepy zaułek pirata.",
+        initial [;
+            StopDaemon(Pirate);
+            if (treasure_chest in self && treasure_chest hasnt moved)
+                "Oto skrzynia ze skarbem pirata!";
+        ],
+  has   nodwarf;
+
+Treasure -> treasure_chest "skrzyni/a ze skarbem"
+  with  name 'skrzynka' 'skrzynkę' 'skrzynki' 'kufer' 'kufra' 'kufrze'
+             'skarb' 'skarbu' 'skarby' 'skarbów' 'bogactwa' 'bogactw'
+             'pirata' 'piracka' 'piracką' 'pirackiej',
+        description
+            "To skrzynia ze skarbem pirata, pełna wszelkiego rodzaju
+             bogactw!",
+        initial "Stoi tu skrzynia ze skarbem pirata!",
+        depositpoints 12,
+  has   female;
+
+! ------------------------------------------------------------------------------
+!   Nad łodygą fasoli: Komnata Olbrzyma i wodospad
+! ------------------------------------------------------------------------------
+
+Room    In_Narrow_Corridor "Wąski korytarz"
+  with  name 'wąski' 'korytarz' 'korytarzu',
+        description
+            "Jesteś w długim, wąskim korytarzu, który ciągnie się na zachód aż
+             poza zasięg wzroku. Na wschodnim końcu jest dziura, przez którą
+             widać gąszcz liści.",
+        d_to In_West_Pit,
+        w_to In_Giant_Room,
+        e_to In_West_Pit,
+        before [;
+          Jump:
+            deadflag = 1;
+            "Spadasz i skręcasz kark!";
+        ];
+
+Scenic  -> "liści/e"
+  with  name 'liść' 'liścia' 'roślina' 'rośliny' 'roślinę' 'drzewo'
+             'drzewa' 'łodyga' 'łodygi' 'łodygę' 'gąszcz' 'gąszczu',
+        desc_nar "liśćmi",
+        description
+            "Liście wyglądają na przyczepione do łodygi fasoli, po której
+             można się tu wspiąć.",
+        before [;
+          Count:
+            "69 105.";                  ! (dziękuję Rene Schnoorowi za ich policzenie)
+        ],
+  has   pluralname;
+
+! ------------------------------------------------------------------------------
+
+Room    At_Steep_Incline "Strome zbocze nad dużą komnatą"
+  with  name 'strome' 'zbocze' 'zboczu',
+        description
+            "Jesteś na szczycie stromego zbocza nad dużą komnatą. Można by
+             tędy zejść, ale nie dałoby się wspiąć z powrotem. Korytarz
+             prowadzi z powrotem na północ.",
+        n_to In_Cavern_With_Waterfall,
+        d_to In_Large_Low_Room;
+
+! ------------------------------------------------------------------------------
+
+Room    In_Giant_Room "Komnata Olbrzyma"
+  with  name 'komnata' 'komnacie' 'olbrzyma',
+        description
+            "Jesteś w Komnacie Olbrzyma. Strop jest tak wysoko, że twoja
+             lampa go nie oświetla. Na wschód, północ i południe prowadzą
+             przepastne korytarze. Na zachodniej ścianie ktoś nabazgrał:
+             ~Fee fie foe foo~ [sic].",
+        s_to In_Narrow_Corridor,
+        e_to At_Recent_Cave_In,
+        n_to In_Immense_N_S_Passage;
+
+Scenic  -> "nabazgran/y napis/+u"
+  with  name 'bazgroły' 'bazgrołów' 'pismo' 'pisma' 'inskrypcja'
+             'inskrypcję' 'inskrypcji',
+        description "Napis głosi: ~Fee fie foe foo [sic].~";
+
+Treasure -> golden_eggs "gniazd/o ze złotymi jajami"
+  with  name 'jaja' 'jaj' 'jajami' 'jajo' 'jajko' 'jajka' 'złote' 'złotych'
+             'złotymi' 'piękne' 'pięknych',
+        desc_mie "gnieździe ze złotymi jajami",
+        description "Gniazdo jest pełne pięknych złotych jaj!",
+        initial "Jest tu wielkie gniazdo pełne złotych jaj!",
+        depositpoints 14,
+  has   multitude neuter;
+
+! ------------------------------------------------------------------------------
+
+Room    At_Recent_Cave_In "Świeże zawalisko"
+  with  description "Korytarz zablokowało tu świeże zawalisko.",
+        s_to In_Giant_Room;
+
+! ------------------------------------------------------------------------------
+
+Room    In_Immense_N_S_Passage "Ogromny korytarz północ-południe"
+  with  name 'ogromny' 'korytarz' 'korytarzu',
+        description "Jesteś na jednym końcu ogromnego korytarza biegnącego
+                     z północy na południe.",
+        s_to In_Giant_Room,
+        n_to [;
+            if (RustyDoor has locked) <<Open RustyDoor>>;
+            if (RustyDoor hasnt open) {
+                give RustyDoor open;
+                print "(najpierw z wysiłkiem otwierasz drzwi)^";
+            }
+            return RustyDoor;
+        ];
+
+Object  -> RustyDoor "zardzewiał/e drzwi/"
+  with  name 'zawias' 'zawiasy' 'zawiasów' 'zawiasach' 'masywne' 'masywnych'
+             'żelazne' 'żelaznych' 'żelaznymi',
+        description "To po prostu wielkie żelazne drzwi.",
+        when_closed "Drogę na północ zagradzają masywne, zardzewiałe,
+                     żelazne drzwi.",
+        when_open "Droga na północ prowadzi przez masywne, zardzewiałe,
+                   żelazne drzwi.",
+        door_to In_Cavern_With_Waterfall,
+        door_dir n_to,
+        before [;
+          Open:
+            if (self has locked)
+                "Zawiasy są dokumentnie zardzewiałe i ani drgną.";
+          Close:
+            if (self has open)
+                "Po takim wysiłku przy otwieraniu tych drzwi nie radziłbym
+                 ich znowu zamykać.";
+            "Nie ma problemu - już są zamknięte.";
+          Oil:
+            if (bottle in player && oil_in_the_bottle in bottle) {
+                remove oil_in_the_bottle;
+                give self ~locked openable;
+                "Olej uwolnił zawiasy i drzwi dadzą się teraz otworzyć,
+                 choć wymaga to trochę wysiłku.";
+            }
+            else
+                "Nie masz ich czym naoliwić.";
+          Water:
+            if (bottle in player && water_in_the_bottle in bottle) {
+                remove water_in_the_bottle;
+                give self locked ~open;
+                "Zawiasy są dokumentnie zardzewiałe i ani drgną.";
+            }
+            else
+                "Nie masz ich czym polać.";
+        ],
+        after [;
+          Open:
+            "Drzwi otwierają się ze zgrzytem, sypiąc rdzą.";
+        ],
+  has   static door locked pluralname;
+
+! ------------------------------------------------------------------------------
+
+Room    In_Cavern_With_Waterfall "Grota z wodospadem"
+  with  name 'grota' 'grocie' 'wodospadem',
+        description
+            "Jesteś we wspaniałej grocie z rwącym strumieniem, który spływa
+             kaskadą po lśniącym wodospadzie do huczącego wiru, znikającego
+             w dziurze w podłodze. Korytarze prowadzą na południe i zachód.",
+        s_to In_Immense_N_S_Passage,
+        w_to At_Steep_Incline;
+
+Scenic  -> "wodospad/+u"
+  with  name 'wir' 'wiru' 'wirze' 'kaskada' 'kaskadę' 'kaskadzie' 'lśniący'
+             'lśniącego' 'lśniącym',
+        description "Lepiej nie spływać tędy w beczce!";
+
+Treasure -> trident "trójz/ą=ę/b/+u wysadzan/y! klejnotami"
+  with  name 'klejnot' 'klejnoty' 'klejnotów' 'bajeczny' 'bajecznego'
+             'bajecznym' 'widły' 'wideł',
+        description "Trójząb jest wysadzany bajecznymi klejnotami!",
+        initial "Leży tu trójząb wysadzany klejnotami!",
+        depositpoints 14;
+
+! ------------------------------------------------------------------------------
+!   Jaskinie wokół Pikowanej Kołdry
+! ------------------------------------------------------------------------------
+
+Room    In_Soft_Room "Miękka komnata"
+  with  name 'miękka' 'miękkiej' 'komnata' 'komnacie',
+        description
+            "Jesteś w Miękkiej Komnacie. Ściany pokrywają ciężkie zasłony,
+             podłogę gruba, puszysta wykładzina. Strop porasta mech.",
+        w_to In_Swiss_Cheese_Room;
+
+Scenic  -> "wykładzin/a"
+  with  name 'dywan' 'dywanu' 'dywanie' 'puszysta' 'puszystą' 'puszystej'
+             'gruba' 'grubą' 'grubej',
+        description "Wykładzina jest naprawdę puszysta.",
+  has   female;
+
+Scenic  -> "zasłon/y"
+  with  name 'zasłona' 'zasłonę' 'zasłonie' 'kotary' 'kotar' 'ciężkie'
+             'ciężkich' 'grube' 'grubych',
+        description "Chyba bardzo dobrze tłumią dźwięk.",
+        before [;
+          Take:
+            "Tylko nie demoluj mi tu wszystkiego!";
+          LookUnder, Search:
+            "Za zasłonami nie ma niczego ciekawego.";
+        ],
+  has   pluralname female;
+
+Scenic  -> "m/e/ch/+u"
+  with  name 'zwyczajny' 'zwyczajnego' 'zwykły' 'zwykłego',
+        description "Wygląda jak zwyczajny, codzienny mech.",
+        before [;
+          Take:
+            "Kruszy ci się w dłoniach na nic.";
+        ],
+  has   edible;
+
+Object  -> velvet_pillow "aksamitn/a poduszk/a"
+  with  name 'poduszeczka' 'poduszeczkę' 'poduszeczki' 'aksamit' 'aksamitu'
+             'mała' 'małą' 'małej',
+        description "To po prostu mała aksamitna poduszka.",
+        initial "Na podłodze leży mała aksamitna poduszka.",
+  has   female;
+
+! ------------------------------------------------------------------------------
+
+Room    In_Oriental_Room "Komnata Orientalna"
+  with  name 'komnata' 'komnacie' 'orientalna' 'orientalnej',
+        description
+            "To Komnata Orientalna. Ściany pokrywają starożytne orientalne
+             malowidła naskalne. Łagodnie wznoszący się korytarz prowadzi
+             w górę na północ, inny na południowy wschód, a na zachód
+             wiedzie przejście, którym trzeba iść na czworakach.",
+        w_to In_Large_Low_Room,
+        se_to In_Swiss_Cheese_Room,
+        u_to In_Misty_Cavern,
+        n_to In_Misty_Cavern;
+
+Scenic  -> "starożytn/e orientaln/e rysunk/i"
+  with  name 'malowidła' 'malowideł' 'malowidłach' 'rysunek' 'rysunku'
+             'sztuka' 'sztuki' 'naskalne' 'naskalnych',
+        description "Przedstawiają chyba ludzi i zwierzęta.",
+  has   multitude pluralname;
+
+Treasure -> ming_vase "waz/a z dynastii Ming"
+  with  name 'wazon' 'wazonu' 'wazonem' 'ming' 'delikatna' 'delikatną'
+             'delikatnej' 'dynastii',
+        description "To delikatna, cenna waza z dynastii Ming!",
+        after [;
+          Drop:
+            if (velvet_pillow in location) {
+                print "(delikatnie spoczywa na aksamitnej poduszce)^";
+                rfalse;
+            }
+            remove ming_vase;
+            move shards to location;
+            "Waza spada z delikatnym brzękiem.";
+        ],
+        before [;
+          Attack:
+            remove ming_vase;
+            move shards to location;
+            "Bierzesz wazę i delikatnie ciskasz nią o ziemię.";
+          Receive:
+            "Waza jest zbyt krucha, żeby służyć za pojemnik.";
+        ],
+        depositpoints 14,
+  has   female;
+
+Object  shards "bezwartościow/e skorup/y"
+  with  name 'skorupa' 'skorupę' 'skorupy' 'skorupki' 'skorupek' 'ceramika'
+             'ceramiki' 'resztki' 'resztek' 'waza' 'wazy' 'wazie',
+        description
+            "Wyglądają na resztki czegoś, co kiedyś było piękną wazą.
+             Pewnie jakiś niezdara ją upuścił.",
+        initial "Podłogę zaścielają bezwartościowe skorupy ceramiki.",
+  has   multitude pluralname female;
+
+! ------------------------------------------------------------------------------
+
+Room    In_Misty_Cavern "Mglista grota"
+  with  name 'mglista' 'mglistej' 'grota' 'grocie',
+        description
+            "Idziesz szeroką ścieżką wzdłuż zewnętrznej krawędzi dużej groty.
+             Daleko w dole, za gęstą białą mgłą, słychać dziwne pluski. Mgła
+             unosi się przez szczelinę w stropie. Ścieżka prowadzi na
+             południe i zachód.",
+        s_to In_Oriental_Room,
+        w_to In_Alcove;
+
+Scenic  -> "szczelin/a w stropie"
+  with  name 'strop' 'stropu' 'sufit' 'sufitu' 'rozpadlina' 'rozpadlinę',
+        description "Nie da się do niej podejść na tyle blisko, żeby ją
+                     zbadać.",
+  has   female;
+
+! ------------------------------------------------------------------------------
+!   Siewki i piramidy
+! ------------------------------------------------------------------------------
+
+Room    In_Alcove "Wnęka"
+  with  name 'wnęka' 'wnęce',
+        description
+            "Jesteś we wnęce. Wąska ścieżka na północny zachód po chwili
+             wyraźnie się rozszerza. Na wschód prowadzi niezwykle ciasny
+             tunel. Wygląda na to, że trzeba się będzie przez niego
+             przeciskać. Na drugim końcu widać niesamowite światło.",
+        nw_to In_Misty_Cavern,
+        e_to [ j;
+            j = children(player);
+            if (j == 0 || (j == 1 && egg_sized_emerald in player))
+                return In_Plover_Room;
+            "Coś, co niesiesz, nie zmieści się z tobą w tunelu. Lepiej
+             sprawdź ekwipunek i coś odłóż.";
+        ];
+
+! ------------------------------------------------------------------------------
+
+Room    In_Plover_Room "Komnata Siewki"
+  with  name 'komnata' 'komnacie' 'siewki',
+        description
+            "Jesteś w niewielkiej komorze oświetlonej niesamowitym zielonym
+             światłem. Na zachód prowadzi niezwykle wąski tunel, a na północny
+             wschód ciemny korytarz.",
+        ne_to In_Dark_Room,
+        w_to [ j;
+            j = children(player);
+            if (j == 0 || (j == 1 && egg_sized_emerald in player))
+                return In_Alcove;
+            "Coś, co niesiesz, nie zmieści się z tobą w tunelu. Lepiej
+             sprawdź ekwipunek i coś odłóż.";
+        ],
+        before [;
+          Plover:
+            if (egg_sized_emerald in player) {
+                move egg_sized_emerald to In_Plover_Room;
+                score = score - 5;
+            }
+            PlayerTo(At_Y2);
+            rtrue;
+          Go:
+            if (noun == out_obj)
+                <<Go w_obj>>;
+        ],
+  has   light;
+
+Treasure -> egg_sized_emerald "szmaragd/+u wielkości jaja siewki"
+  with  name 'jajo' 'jaja' 'jaje' 'siewka' 'siewki' 'kamień' 'kamienia',
+        description "Jaja siewki są, nawiasem mówiąc, całkiem duże.",
+        initial "Leży tu szmaragd wielkości jaja siewki!",
+        depositpoints 14;
+
+! ------------------------------------------------------------------------------
+
+Room    In_Dark_Room "Ciemna Komnata"
+  with  name 'ciemna' 'ciemnej' 'komnata' 'komnacie',
+        description
+            "Jesteś w Ciemnej Komnacie. Jedynym wyjściem jest korytarz na
+             południe.",
+        s_to In_Plover_Room,
+  has   nodwarf;
+
+Object  -> "kamienn/a tablic/a"
+  with  name 'masywna' 'masywną' 'masywnej' 'kamień' 'kamienia' 'napis'
+             'napisu',
+        initial
+            "W ścianę wmurowana jest masywna kamienna tablica z napisem:
+             ~Gratulacje z okazji wniesienia światła do Ciemnej Komnaty!~",
+  has   static female;
+
+Treasure -> "platynow/a piramid/a"
+  with  name 'platyna' 'platyny' 'platynę' 'ostrosłup' 'ostrosłupa',
+        description "Platynowa piramida ma osiem cali w podstawie!",
+        initial "Stoi tu platynowa piramida, osiem cali w podstawie!",
+        depositpoints 14,
+  has   female;
+
+! ------------------------------------------------------------------------------
+!   Na północ od złożonego skrzyżowania: długi korytarz w górę i w dół
+! ------------------------------------------------------------------------------
+
+Room    In_Arched_Hall "Sala łukowa"
+  with  name 'sala' 'sali' 'łukowa' 'łukowej',
+        description
+            "Jesteś w sali o łukowym sklepieniu. Kiedyś dalej w górę i na
+             wschód biegł stąd koralowy korytarz, ale teraz zawalają go
+             śmieci. Powietrze pachnie morską wodą.",
+        d_to In_Shell_Room;
+
+! ------------------------------------------------------------------------------
+
+Room    In_Shell_Room "Komnata Muszli"
+  with  name 'komnata' 'komnacie' 'muszli',
+        description
+            "Jesteś w dużej komnacie wykutej w skale osadowej. Podłogę
+             i ściany pokrywają odłamki muszli zatopione w kamieniu. Płytki
+             korytarz prowadzi w dół, a nieco bardziej stromy w górę. Od
+             południa wchodzi tu niskie przejście, którym trzeba iść na
+             czworakach.",
+        u_to In_Arched_Hall,
+        d_to In_Ragged_Corridor,
+        s_to [;
+            if (giant_bivalve in player) {
+                if (giant_bivalve has open)
+                    "Nie przeciśniesz tej pięciostopowej ostrygi przez to małe
+                     przejście!";
+                else
+                    "Nie przeciśniesz tego pięciostopowego małża przez to małe
+                     przejście!";
+            }
+            return At_Complex_Junction;
+        ];
+
+Object  -> giant_bivalve "olbrzym/i małż/"
+  with  name 'ostryga' 'ostrygi' 'ostrygę' 'ostrygą' 'ostrydze' 'mięczak'
+             'mięczaka' 'małża' 'muszla' 'muszlę' 'muszli',
+        describe [;
+            if (self.has_been_opened)
+                "Leży tu olbrzymia ostryga o szczelnie zamkniętej muszli.";
+            "Leży tu olbrzymi małż o szczelnie zamkniętej muszli.";
+        ],
+        before [;
+          Examine:
+            if (location == At_Ne_End or At_Sw_End)
+                "Ciekawe. Na spodzie ostrygi chyba coś napisano:
+                 ^^
+                 ~W tym miejscu jest coś dziwnego: jedno z przekleństw,
+                 które znam od zawsze, działa tu teraz inaczej.~";
+            "Jakiś olbrzymi małż.";
+          Open:
+            "Nie masz dość siły, żeby otworzyć małża gołymi rękami.";
+          Unlock:
+            if (second ~= trident) {
+                print (CMian) second, " nie ";
+                PL(second, "jest", "są");
+                " dość ", (nop) Forma(second, "mocny", "mocna", "mocne",
+                    "mocne", "mocni"), ", żeby otworzyć małża.";
+            }
+            if (self.has_been_opened)
+                "Ostryga otwiera się ze skrzypnięciem, ale w środku jest tylko
+                 ostryga. Zaraz znów się zatrzaskuje.";
+            self.has_been_opened = true;
+            move pearl to In_A_Cul_De_Sac;
+            "Z małża wypada lśniąca perła i gdzieś się toczy. Ojej, to
+             chyba jednak ostryga. (Nigdy nie umiałem odróżniać małży.)
+             Czymkolwiek jest, znów się zatrzasnęła.";
+          Attack:
+            "Muszla jest bardzo mocna i odporna na ataki.";
+        ],
+        has_been_opened false;
+
+Treasure pearl "lśniąc/a perł/a"
+  with  name 'niezwykle' 'niewiarygodnie' 'duża' 'dużą' 'dużej' 'perełka'
+             'perełkę',
+        description "Jest niewiarygodnie duża!",
+        initial "Z boku leży lśniąca perła!",
+        depositpoints 14,
+  has   female;
+
+! ------------------------------------------------------------------------------
+
+Room    In_Ragged_Corridor "Poszarpany korytarz"
+  with  name 'poszarpany' 'korytarz' 'korytarzu',
+        description "Jesteś w długim, opadającym korytarzu o poszarpanych,
+                     ostrych ścianach.",
+        u_to In_Shell_Room,
+        d_to In_A_Cul_De_Sac;
+
+Room    In_A_Cul_De_Sac "Ślepa uliczka"
+  with  name 'ślepa' 'ślepej' 'uliczka' 'uliczce',
+        description "Jesteś w ślepej uliczce szerokiej na jakieś osiem stóp.",
+        u_to In_Ragged_Corridor,
+        out_to In_Ragged_Corridor;
+
+! ------------------------------------------------------------------------------
+!   Koniec Witta: jaskinia w budowie
+! ------------------------------------------------------------------------------
+
+Room    In_Anteroom "Przedsionek"
+  with  name 'przedsionek' 'przedsionku',
+        description
+            "Jesteś w przedsionku, z którego na wschód prowadzi duży korytarz.
+             Małe przejścia biegną na zachód i w górę. Widać ślady niedawnego
+             kopania.",
+        u_to At_Complex_Junction,
+        w_to In_Bedquilt,
+        e_to At_Witts_End;
+
+Object  -> "szyld/+u"
+  with  name 'tablica' 'tablicę' 'tablicy' 'witt' 'witta' 'firma' 'firmy'
+             'budowlana' 'budowlanej',
+        initial
+            "W powietrzu wisi szyld: ~Dalej jaskinia w budowie. Wstęp na
+             własne ryzyko. [Przedsiębiorstwo Budowlane Witt]~",
+        before [;
+          Take:
+            "Wisi wysoko nad twoją głową.";
+        ],
+  has   static;
+
+Object  -> "najnowsz/e numer/y ~Grotołaza Dzisiaj~"
+  with  name 'czasopisma' 'czasopism' 'czasopismo' 'magazyn' 'magazyny'
+             'magazynów' 'numer' 'numeru' 'grotołaz' 'grotołaza'
+             'dzisiaj' 'gazety' 'gazet',
+        description "Obawiam się, że czasopisma są napisane w języku
+                     krasnoludów.",
+        initial "Leży tu kilka najnowszych numerów czasopisma ~Grotołaz
+                 Dzisiaj~.",
+        after [;
+          Take:
+            if (location == At_Witts_End) score--;
+          Drop:
+            if (location == At_Witts_End) {
+                score++;
+                "Doprawdy, jesteś u kresu wytrzymałości.";
+            }
+        ],
+  has   multitude pluralname;
+
+! ------------------------------------------------------------------------------
+
+Room    At_Witts_End "Koniec Witta"
+  with  name 'koniec' 'końcu' 'witta',
+        description
+            "Jesteś na Końcu Witta. Korytarze prowadzą we *wszystkich*
+             kierunkach.",
+        w_to
+            "Przeczołgujesz się przez jakieś małe dziury i natrafiasz na
+             świeże zawalisko. Jesteś z powrotem w głównym korytarzu.",
+        before [;
+          Go:
+            if (noun ~= w_obj && random(100) <= 95)
+                "Przeczołgujesz się przez jakieś małe dziury i lądujesz
+                 z powrotem w głównym korytarzu.";
+            PlayerTo(In_Anteroom);
+            rtrue;
+        ];
+
+! ------------------------------------------------------------------------------
+!   Na północ od tajnych kanionów, po drugiej stronie jamy
+! ------------------------------------------------------------------------------
+
+Room    In_Mirror_Canyon "Kanion Lustra"
+  with  name 'kanion' 'kanionie' 'lustra',
+        description
+            "Jesteś w kanionie biegnącym z północy na południe, szerokim na
+             jakieś dwadzieścia pięć stóp. Dno pokrywa biała mgła napływająca
+             z północy. Ściany wznoszą się na grubo ponad sto stóp. Z jakiegoś
+             niewidocznego punktu wysoko nad tobą zwisa ogromne dwustronne
+             lustro, dokładnie pośrodku między ścianami kanionu i równolegle
+             do nich.
+             ^^
+             W obu ścianach, jakieś pięćdziesiąt stóp nad tobą, widać małe
+             okienko.",
+        s_to In_Secret_N_S_Canyon_0,
+        n_to At_Reservoir;
+
+Object  -> "zawieszon/e lustr/o"
+  with  name 'zwierciadło' 'zwierciadła' 'masywne' 'ogromne' 'ogromnego'
+             'wiszące' 'wiszącego' 'dwustronne' 'dwustronnego' 'krasnoludów',
+        description
+            "Lustro najwyraźniej służy krasnoludom, które - jak wiadomo - są
+             niezwykle próżne.",
+        initial
+            "Lustro najwyraźniej służy krasnoludom, które - jak wiadomo - są
+             niezwykle próżne.",
+        before [;
+          Attack, Remove:
+            "Nie dosięgniesz go stąd.";
+        ],
+  has   static neuter;
+
+! ------------------------------------------------------------------------------
+
+Room    At_Window_On_Pit_2 "Przy oknie nad jamą"
+  with  name 'okno' 'oknie' 'jamą',
+        description
+            "Stoisz przy niskim oknie, które wychodzi na ogromną jamę ginącą
+             w górze poza zasięgiem wzroku. Ponad pięćdziesiąt stóp niżej
+             niewyraźnie widać dno. Dno jamy pokrywają smużki białej mgły,
+             gęstniejące w lewo. Ślady w kurzu wokół okna wskazują, że ktoś
+             niedawno tu był. Dokładnie naprzeciwko, po drugiej stronie jamy,
+             dwadzieścia pięć stóp dalej, jest podobne okno wychodzące na
+             oświetloną komnatę. Widać w nim mroczną postać, która ci się
+             przygląda.",
+        w_to At_Junction_Of_Three,
+        cant_go "Jedyne przejście prowadzi z powrotem na zachód, do
+                 rozwidlenia.",
+        before [;
+          Jump:
+            deadflag = 1;
+            "Skaczesz i skręcasz kark!";
+          WaveHands:
+            "Mroczna postać macha ci w odpowiedzi!";
+        ];
+
+! ------------------------------------------------------------------------------
+
+Room    At_Reservoir "Nad zbiornikiem"
+  with  name 'zbiornik' 'zbiorniku',
+        description
+            "Jesteś na brzegu dużego podziemnego zbiornika. Komnatę wypełnia
+             nieprzejrzysta chmura białej mgły, która szybko unosi się w górę.
+             Jezioro zasila strumień, który wypada z dziury w ścianie jakieś
+             dziesięć stóp nad tobą i z pluskiem wpada gdzieś do wody we
+             mgle. Jedyny korytarz prowadzi z powrotem na południe.",
+        s_to In_Mirror_Canyon,
+        out_to In_Mirror_Canyon,
+        before [;
+          Swim:
+            "Woda jest lodowata; w takiej wodzie szybko zamarza się na
+             śmierć.";
+        ];
+
+! ------------------------------------------------------------------------------
+!   Przepaść i most trolla
+! ------------------------------------------------------------------------------
+
+Room    In_Sloping_Corridor "Opadający korytarz"
+  with  name 'opadający' 'korytarz' 'korytarzu',
+        description
+            "Jesteś w długim, krętym korytarzu, który w obu kierunkach opada
+             poza zasięg wzroku.",
+        d_to In_Large_Low_Room,
+        u_to On_Sw_Side_Of_Chasm,
+        cant_go "Korytarz stromo wznosi się i opada.";
+
+Room    On_Sw_Side_Of_Chasm "Południowo-zachodnia strona przepaści"
+  with  name 'strona' 'stronie' 'przepaści',
+        description
+            "Jesteś po jednej stronie wielkiej, głębokiej przepaści. Gęsta
+             biała mgła unosząca się z dołu zasłania widok na drugi brzeg.
+             Ścieżka na południowy zachód odchodzi od przepaści w kręty
+             korytarz.",
+        ne_to CrossRicketyBridge,
+        sw_to In_Sloping_Corridor,
+        d_to In_Sloping_Corridor,
+        cant_go "Ścieżka wije się na południowy zachód.",
+        before [;
+          Jump:
+            if (RicketyBridge in self)
+                "Z szacunkiem sugeruję, żeby przejść przez most, zamiast
+                 skakać.";
+            deadflag = 1;
+            "Nie udało się.";
+        ];
+
+[ CrossRicketyBridge;
+    if (Troll.has_caught_treasure || Troll in nothing) {
+        Troll.has_caught_treasure = false;
+        if (Bear.is_following_you) {
+            remove Bear;
+            remove self;
+            give Wreckage ~absent;
+            remove RicketyBridge;
+            give RicketyBridge absent;
+            StopDaemon(Bear);
+            deadflag = 1;
+            "Gdy docierasz na drugą stronę, most ugina się pod ciężarem
+             niedźwiedzia, który wciąż za tobą chodził. Rozpaczliwie szukasz
+             oparcia, ale most się zawala, a ty tracisz równowagę i spadasz
+             w przepaść.";
+        }
+        return RicketyBridge;
+    }
+    if (Troll in location) "Troll nie pozwala ci przejść.";
+    move Troll to location;
+    "Spod mostu wychodzi troll i zagradza ci drogę.";
+];
+
+Object  -> RicketyBridge "chybotliw/y most/+u"
+  with  name 'mostek' 'mostku' 'niestabilny' 'niestabilnego' 'rozklekotany'
+             'rozklekotanego' 'linowy' 'linowego' 'lina' 'liny',
+        description "Wygląda jak zwykły, choć niestabilny most.",
+        describe [;
+            print
+                "Nad przepaścią rozpięty jest chybotliwy drewniany most, który
+                 znika we mgle.
+                 ^^
+                 Na moście wisi tabliczka: ~Stój! Zapłać trollowi!~^";
+            if (Troll notin location)
+                "Trolla nigdzie nie widać.";
+            rtrue;
+        ],
+        door_dir [;
+            if (location == On_Sw_Side_Of_Chasm) return ne_to;
+            return sw_to;
+        ],
+        door_to [;
+            if (location == On_Sw_Side_Of_Chasm) return On_Ne_Side_Of_Chasm;
+            return On_Sw_Side_Of_Chasm;
+        ],
+        found_in On_Sw_Side_Of_Chasm On_Ne_Side_Of_Chasm,
+  has   static door open;
+
+Object  -> -> Troll "krzepk/i troll/"
+  with  name 'trolla' 'trollem' 'trollu' 'trollowi',
+        description
+            "Trolle są bliskimi krewnymi skał i mają skórę grubą jak nosorożec.",
+        initial
+            "Przy moście stoi krzepki troll i żąda skarbu w zamian za
+             przejście.",
+        life [;
+          Attack:
+            "Troll śmieje się na głos z twojej żałosnej próby zrobienia mu
+             krzywdy.";
+          ThrowAt, Give:
+            if (noun ofclass Treasure) {
+                remove noun;
+                move self to RicketyBridge;
+                self.has_caught_treasure = true;
+                score = score - 5;
+                "Troll łapie twój skarb i umyka gdzieś poza zasięg wzroku.";
+            }
+            if (noun == tasty_food)
+                "Obżarstwo nie należy do wad trolla. Chciwość - owszem.";
+            "Troll zręcznie łapie ", (bie) noun, ", ogląda uważnie i odrzuca
+             ci z powrotem, oznajmiając: ~Dobra robota, ale za mało cenne.~";
+          Order:
+            "Chyba śnisz.";
+          Answer, Ask:
+            "Trolle to kiepscy rozmówcy.";
+        ],
+        has_caught_treasure false,
+  has   animate male;
+
+Object  Wreckage "szczątk/i mostu"
+  with  name 'szczątek' 'wrak' 'wraku' 'most' 'mostu' 'martwy' 'martwego'
+             'niedźwiedź' 'niedźwiedzia',
+        initial
+            "Na dnie przepaści widać szczątki mostu trolla (i martwego
+             niedźwiedzia).",
+        before [;
+            "Szczątki są za głęboko w dole.";
+        ],
+        found_in On_Sw_Side_Of_Chasm On_Ne_Side_Of_Chasm,
+  has   static absent pluralname;
+
+! ------------------------------------------------------------------------------
+
+Room    On_Ne_Side_Of_Chasm "Północno-wschodnia strona przepaści"
+  with  name 'strona' 'stronie' 'przepaści',
+        description
+            "Jesteś po drugiej stronie przepaści. Z tej strony od przepaści
+             odchodzi ścieżka na północny wschód.",
+        sw_to CrossRicketyBridge,
+        ne_to In_Corridor,
+        before [;
+          Jump:
+            if (RicketyBridge in self)
+                "Z szacunkiem sugeruję, żeby przejść przez most, zamiast
+                 skakać.";
+            deadflag = 1;
+            "Nie udało się.";
+        ],
+  has   nodwarf;
+
+Room    In_Corridor "Korytarz"
+  with  name 'korytarz' 'korytarzu',
+        description
+            "Jesteś w długim korytarzu biegnącym ze wschodu na zachód.
+             W oddali słychać ciche dudnienie.",
+        w_to On_Ne_Side_Of_Chasm,
+        e_to At_Fork_In_Path,
+  has   nodwarf;
+
+! ------------------------------------------------------------------------------
+!   Wulkan
+! ------------------------------------------------------------------------------
+
+Room    At_Fork_In_Path "Rozwidlenie ścieżki"
+  with  name 'rozwidlenie' 'rozwidleniu' 'ścieżki',
+        description
+            "Ścieżka się tu rozwidla. Lewa odnoga prowadzi na północny
+             wschód; głuche dudnienie wydaje się w tamtą stronę coraz
+             głośniejsze. Prawa odnoga łagodnie opada na południowy wschód.
+             Główny korytarz dochodzi tu od zachodu.",
+        w_to In_Corridor,
+        ne_to At_Junction_With_Warm_Walls,
+        se_to In_Limestone_Passage,
+        d_to In_Limestone_Passage,
+  has   nodwarf;
+
+! ------------------------------------------------------------------------------
+
+Room    At_Junction_With_Warm_Walls "Rozwidlenie przy ciepłych ścianach"
+  with  name 'rozwidlenie' 'rozwidleniu' 'ciepłe' 'ciepłych' 'ściany',
+        description
+            "Ściany są tu całkiem ciepłe. Z północy dobiega jednostajny ryk,
+             tak głośny, że cała jaskinia zdaje się drżeć. Inny korytarz
+             prowadzi na południe, a na wschód niskie przejście.",
+        s_to At_Fork_In_Path,
+        n_to At_Breath_Taking_View,
+        e_to In_Chamber_Of_Boulders,
+  has   nodwarf;
+
+! ------------------------------------------------------------------------------
+
+Room    At_Breath_Taking_View "Zapierający dech widok"
+  with  name 'zapierający' 'dech' 'widok' 'widoku',
+        description
+            "Stoisz na krawędzi widoku zapierającego dech w piersiach. Daleko
+             w dole jest czynny wulkan, z którego wylewają się wielkie
+             strumienie roztopionej lawy i kaskadami spływają z powrotem
+             w głębiny. Rozżarzona skała wypełnia najdalsze zakątki groty
+             krwistoczerwoną łuną, nadając wszystkiemu niesamowity, makabryczny
+             wygląd. Powietrze jest pełne migoczących iskier popiołu i ciężkiej
+             woni siarki. Ściany są gorące w dotyku, a grzmot wulkanu zagłusza
+             wszystkie inne dźwięki. W poszarpanym stropie wysoko w górze tkwią
+             niezliczone poskręcane formacje z czystego, białego alabastru,
+             które rozpraszają mętne światło w złowrogie zjawy na ścianach.
+             Z jednej strony jest głęboki wąwóz, pełen dziwacznego chaosu
+             powykręcanych skał, jakby wykutych przez samego diabła. Z głębi
+             wulkanu wyrywa się ogromna rzeka ognia, przepala sobie drogę przez
+             wąwóz i spada w bezdenną otchłań daleko po twojej lewej. Po
+             prawej z jałowej wyspy pośrodku siarkowego jeziora, które
+             złowieszczo bulgocze, bez przerwy tryska ogromny gejzer
+             parzącej pary. Najdalsza prawa ściana płonie własnym żarem, co
+             dodaje piekielnego blasku i tak już iście piekielnej scenie. Na
+             południe prowadzi ciemny, złowróżbny korytarz.",
+        s_to At_Junction_With_Warm_Walls,
+        out_to At_Junction_With_Warm_Walls,
+        d_to "Nie wygłupiaj się!",
+        before [;
+          Jump:
+            <<Go d_obj>>;
+        ],
+  has   light;
+
+Scenic  -> "czynn/y wulkan/+u"
+  with  name 'skała' 'skały' 'skałę' 'rozżarzona' 'rozżarzoną' 'lawa' 'lawy'
+             'lawę' 'krwistoczerwona' 'łuna' 'łunę' 'łuny',
+        description
+            "Z wulkanu wylewają się wielkie strumienie roztopionej lawy
+             i kaskadami spływają z powrotem w głębiny. Rozżarzona skała
+             wypełnia najdalsze zakątki groty krwistoczerwoną łuną, nadając
+             wszystkiemu niesamowity, makabryczny wygląd.";
+
+Scenic  -> "iskr/y+ie popiołu"
+  with  name 'iskra' 'iskrę' 'popiół' 'popiołu' 'powietrze' 'powietrza'
+             'migoczące' 'migoczących',
+        description
+            "Iskry są za daleko, żeby dobrze im się przyjrzeć.",
+  has   multitude pluralname female;
+
+Scenic  -> "postrzępion/y strop/+u"
+  with  name 'sklepienie' 'sklepienia' 'formacje' 'formacji' 'alabaster'
+             'alabastru' 'światło' 'światła' 'zjawy' 'zjaw' 'poskręcane'
+             'mętne' 'złowrogie',
+        description
+            "W poszarpanym stropie wysoko w górze tkwią niezliczone poskręcane
+             formacje z czystego, białego alabastru, które rozpraszają mętne
+             światło w złowrogie zjawy na ścianach.";
+
+Scenic  -> "głębok/i wąw/ó=o/z/+u"
+  with  name 'chaos' 'chaosu' 'skały' 'skał' 'dziwaczny' 'dziwacznego'
+             'powykręcane' 'powykręcanych',
+        description
+            "Wąwóz jest pełen dziwacznego chaosu powykręcanych skał, jakby
+             wykutych przez samego diabła.";
+
+Scenic  -> "rzek/a ognia"
+  with  name 'ogień' 'ognia' 'ogniem' 'głębia' 'głębi' 'otchłań' 'otchłani'
+             'ognista' 'ognistą' 'ognistej' 'bezdenna' 'bezdenną',
+        description
+            "Rzeka ognia wyrywa się z głębi wulkanu, przepala sobie drogę
+             przez wąwóz i spada w bezdenną otchłań daleko po twojej lewej.",
+  has   female;
+
+Scenic  -> "ogromn/y gejzer/+u"
+  with  name 'para' 'pary' 'parę' 'wyspa' 'wyspy' 'wyspę' 'wyspie' 'jezioro'
+             'jeziora' 'jeziorze' 'parząca' 'parzącej' 'jałowa' 'jałowej'
+             'siarkowe' 'siarkowego' 'bulgoczące' 'bulgoczącego',
+        description
+            "Gejzer parzącej pary bez przerwy tryska z jałowej wyspy pośrodku
+             siarkowego jeziora, które złowieszczo bulgocze.";
+
+! ------------------------------------------------------------------------------
+
+Room    In_Chamber_Of_Boulders "Komnata głazów"
+  with  name 'komnata' 'komnacie' 'głazów',
+        description
+            "Jesteś w niewielkiej komnacie pełnej wielkich głazów. Ściany są
+             bardzo ciepłe, przez co powietrze jest tu niemal duszne od gorąca.
+             Jedyne wyjście to niskie przejście na zachód, z którego dochodzi
+             głuche dudnienie.",
+        w_to At_Junction_With_Warm_Walls,
+        out_to At_Junction_With_Warm_Walls,
+  has   nodwarf;
+
+Scenic  -> "głaz/y"
+  with  name 'głaz' 'głazu' 'kamienie' 'kamieni' 'skały' 'skał',
+        description "To zwykłe głazy. Są ciepłe.",
+        before [;
+          LookUnder, Push, Pull:
+            "Trzeba by je wysadzić.";
+        ],
+  has   multitude pluralname;
+
+Treasure -> "rzadk/ie przypraw/y"
+  with  name 'przyprawa' 'przyprawę' 'przyprawy' 'egzotyczne' 'egzotycznych'
+             'korzenie' 'korzeni',
+        before [;
+          Smell, Examine:
+            "Pachną cudownie egzotycznie!";
+        ],
+        depositpoints 14,
+  has   multitude pluralname female;
+
+! ------------------------------------------------------------------------------
+
+Room    In_Limestone_Passage "Wapienny korytarz"
+  with  name 'wapienny' 'korytarz' 'korytarzu',
+        description
+            "Idziesz łagodnie opadającym korytarzem z północy na południe,
+             wzdłuż którego ciągną się dziwnie ukształtowane formacje
+             wapienne.",
+        n_to At_Fork_In_Path,
+        u_to At_Fork_In_Path,
+        s_to In_Front_Of_Barren_Room,
+        d_to In_Front_Of_Barren_Room,
+  has   nodwarf;
+
+Scenic  -> "wapienn/e form/y"
+  with  name 'formacje' 'formacji' 'kształt' 'kształty' 'kształtów'
+             'wapień' 'wapienia' 'kamień' 'kamienia' 'dziwnie' 'ukształtowane',
+        description
+            "Co jakiś czas wzrok przyciąga jakiś szczególnie dziwny kształt.",
+  has   multitude pluralname female;
+
+! ------------------------------------------------------------------------------
+!   Jeśli dziś w lesie się wybierzesz...
+! ------------------------------------------------------------------------------
+
+Room    In_Front_Of_Barren_Room "Przed pustą komnatą"
+  with  name 'wejście' 'wejściu' 'pusta' 'pustej' 'komnata' 'komnaty',
+        description
+            "Stoisz przy wejściu do dużej, pustej komnaty. Nad wejściem wisi
+             tabliczka: ~Uwaga! W komnacie niedźwiedź!~",
+        w_to In_Limestone_Passage,
+        u_to In_Limestone_Passage,
+        e_to In_Barren_Room,
+        in_to In_Barren_Room,
+  has   nodwarf;
+
+Scenic  -> "tabliczk/a ostrzegawcz/a!"
+  with  name 'tablica' 'tablicę' 'tablicy' 'uwaga' 'ostrzeżenie' 'ostrzeżenia',
+        description "Na tabliczce jest napisane: ~Uwaga! W komnacie
+                     niedźwiedź!~",
+  has   female;
+
+! ------------------------------------------------------------------------------
+
+Room    In_Barren_Room "Pusta komnata"
+  with  name 'pusta' 'pustej' 'komnata' 'komnacie',
+        description
+            "Jesteś w pustej komnacie. Środek komnaty jest zupełnie pusty, jeśli
+             nie liczyć kurzu. Ślady w kurzu prowadzą w stronę drugiego końca
+             komnaty. Jedyne wyjście prowadzi tam, skąd się tu weszło.",
+        w_to In_Front_Of_Barren_Room,
+        out_to In_Front_Of_Barren_Room,
+  has   nodwarf;
+
+Scenic  -> "kurz/+u"
+  with  name 'ślady' 'śladów' 'pył' 'pyłu',
+        description "Wygląda jak zwykły kurz.";
+
+Object  -> Bear "wielk/i niedźwied/ź=zi/ jaskiniow/y!"
+  with  name 'miś' 'misia' 'misiem' 'misiu' 'oswojony' 'oswojonego'
+             'oswojonym' 'groźny' 'groźnego' 'groźnym' 'dziki' 'dzikiego',
+        describe [;
+            if (self.is_following_you)
+                "Chodzi za tobą bardzo duży, oswojony niedźwiedź.";
+            if (self.is_friendly == false)
+                "Z drugiego końca komnaty przygląda ci się groźny niedźwiedź
+                 jaskiniowy!";
+            if (location == In_Barren_Room)
+                "W kącie spokojnie siedzi łagodny niedźwiedź jaskiniowy.";
+            "W pobliżu kręci się zadowolony z życia niedźwiedź.";
+        ],
+        life [;
+          Attack:
+            if (axe in player) <<ThrowAt axe self>>;
+            if (self.is_friendly)
+                "Niedźwiedź jest zdezorientowany; chce tylko być twoim
+                 przyjacielem.";
+            "Czym? Gołymi rękami? Przeciwko *jego* niedźwiedzim łapom??";
+          ThrowAt:
+            if (noun ~= axe) <<Give noun self>>;
+            if (self.is_friendly)
+                "Niedźwiedź jest zdezorientowany; chce tylko być twoim
+                 przyjacielem.";
+            move axe to location;
+            axe.is_near_bear = true;
+            "Topór chybia i ląduje obok niedźwiedzia, tam gdzie nie da się
+             po niego sięgnąć.";
+          Give:
+            if (noun == tasty_food) {
+                axe.is_near_bear = false;
+                remove tasty_food;
+                self.is_friendly = true;
+                "Niedźwiedź łapczywie pożera twoje jedzenie, po czym wyraźnie
+                 się uspokaja, a nawet robi się całkiem przyjazny.";
+            }
+            if (self.is_friendly)
+                "Niedźwiedź nie wydaje się zbytnio zainteresowany twoją
+                 propozycją.";
+            "Ojej - twoja propozycja tylko jeszcze bardziej rozzłościła
+             niedźwiedzia!";
+          Order, Ask, Answer:
+            "To Miś o Bardzo Małym Rozumku.";
+        ],
+        before [;
+          Examine:
+            print "Niedźwiedź jest ogromny";
+            if (self.is_friendly) ", ale wydaje się przyjazny.";
+            " i wygląda na bardzo groźnego!";
+          Take, Catch:
+            if (self.is_friendly == false) "Chyba żartujesz!";
+            if (golden_chain has locked)
+                "Niedźwiedź jest wciąż przykuty do ściany.";
+            self.is_following_you = true;
+            StartDaemon(self);
+            "Dobrze, niedźwiedź chodzi teraz za tobą.";
+          Drop, Release:
+            if (self.is_following_you == false) "Słucham?";
+            self.is_following_you = false;
+            StopDaemon(self);
+            if (Troll in location) {
+                remove Troll;
+                "Niedźwiedź toczy się w stronę trolla, który wydaje z siebie
+                 zaskoczony pisk i ucieka. Niedźwiedź szybko rezygnuje
+                 z pościgu i wraca.";
+            }
+            "Niedźwiedź oddala się od ciebie.";
+        ],
+        daemon [;
+            if (location == thedark) rfalse;
+            if (self in location) {
+                if (location == At_Breath_Taking_View)
+                    "^Niedźwiedź ryczy z zachwytu.";
+                rfalse;
+            }
+            move self to location;
+            "^Niedźwiedź człapie za tobą.";
+        ],
+        is_following_you false,
+        is_friendly false,
+  has   animate male;
+
+Treasure -> golden_chain "złot/y łańcuch/"
+  with  name 'ogniwa' 'ogniw' 'kajdany' 'kajdan' 'szczerozłoty'
+             'szczerozłotego' 'złoto' 'złota' 'gruby' 'grubego' 'łańcuchy',
+        description "Łańcuch ma grube ogniwa ze szczerego złota!",
+        describe [;
+            if (self has locked)
+                "Niedźwiedzia trzyma na uwięzi łańcuch ze szczerego złota.";
+            "Na ziemi leży zwinięty łańcuch ze szczerego złota!";
+        ],
+        with_key set_of_keys,
+        before [;
+          Take:
+            if (self has locked) {
+                if (Bear.is_friendly) "Jest przypięty do przyjaznego
+                                       niedźwiedzia.";
+                "Jest przypięty do groźnego niedźwiedzia!";
+            }
+          Unlock:
+            if (Bear.is_friendly == false)
+                "Nie da się przejść obok niedźwiedzia, żeby odpiąć łańcuch,
+                 i może to i lepiej.";
+          Lock:
+            if (self hasnt locked) "Mechanizm już się nie zamknie.";
+        ],
+        after [;
+          Unlock:
+            "Odpinasz łańcuch i uwalniasz oswojonego niedźwiedzia.";
+        ],
+        depositpoints 14,
+  has   lockable locked;
+
+! ------------------------------------------------------------------------------
+!   Różnorodny labirynt
+! ------------------------------------------------------------------------------
+
+Class   DiffmazeRoom
+  with  short_name "Labirynt";
+
+DiffmazeRoom Different_Maze_1
+  with  description "Jesteś w labiryncie krętych korytarzyków, wszystkich
+                     różnych.",
+        s_to Different_Maze_3,
+        sw_to Different_Maze_4,
+        ne_to Different_Maze_5,
+        se_to Different_Maze_6,
+        u_to Different_Maze_7,
+        nw_to Different_Maze_8,
+        e_to Different_Maze_9,
+        w_to Different_Maze_10,
+        n_to Different_Maze_11,
+        d_to At_West_End_Of_Long_Hall;
+
+DiffmazeRoom Different_Maze_2
+  with  description "Jesteś w małym labiryncie wijących się korytarzy,
+                     wszystkich różnych.",
+        sw_to Different_Maze_3,
+        n_to Different_Maze_4,
+        e_to Different_Maze_5,
+        nw_to Different_Maze_6,
+        se_to Different_Maze_7,
+        ne_to Different_Maze_8,
+        w_to Different_Maze_9,
+        d_to Different_Maze_10,
+        u_to Different_Maze_11,
+        s_to Dead_End_14;
+
+DiffmazeRoom Different_Maze_3
+  with  description "Jesteś w labiryncie wijących się korytarzyków, wszystkich
+                     różnych.",
+        w_to Different_Maze_1,
+        se_to Different_Maze_4,
+        nw_to Different_Maze_5,
+        sw_to Different_Maze_6,
+        ne_to Different_Maze_7,
+        u_to Different_Maze_8,
+        d_to Different_Maze_9,
+        n_to Different_Maze_10,
+        s_to Different_Maze_11,
+        e_to Different_Maze_2;
+
+DiffmazeRoom Different_Maze_4
+  with  description "Jesteś w małym labiryncie krętych korytarzy, wszystkich
+                     różnych.",
+        nw_to Different_Maze_1,
+        u_to Different_Maze_3,
+        n_to Different_Maze_5,
+        s_to Different_Maze_6,
+        w_to Different_Maze_7,
+        sw_to Different_Maze_8,
+        ne_to Different_Maze_9,
+        e_to Different_Maze_10,
+        d_to Different_Maze_11,
+        se_to Different_Maze_2;
+
+DiffmazeRoom Different_Maze_5
+  with  description "Jesteś w wijącym się labiryncie korytarzyków, wszystkich
+                     różnych.",
+        u_to Different_Maze_1,
+        d_to Different_Maze_3,
+        w_to Different_Maze_4,
+        ne_to Different_Maze_6,
+        sw_to Different_Maze_7,
+        e_to Different_Maze_8,
+        n_to Different_Maze_9,
+        nw_to Different_Maze_10,
+        se_to Different_Maze_11,
+        s_to Different_Maze_2;
+
+DiffmazeRoom Different_Maze_6
+  with  description "Jesteś w wijącym się małym labiryncie korytarzy,
+                     wszystkich różnych.",
+        ne_to Different_Maze_1,
+        n_to Different_Maze_3,
+        nw_to Different_Maze_4,
+        se_to Different_Maze_5,
+        e_to Different_Maze_7,
+        d_to Different_Maze_8,
+        s_to Different_Maze_9,
+        u_to Different_Maze_10,
+        w_to Different_Maze_11,
+        sw_to Different_Maze_2;
+
+DiffmazeRoom Different_Maze_7
+  with  description "Jesteś w krętym małym labiryncie korytarzy, wszystkich
+                     różnych.",
+        n_to Different_Maze_1,
+        se_to Different_Maze_3,
+        d_to Different_Maze_4,
+        s_to Different_Maze_5,
+        e_to Different_Maze_6,
+        w_to Different_Maze_8,
+        sw_to Different_Maze_9,
+        ne_to Different_Maze_10,
+        nw_to Different_Maze_11,
+        u_to Different_Maze_2;
+
+DiffmazeRoom Different_Maze_8
+  with  description "Jesteś w krętym labiryncie korytarzyków, wszystkich
+                     różnych.",
+        e_to Different_Maze_1,
+        w_to Different_Maze_3,
+        u_to Different_Maze_4,
+        sw_to Different_Maze_5,
+        d_to Different_Maze_6,
+        s_to Different_Maze_7,
+        nw_to Different_Maze_9,
+        se_to Different_Maze_10,
+        ne_to Different_Maze_11,
+        n_to Different_Maze_2;
+
+DiffmazeRoom Different_Maze_9
+  with  description "Jesteś w małym krętym labiryncie korytarzy, wszystkich
+                     różnych.",
+        se_to Different_Maze_1,
+        ne_to Different_Maze_3,
+        s_to Different_Maze_4,
+        d_to Different_Maze_5,
+        u_to Different_Maze_6,
+        nw_to Different_Maze_7,
+        n_to Different_Maze_8,
+        sw_to Different_Maze_10,
+        e_to Different_Maze_11,
+        w_to Different_Maze_2;
+
+DiffmazeRoom Different_Maze_10
+  with  description "Jesteś w labiryncie małych, wijących się korytarzy,
+                     wszystkich różnych.",
+        d_to Different_Maze_1,
+        e_to Different_Maze_3,
+        ne_to Different_Maze_4,
+        u_to Different_Maze_5,
+        w_to Different_Maze_6,
+        n_to Different_Maze_7,
+        s_to Different_Maze_8,
+        se_to Different_Maze_9,
+        sw_to Different_Maze_11,
+        nw_to Different_Maze_2;
+
+DiffmazeRoom Different_Maze_11
+  with  description "Jesteś w labiryncie małych, krętych korytarzy,
+                     wszystkich różnych.",
+        sw_to Different_Maze_1,
+        nw_to Different_Maze_3,
+        e_to Different_Maze_4,
+        w_to Different_Maze_5,
+        n_to Different_Maze_6,
+        d_to Different_Maze_7,
+        se_to Different_Maze_8,
+        u_to Different_Maze_9,
+        s_to Different_Maze_10,
+        ne_to Different_Maze_2;
+
+! ------------------------------------------------------------------------------
+
+DeadendRoom Dead_End_14
+  class Room
+  with  name 'ślepy' 'zaułek' 'zaułku' 'automat' 'automatu',
+        short_name "Ślepy zaułek przy automacie",
+        description
+            "Docierasz do ślepego zaułka. Stoi tu masywny automat.
+             ^^
+             Hmmm... W kurzu ktoś nabazgrał ozdobnym pismem jakąś wiadomość.",
+        n_to Different_Maze_2,
+        out_to Different_Maze_2,
+  has   nodwarf;
+
+Scenic  -> "napis/+u w kurzu"
+  with  name 'wiadomość' 'wiadomości' 'bazgroły' 'pismo' 'pisma' 'ozdobne'
+             'ozdobnym' 'nabazgrany',
+        description
+            "Napis głosi: ~To nie ten labirynt, w którym pirat zostawia swoją
+             skrzynię ze skarbem.~";
+
+Scenic  -> VendingMachine "automat/+u"
+  with  name 'maszyna' 'maszynę' 'maszyny' 'maszynie' 'otwór' 'otworu'
+             'szczelina' 'szczelinę' 'masywny' 'masywnego' 'automacie',
+        description
+            "Instrukcja na automacie głosi: ~Wrzuć monety, a otrzymasz świeże
+             baterie.~",
+        before [;
+          Receive:
+            if (noun == rare_coins) {
+                move fresh_batteries to location;
+                remove rare_coins;
+                "Chwilę po wrzuceniu monet do otworu automat wydaje zgrzytliwy
+                 dźwięk, a u twoich stóp spada para świeżych baterii.";
+            }
+            "Automat chyba przyjmuje tylko monety.";
+          Attack:
+            "Automat jest bardzo solidny i wychodzi z twojego ataku bez
+             najmniejszego zadrapania.";
+          LookUnder:
+            "Pod automatem niczego nie ma.";
+          Search:
+            "Nie da się dostać do wnętrza automatu.";
+          Take:
+            "Automat jest o wiele za ciężki, żeby go ruszyć.";
+        ];
+
+Object  fresh_batteries "śwież/e bateri/e+y" VendingMachine
+  with  name 'bateria' 'baterię' 'baterii' 'nowe' 'nowych',
+        description
+            "Wyglądają jak zwykłe baterie. (Grobowy głos mówi: ~Wciąż
+             działają!~)",
+        initial "Leżą tu świeże baterie.",
+        before [;
+          Count:
+            "Para.";
+        ],
+        have_been_used false,
+  has   pluralname female;
+
+Object  old_batteries "zużyt/e bateri/e+y"
+  with  name 'bateria' 'baterię' 'baterii' 'stare' 'starych' 'wyczerpane'
+             'wyczerpanych',
+        description "Wyglądają jak zwykłe baterie.",
+        initial "W pobliżu ktoś wyrzucił zużyte baterie.",
+        before [;
+          Count:
+            "Para.";
+        ],
+  has   pluralname female;
+
+! ------------------------------------------------------------------------------
+!   Krasnoludy!
+! ------------------------------------------------------------------------------
+
+Object  dwarf "groźn/y mał/y krasnolud/"
+  with  name 'karzeł' 'karła' 'paskudny' 'paskudnego' 'wredny' 'wrednego'
+             'krasnoludek' 'krasnoludka',
+        description
+            "Chyba nie warto podchodzić zbyt blisko. Wystarczy powiedzieć, że
+             ten mały jest dość agresywny.",
+        initial "W cieniu kryje się groźny mały krasnolud.",
+        number 5,
+        daemon [;
+            if (location == thedark) return;
+            if (self.number == 0) {
+                StopDaemon(self);
+                return;
+            }
+            if (parent(self) == nothing) {
+                if (location has nodwarf || location has light) return;
+                if (random(100) <= self.number) {
+                    if (Bear in location || Troll in location) return;
+                    new_line;
+                    if (Dragon in location) {
+                        self.number--;
+                        "Pojawia się krasnolud, ale smok jednym niedbałym
+                         dmuchnięciem zamienia go w parę!";
+                    }
+                    move self to location;
+                    "Z cienia wychodzi groźny mały krasnolud!";
+                }
+                return;
+            }
+            if (parent(self) ~= location) {
+                if (location == thedark) return;
+                if (location has nodwarf || location has light) return;
+                if (random(100) <= 96 && parent(self) ~= In_Mirror_Canyon) {
+                    move self to location;
+                    print "^Krasnolud skrada się za tobą...^";
+                }
+                else {
+                    remove self;
+                    return;
+                }
+            }
+            if (random(100) <= 75) {
+                new_line;
+                if (self.has_thrown_axe == false) {
+                    move axe to location;
+                    self.has_thrown_axe = true;
+                    remove self;
+                    "Krasnolud rzuca w ciebie paskudnym małym toporem, chybia,
+                     klnie i ucieka.";
+                }
+                if (location == In_Mirror_Canyon)
+                    "Krasnolud podziwia się w lustrze.";
+                print "Krasnolud rzuca w ciebie paskudnym małym nożem ";
+                if (random(1000) <= 95) {
+                    deadflag = 1;
+                    "i trafia!";
+                }
+                "i chybia!";
+            }
+            if (random(3) == 1) {
+                remove self;
+                "^Znudzony krasnolud gdzieś się wymyka.";
+            }
+        ],
+        before [;
+          Kick:
+            "Kopniakiem posyłasz krasnoluda na drugi koniec komnaty. Klnie,
+             wstaje i otrzepuje się. Teraz jest wściekły jak nigdy!";
+        ],
+        life [;
+          ThrowAt:
+            if (noun == axe) {
+                if (random(3) ~= 1) {
+                    remove self;
+                    move axe to location;
+                    self.number--;
+                    "Mały krasnolud nie żyje! Ciało znika w chmurze tłustego
+                     czarnego dymu.";
+                }
+                move axe to location;
+                "Pudło! Mały krasnolud uskakuje przed toporem.";
+            }
+            <<Give noun second>>;
+          Give:
+            if (noun == tasty_food)
+                "Głupi pomysł - krasnoludy jedzą tylko węgiel! Teraz jest
+                 *naprawdę* wściekły!";
+            "Krasnolud wcale nie jest zainteresowany twoją propozycją.
+             (Może dlatego, że jeśli cię zabije, i tak dostanie wszystko,
+             co masz.)";
+          Attack:
+            "Nie gołymi rękami. Mowy nie ma.";
+        ],
+        has_thrown_axe false,
+  has   animate male;
+
+Object  axe "krasnoludzk/i top/ó=o/r/"
+  with  name 'toporek' 'toporka' 'toporkiem' 'siekiera' 'siekierę' 'siekiery'
+             'mały' 'małego' 'małym',
+        description "To po prostu mały topór.",
+        initial "Leży tu mały topór.",
+        before [;
+            if (~~self.is_near_bear) rfalse;
+          Examine:
+            "Leży obok niedźwiedzia.";
+          Take:
+            "Nie ma szans. Leży obok groźnego niedźwiedzia, w zasięgu jego
+             łap.";
+        ],
+        is_near_bear false;
+
+! ------------------------------------------------------------------------------
+!   Dwa spotkania z piratem
+! ------------------------------------------------------------------------------
+
+Object  pirate
+  with  daemon [ obj booty_nearby;
+            if (random(100) > 2 || location == thedark or In_Secret_Canyon ||
+                location has light || location has nodwarf) return;
+            if (dwarf in location)
+                "^Pojawia się brodaty pirat, dostrzega krasnoluda i ucieka.";
+            objectloop (obj ofclass Treasure && obj in player or location)
+                booty_nearby = true;
+            if (booty_nearby == false) {
+                if (self.has_been_spotted) return;
+                self.has_been_spotted = true;
+                if (self.has_stolen_something) StopDaemon(self);
+                "^Z ciemności za tobą dochodzą ciche szelesty. Gdy się
+                 odwracasz, dostrzegasz brodatego pirata. Niesie dużą
+                 skrzynię.
+                 ^^
+                 ~Do stu tysięcy beczek śledzi!~ woła. ~Ktoś mnie zobaczył!
+                 Lepiej zmykam do labiryntu schować skrzynię!~
+                 ^^
+                 I już znika w mroku.";
+            }
+            if (self.has_stolen_something) return;
+            self.has_stolen_something = true;
+            if (self.has_been_spotted) StopDaemon(self);
+            objectloop (obj ofclass Treasure && obj in player or location) {
+                if (obj in player) score = score - 5;
+                move obj to Dead_End_13;
+            }
+            "^Z cienia za tobą wyskakuje brodaty pirat! ~Har, har~ - rechocze.
+             ~Wezmę sobie cały ten łup i schowam go razem z moją skrzynią
+             głęboko w labiryncie!~ Porywa twój skarb i znika w mroku.";
+        ],
+        has_stolen_something false,
+        has_been_spotted false;
+
+! ----------------------------------------------------------------------------
+!   Jaskinia się zamyka...
+! ----------------------------------------------------------------------------
+
+Object  cave_closer
+  with  daemon [;
+            if (treasures_found < MAX_TREASURES) return;
+            StopDaemon(self);
+            caves_closed = true;
+            score = score + 25;
+            remove CrystalBridge;
+            give Grate locked ~open;
+            remove set_of_keys;
+            StopDaemon(dwarf);
+            StopDaemon(pirate);
+            remove Troll;
+            remove Bear;
+            remove Dragon;
+            StartTimer(endgame_timer, 25);
+            "^Grobowy głos niesie się echem po jaskini: ~Jaskinia wkrótce
+             zostanie zamknięta. Wszyscy poszukiwacze przygód proszeni są
+             o natychmiastowe wyjście przez główne biuro.~";
+        ];
+
+Object  endgame_timer
+  with  time_left 0,
+        time_out [;
+            score = score + 10;
+            while (child(player)) remove child(player);
+            move bottle to At_Ne_End;
+            if (child(bottle)) remove child(bottle);
+            move giant_bivalve to At_Ne_End;
+            move brass_lantern to At_Ne_End;
+            move black_rod to At_Ne_End;
+            move little_bird to At_Sw_End;
+            move velvet_pillow to At_Sw_End;
+            print
+                "^Grobowy głos oznajmia: ~Jaskinia jest zamknięta.~ Gdy echo
+                 cichnie, następuje oślepiający błysk światła (i mały obłoczek
+                 pomarańczowego dymu)...
+                 ^^
+                 Gdy wzrok wraca ci do normy, rozglądasz się...^";
+            PlayerTo(At_Ne_End);
+        ];
+
+! ------------------------------------------------------------------------------
+!   Gra końcowa
+! ------------------------------------------------------------------------------
+
+Room    At_Ne_End "Północno-wschodni koniec magazynu"
+  with  name 'koniec' 'końcu' 'magazyn' 'magazynu',
+        description
+            "Jesteś na północno-wschodnim końcu ogromnej sali, większej
+             nawet od Komnaty Olbrzyma. Wygląda na magazyn programu
+             ~Przygoda~. Masywne pochodnie wysoko w górze zalewają salę
+             zadymionym żółtym światłem. Dookoła leży stos butelek
+             (wszystkie puste), szkółka młodych łodyg fasoli cicho
+             mruczących pod nosem, ławica ostryg, pęk czarnych prętów
+             z zardzewiałymi gwiazdami na końcach i kolekcja mosiężnych lamp.
+             Z boku na podłodze śpi mnóstwo krasnoludów, głośno chrapiąc.
+             Tabliczka obok głosi: ~Nie budzić krasnoludów!~",
+        sw_to At_Sw_End,
+  has   light;
+
+Object  -> "ogromn/e lustr/o"
+  with  name 'zwierciadło' 'zwierciadła' 'wielkie' 'wielkiego' 'duże'
+             'dużego' 'zawieszone' 'wiszące' 'krasnoludzkie',
+        description "Wygląda jak zwykłe, choć ogromne lustro.",
+        initial
+            "Na jednej ze ścian wisi gigantyczne lustro, ciągnące się aż do
+             drugiego końca sali, gdzie w oddali majaczą różne inne
+             przedmioty.",
+        before [;
+          Attack:
+            print
+                "Uderzasz w lustro z głośnym hukiem, a ono rozpryskuje się na
+                 miriady drobnych kawałeczków.^^";
+            SleepingDwarves.wake_up();
+            rtrue;
+        ],
+        found_in At_Ne_End At_Sw_End,
+  has   static neuter;
+
+Scenic  -> "zbi/ó=o/r/+u materiałów do gry"
+  with  name 'rzeczy' 'rupiecie' 'rupieci' 'materiały' 'materiałów'
+             'pochodnie' 'pochodni' 'przedmioty' 'przedmiotów' 'przygoda'
+             'przygody' 'magazyn' 'magazynu' 'masywne' 'różne',
+        description
+            "Wszystko to już widziano, choć w nieco innym kontekście.",
+        before [;
+          Take:
+            "Zabranie stąd łupu zepsułoby grę przyszłym graczom, więc
+             zostawiasz materiały ~Przygody~ tam, gdzie są.";
+        ];
+
+Scenic  -> SleepingDwarves "śpiąc/e krasnolud/y"
+  with  name 'krasnolud' 'krasnoluda' 'krasnoludów' 'krasnoludami'
+             'chrapiące' 'chrapiących' 'drzemiące' 'drzemiących',
+        description "Na twoim miejscu nie zaczepiałbym krasnoludów.",
+        before [;
+          Take:
+            "Co, wszystkie?";
+        ],
+        life [;
+          WakeOther:
+            print
+                "Szturchasz najbliższego krasnoluda. Budzi się zrzędliwie,
+                 rzuca na ciebie jedno spojrzenie, klnie i sięga po topór.^^";
+            self.wake_up();
+            rtrue;
+          Attack:
+            self.wake_up();
+            rtrue;
+        ],
+        wake_up [;
+            deadflag = 1;
+            "Ten hałas obudził krasnoludy. W sali jest teraz z tobą kilkadziesiąt
+             groźnych małych krasnoludów! Większość z nich rzuca w ciebie
+             nożami! Wszystkie trafiają!";
+        ],
+  has   animate multitude pluralname;
+
+! ------------------------------------------------------------------------------
+
+Room    At_Sw_End "Południowo-zachodni koniec magazynu"
+  with  name 'koniec' 'końcu' 'magazyn' 'magazynu',
+        description
+            "Jesteś na południowo-zachodnim końcu magazynu. Z jednej strony
+             jest jama pełna groźnych zielonych węży. Z drugiej stoi rząd
+             małych wiklinowych klatek, a w każdej siedzi nadąsany ptaszek.
+             W jednym kącie leży pęk czarnych prętów z zardzewiałymi znakami
+             na końcach. Po podłodze porozrzucano mnóstwo aksamitnych poduszek.
+             Na północny wschód ciągnie się olbrzymie lustro. U twoich stóp jest
+             duża stalowa krata, a obok niej tabliczka: ~SKARBIEC. Klucze
+             w głównym biurze.~",
+        d_to RepositoryGrate,
+        ne_to At_Ne_End,
+  has   light;
+
+Object  -> RepositoryGrate "stalow/a krat/a"
+  with  name 'zwykła' 'zwykłą' 'zwykłej' 'kratka' 'kratkę' 'kratownica',
+        description "Wygląda jak zwykła stalowa krata.",
+        when_open "Krata jest otwarta.",
+        when_closed "Krata jest zamknięta.",
+        door_dir d_to,
+        door_to Outside_Grate,
+        with_key nothing,
+  has   static door locked openable female;
+
+Scenic  -> "zbi/ó=o/r/+u materiałów do gry"
+  with  name 'jama' 'jamę' 'jamie' 'wąż' 'węże' 'węży' 'groźne' 'zielone'
+             'rzeczy' 'rupiecie' 'rupieci' 'materiały' 'materiałów'
+             'przygoda' 'przygody' 'magazyn' 'magazynu' 'masywne' 'różne',
+        description
+            "Wszystko to już widziano, choć w nieco innym kontekście.",
+        before [;
+          Take:
+            "Zabranie stąd łupu zepsułoby grę przyszłym graczom, więc
+             zostawiasz materiały ~Przygody~ tam, gdzie są.";
+        ];
+
+Object  -> black_mark_rod "czarn/y pręt/ z zardzewiałym znakiem"
+  with  name 'znak' 'znakiem' 'zardzewiały' 'zardzewiałym' 'żelazny'
+             'żelaznego' 'trzystopowy' 'wybuchowy' 'wybuchowego' 'dynamit'
+             'dynamitu' 'laska' 'laskę' 'laski',
+        description "To czarny pręt długości trzech stóp, z zardzewiałym
+                     znakiem na jednym końcu.",
+        initial
+            "Niedaleko leży czarny pręt długości trzech stóp, z zardzewiałym
+             znakiem na jednym końcu.",
+        before [;
+          Wave:
+            "Nic się nie dzieje.";
+        ];
+
+! ------------------------------------------------------------------------------
+!   Kilka punktów wejścia
+! ------------------------------------------------------------------------------
+
+[ Initialise;
+    location = At_End_Of_Road;
+    score = 36;
+    StartDaemon(dwarf);
+    StartDaemon(pirate);
+    StartDaemon(cave_closer);
+    "^^^^^Witaj w Przygodzie!^
+          (Wpisz POMOC, żeby zobaczyć instrukcję i informacje o grze.)^^";
+];
+
+[ PrintRank;
+    print ", co czyni cię ";
+    if (score >= 348) "Wielkim Mistrzem Przygody!";
+    if (score >= 330) "Mistrzem pierwszej klasy.";
+    if (score >= 300) "Mistrzem drugiej klasy.";
+    if (score >= 200) "Młodszym Mistrzem.";
+    if (score >= 130) "Zaprawionym Poszukiwaczem Przygód.";
+    if (score >= 100) "Doświadczonym Poszukiwaczem Przygód.";
+    if (score >= 35)  "Poszukiwaczem Przygód.";
+    if (score >= 10)  "Nowicjuszem.";
+                      "Amatorem.";
+];
+
+[ DarkToDark;
+    if (dark_warning == false) {
+        dark_warning = true;
+        "Jest zupełnie ciemno. Jeśli pójdziesz dalej, najpewniej wpadniesz
+         do jakiejś jamy.";
+    }
+    if (random(4) == 1) {
+        deadflag = 1;
+        "Wpadasz do jamy i łamiesz sobie wszystkie kości!";
+    }
+    rfalse;
+];
+
+[ UnknownVerb word
+    obj;
+    objectloop (obj ofclass Room) {
+        if (obj has visited && WordInProperty(word, obj, name)) {
+            verb_wordnum = 0;
+            return 'idź';
+        }
+    }
+    rfalse;
+];
+
+! ------------------------------------------------------------------------------
+!   Wskrzeszenie
+! ------------------------------------------------------------------------------
+
+[ AfterLife o;
+    if (deadflag == 3) {
+        deadflag = 1;
+        rfalse;
+    }
+    print "^^";
+    if (caves_closed)
+        "Wygląda na to, że nie żyjesz. Cóż, skoro i tak zaraz zamykamy,
+         chyba na tym skończymy.";
+    switch (deaths) {
+      0:
+        print
+            "Ojej, wygląda na to, że nie żyjesz. Może dałbym radę ci pomóc,
+             ale nigdy wcześniej tego nie robiłem. Mam spróbować cię
+             wskrzesić?^^";
+      1:
+        print
+            "Ty niezdaro, znowu to samo! Nie wiem, jak długo jeszcze dam radę.
+             Mam spróbować wskrzesić cię jeszcze raz?^^";
+      2:
+        print
+            "No, teraz to już naprawdę przesada! Skończył mi się pomarańczowy
+             dym! Chyba nie oczekujesz porządnego wskrzeszenia bez
+             pomarańczowego dymu?^^";
+    }
+    print "> ";
+    if (YesOrNo() == false) {
+        switch (deaths) {
+          0: "Jak sobie życzysz.";
+          1: "Chyba rozsądny wybór.";
+          2: "Tak myślałem!";
+        }
+    }
+    switch (deaths) {
+      0:
+        print
+            "Dobrze. Ale nie miej do mnie pretensji, jeśli coś pójdzie nie
+             ta......
+             ^^^^
+             --- PUF!! ---
+             ^^
+             Spowija cię chmura pomarańczowego dymu. Kaszląc i łapiąc
+             oddech, wychodzisz z dymu i odkrywasz, że jesteś....^";
+      1:
+        print
+            "Dobrze, gdzie ja położyłem ten pomarańczowy dym?.... >PUF!<
+             ^^
+             Wszystko znika w gęstej chmurze pomarańczowego dymu.^";
+      2:
+        "Dobrze, skoro tyle wiesz, radź sobie dalej beze mnie! Ja się
+         wynoszę!";
+    }
+    deaths++;
+    score = score - 10;
+    if (location ~= thedark) {
+        while (child(player)) {
+            o = child(player);
+            move o to location;
+            if (o ofclass Treasure) score = score - 5;
+        }
+    }
+    else {
+        while (child(player)) {
+            o = child(player);
+            move o to real_location;
+            if (o ofclass Treasure) score = score - 5;
+        }
+    }
+    move brass_lantern to At_End_Of_Road;
+    give brass_lantern ~on ~light;
+    remove dwarf;
+    deadflag = 0;
+    PlayerTo(Inside_Building);
+];
+
+! ------------------------------------------------------------------------------
+!   Pomoc w formie menu (właściwie nie należy do samej gry)
+! ------------------------------------------------------------------------------
+
+[ HelpMenu;
+    if (menu_item == 0) {
+        item_width = 7;
+        item_name = "O Przygodzie";
+        if (deadflag == 2) return 4;
+        else               return 3;
+    }
+    if (menu_item == 1) {
+        item_width = 5;
+        item_name = "Instrukcja";
+    }
+    if (menu_item == 2) {
+        item_width = 4;
+        item_name = "Historia";
+    }
+    if (menu_item == 3) {
+        item_width = 6;
+        item_name = "Autentyczność";
+    }
+    if (menu_item == 4) {
+        item_width = 8;
+        item_name = "Czy wiesz, że...";
+    }
+];
+
+[ HelpInfo;
+    if (menu_item == 1) {
+        print
+            "Znam miejsca, czynności i przedmioty. Możesz mną kierować za
+             pomocą poleceń w trybie rozkazującym. Żeby się poruszać, spróbuj
+             poleceń takich jak ~wejdź~, ~wschód~, ~zachód~, ~północ~,
+             ~południe~, ~góra~, ~dół~, ~wejdź do budynku~, ~wespnij się
+             na słup~ itd.^^";
+        print
+            "Znam kilka szczególnych przedmiotów, na przykład czarny pręt
+             ukryty w jaskini. Można coś z nimi robić za pomocą czasowników,
+             które znam. Zwykle trzeba podać czasownik, a po nim przedmiot
+             (w razie potrzeby z przymiotnikami), ale czasem potrafię się
+             domyślić przedmiotu z samego czasownika. Niektóre przedmioty
+             same wskazują czynność; na przykład ~ekwipunek~ oznacza
+             ~sprawdź ekwipunek~, a wtedy podaję listę tego, co masz przy
+             sobie. Przedmioty mają skutki uboczne; na przykład pręt
+             płoszy ptaszka.^^";
+        print
+            "Wiele poleceń ma skróty. Na przykład zamiast ~ekwipunek~ możesz
+             wpisać ~i~, zamiast ~zbadaj przedmiot~ - ~x przedmiot~ itd.
+             Kierunki skraca się tak: pn, pd, w, z, pnw, pnz, pdw, pdz,
+             g (góra) i d (dół).^^";
+        print
+            "Zwykle, gdy ktoś ma kłopot z poruszaniem się, wystarczy
+             spróbować kilku innych słów. Zwykle, gdy ktoś bezskutecznie
+             próbuje coś zrobić z przedmiotem, próbuje czegoś, co przekracza
+             jego (albo moje!) możliwości, i powinien spróbować zupełnie innego
+             podejścia.^^";
+        print
+            "Pamiętaj, że korytarze w jaskini bardzo się wiją i że wyjście
+             z komnaty na północ wcale nie gwarantuje, że do następnej wejdzie
+             się od południa.^^";
+        print
+            "Jeśli chcesz wcześniej zakończyć przygodę, wpisz ~koniec~. Żeby
+             przerwać przygodę i dokończyć ją później, wpisz ~zapisz~, a żeby
+             wczytać zapisaną grę - ~wczytaj~. Żeby zobaczyć, jak ci idzie,
+             wpisz ~wynik~. Pełną liczbę punktów za skarb dostaje się dopiero
+             po bezpiecznym złożeniu go w budynku, choć część punktów dostaje
+             się już za samo odnalezienie. Punkty traci się za śmierć albo za
+             rezygnację, przy czym śmierć kosztuje więcej. Są też punkty
+             za to, jak dużą część jaskini (jeśli w ogóle) udało się zbadać;
+             w szczególności jest duża premia za samo dostanie się do środka
+             (żeby odróżnić początkujących od reszty stawki), a są też inne
+             sposoby sprawdzenia, czy udało się przejść przez niektóre
+             z bardziej mrożących krew w żyłach miejsc.^^";
+        print
+            "Jeśli wydaje ci się, że masz już wszystkie skarby, po prostu
+             zwiedzaj dalej przez jakiś czas. Jeśli nic ciekawego się nie
+             wydarzy, znaczy, że jeszcze nie wszystkie. Jeśli coś ciekawego
+             *się* wydarzy, znaczy to, że dostajesz premię i masz okazję zdobyć
+             mnóstwo kolejnych punktów w części dla mistrzów.^^";
+        "Powodzenia!";
+    }
+    if (menu_item == 2) {
+        print
+            "Być może pierwszym poszukiwaczem przygód był niewolnik Stephen
+             Bishop, urodzony około 1820 roku: «drobny, zgrabny i bardzo
+             przystojny»; «bystry, odważny i pełen zapału» przewodnik po
+             Jaskini Mamuciej w krasie Kentucky. Historia jaskini to
+             osobliwy mikrokosmos historii Ameryki. Jej odkrycie to legenda
+             sięgająca lat dziewięćdziesiątych XVIII wieku; podobno myśliwy
+             John Houchin ścigał rannego niedźwiedzia aż do dużej jamy nad
+             Green River i natknął się na wejście. Przy wejściu roiło się od
+             nietoperzy, a w czasie wojny 1812 roku intensywnie wydobywano
+             tu guano, które rozpuszczano w kadziach z azotanem, żeby uzyskać
+             saletrę do prochu. Po wojnie ceny spadły, ale jaskinia stała się
+             pomniejszą atrakcją, kiedy w pobliżu znaleziono wysuszoną mumię
+             Indianki, siedzącą prosto w kamiennej trumnie i otoczoną
+             talizmanami. W 1815 roku Fawn Hoof, jak ją nazwano od jednego
+             z amuletów, zabrał cyrk, który ściągał na nią tłumy w całej
+             Ameryce (trasa przypominała nieco piosenkę Dona McLeana «The
+             Legend of Andrew McCrew»). Trafiła w końcu do Instytutu
+             Smithsona, ale w latach dwudziestych XIX wieku jaskinię nazywano
+             już jednym z cudów świata, głównie dzięki jej pośmiertnym
+             staraniom.^^";
+        print
+            "Na początku XIX wieku jaskinie europejskie były wielkimi
+             atrakcjami turystycznymi, ale Jaskini Mamuciej, «cud świata» czy
+             nie, prawie nikt nie odwiedzał. Nie była też wtedy szczególnie
+             duża (nazwa została po górnikach, którzy chwalili się mamucimi
+             urobkami guana). W 1838 roku właściciel Stephena Bishopa kupił
+             jaskinię. Stephen, jak go (jako niewolnika) zawsze nazywano, był
+             pod każdym względem niezwykłym człowiekiem: samouk w łacinie
+             i grece, zasłynął jako «główny władca» swojego podziemnego
+             królestwa. W wolnym czasie zbadał i nazwał dużą część jaskini,
+             w ciągu roku podwajając znaną mapę. Charakterystyczny styl nazw
+             w jaskini - na wpół swojski amerykański, na wpół klasyczny -
+             zaczął się od Stephena: rzeka Styks, Komnata Śnieżki, Aleja
+             Małego Nietoperza, Wielka Kopuła. Stephen znalazł dziwne ślepe
+             ryby, węże, nieme świerszcze, szczątki niedźwiedzi jaskiniowych
+             (dzikich, figlarnych stworzeń, długich na pięć stóp i wysokich na
+             cztery, które wymarły pod koniec ostatniej epoki lodowcowej),
+             kilkusetletnie indiańskie wyrobiska gipsu i coraz więcej jaskini.
+             Jego mapa z 1842 roku, narysowana w całości z pamięci, była
+             w użyciu jeszcze czterdzieści lat później.^^";
+        print
+            "Jako atrakcja turystyczna (a ponieważ właściciel Stephena był
+             filantropem, przez krótki czas także, na podstawie beznadziejnej
+             teorii medycznej, sanatorium dla gruźlików) jaskinia stała się
+             wielkim biznesem: przez dziesięciolecia gorączkowo zajmowano
+             pobliskie jaskinie i bez końca podważano tytuły prawne. Sąsiedni
+             system, po drugiej stronie doliny Houchins w Flint Ridge, otworzył
+             w 1912 roku Wielką Jaskinię Onyksową. W latach dwudziestych
+             wojny jaskiniowe w Kentucky trwały w najlepsze. Konkurencyjni
+             właściciele zawracali turystów za pomocą fałszywych policjantów,
+             wynajmowali ludzi do zakłócania wycieczek z przewodnikiem
+             konkurencji, palili budki z biletami i publikowali oszczercze
+             i fałszywe ogłoszenia. Badanie jaskiń stało się tak niebezpieczne
+             i tajemnicze, że w końcu w 1941 roku wkroczył rząd Stanów
+             Zjednoczonych, ustanowił na dużej części tego obszaru park
+             narodowy i w praktyce zakazał eksploracji jaskiń. Gorączka
+             złota turystów i tak już zresztą słabła.^^";
+        print
+            "Przekonani, że jaskinie Mamucia i Flint Ridge tworzą jeden wielki
+             system, grotołazi latami szukali tajnych wejść, aż w końcu
+             zyskali oficjalne poparcie. Przez całe lata sześćdziesiąte
+             wszystkie połączenia z Flint Ridge - trudne, zalane wodą tunele -
+             kończyły się frustrująco zwałami głazów. Przełomu dokonała w 1972
+             roku «chuda jak trzcina» fizyczka Patricia Crowther, która
+             przecisnęła się przez Ciasne Miejsce i znalazła błotnisty
+             korytarz: było to ukryte wejście do Jaskini Mamuciej.^^";
+        print
+            "Zgodnie z testamentem właściciela Stephen Bishop odzyskał wolność
+             w 1856 roku; jaskinia miała wtedy 226 alei, 47 kopuł, 23 jamy
+             i 8 wodospadów. Zmarł rok później, zanim zdążył wykupić żonę
+             i syna. W latach siedemdziesiątych XX wieku błotnisty korytarz
+             Crowther odnaleziono na jego mapie.^^";
+        print
+            "Jaskinia Mamucia jest ogromna, a jej pełny zasięg wciąż jest
+             przedmiotem spekulacji (szacunki wahają się od 300 do 500 mil).
+             Choć grę często nazywano ~Colossal Cave~, w rzeczywistości jest
+             ona symulacją rejonu jaskini Bedquilt. Oto jak jej powstanie
+             opisuje Will Crowther:^^";
+        print
+            "~Grałem wtedy w niekomputerową grę fabularną, Dungeons and
+             Dragons, a do tego aktywnie zwiedzałem jaskinie - zwłaszcza
+             Jaskinię Mamucią w Kentucky. Nagle przyszedł rozwód i trochę mnie
+             to na różne sposoby rozbiło. Przede wszystkim brakowało mi dzieci.
+             Skończyło się też chodzenie po jaskiniach, bo zrobiło się
+             niezręcznie, więc postanowiłem dla zabawy napisać program, który
+             byłby fantastycznym odtworzeniem mojego grotołażenia, a zarazem
+             grą dla dzieci, może z elementami Dungeons and Dragons, w które
+             grałem.^^";
+        print
+            "~Chodziło mi o to, żeby była to gra komputerowa, która nie
+             onieśmieli ludzi niemających do czynienia z komputerami, i między
+             innymi dlatego zrobiłem tak, żeby gracz kierował grą w języku
+             naturalnym, a nie za pomocą bardziej ustandaryzowanych poleceń.
+             Moje dzieci świetnie się przy niej bawiły.~ [Cytat z ~Genesis II:
+             Creation and Recreation with Computers~, Dale Peterson (1983).]^^";
+        print
+            "Oryginalny program Crowthera w FORTRAN-ie miał mniej więcej pięć
+             skarbów, ale żadnej formalnej punktacji. Wyzwaniem było przede
+             wszystkim zwiedzanie, choć przeszkadzał na przykład wąż. Jak
+             prawdziwy rejon Bedquilt, symulacja Crowthera ma mapę na mniej
+             więcej czterech poziomach głębokości i obfituje w szczegóły
+             geologiczne. Dobrym przykładem jest pomarańczowa kolumna, która
+             schodzi do Komnaty Pomarańczowej Rzeki (gdzie mieszka ptaszek):
+             prawdziwa kolumna jest z pomarańczowego trawertynu, pięknego
+             minerału występującego w wilgotnym wapieniu.^^";
+        print
+            "Język gry jest pełen odniesień do speleologii, do «kopuł»
+             i «przełazów». Na przykład «komnata z płytą» (slab room) to bardzo
+             stara jaskinia, której strop zaczął się kruszyć na ostre płaty,
+             zaścielające podłogę w bezładnym stosie. Używanie przez program
+             słowa «room» (komnata) na określenie wszelkich jaskiń i miejsc
+             wydaje się w potocznym angielskim trochę niechlujne, ale jest
+             powszechne w amerykańskiej speleologii i sięga czasów Stephena
+             Bishopa: możliwe więc, że to on przekazał grom przygodowym
+             zwyczaj nazywania każdego miejsca «komnatą».^^";
+        print
+            "Decydujący krok w stronę rozwiązywania zagadek gra zrobiła,
+             kiedy Don Woods, student Stanfordu, poprawił ją i rozbudował.
+             Potroił liczbę skarbów i dodał strefy niegeologiczne: wszystko od
+             mostu trolla dalej, razem z większością przedsionków na poziomie
+             Bedquilt. Wszystkie liczne naśladownictwa i rozszerzenia
+             oryginalnej Przygody opierają się w gruncie rzeczy na
+             350-punktowej wersji Woodsa. (W internecie krąży wiele
+             rozdętych, zepsutych albo ulepszonych - zależnie od punktu
+             widzenia - wersji gry, a najlepiej rozpoznawać je po
+             maksymalnej liczbie punktów. Istnieje wiele wersji do mniej
+             więcej 400 i 500 punktów, a jedna nawet do 1000. Sam Woods wciąż
+             wydaje nowe wersje swojej gry; większość innych rozszerzających
+             nie ma jego talentu.)^^";
+        print
+            "Choć gra odeszła od czystej symulacji, sporo w niej wciąż
+             realistycznego. Grotołazi naprawdę zawracają, kiedy migocą im
+             lampy karbidowe; na ścianach jaskiń naprawdę są tajemnicze znaki
+             i inicjały, pozostawione częściowo przez górników, częściowo
+             przez Bishopa, częściowo przez badaczy z lat dwudziestych.
+             Oczywiście w środkowym Kentucky nie ma czynnego wulkanu, nie ma
+             też smoków ani krasnoludów. Ale nawet te ozdobniki wywodzą się
+             w pewnym sensie z tradycji: jak większość wczesnych gier
+             fabularnych, «Przygoda» wiele zawdzięcza «Hobbitowi» J. R. R.
+             Tolkiena oraz przejściu przez góry i Morię we «Władcy
+             Pierścieni» (być może najbardziej dramatycznemu
+             i nastrojowemu fragmentowi tej książki). Sam Tolkien, najbardziej
+             utytułowany twórca mitów XX wieku, wzorował się na sagach
+             islandzkich, fińskich i walijskich.^^";
+        print
+            "W 1977 roku taśmy z «Przygodą» krążyły już szeroko, między
+             innymi za sprawą grupy użytkowników Digital, DECUS, i wszędzie,
+             gdzie trafiły, pochłaniały przerwy na lunch i weekendy... ale to
+             już inna historia. (Dobrze oddaje to fascynująca książka Tracy'ego
+             Kiddera «The Soul of a New Machine», dziennikarskie spojrzenie
+             na zespół budujący komputer typu mainframe.)^^";
+        "To kopia z trzeciej albo czwartej ręki: od oryginału Willa
+         Crowthera, przez 350-punktową wersję Donalda Woodsa, przeniesienie
+         na PC Donalda Ekmana i znakomitą wersję TADS Davida M. Baggetta
+         (1993), aż do tej.^^";
+    }
+    if (menu_item == 3) {
+        print
+            "To przeniesienie jest dość bliskie oryginałowi. Zagadki,
+             przedmioty i miejsca są dokładnie takie jak w oryginalnej
+             350-punktowej wersji Woodsa.^^";
+        print
+            "Tu i ówdzie dodałem kilka pomocnych komunikatów, takich jak ~To
+             ślepy zaułek.~, i przywróciłem niektóre opisy początkowego
+             położenia przedmiotów, na przykład (dość kulawe)
+             ^^  Leży tu smaczne jedzenie.^^
+             z plików źródłowych, które są na pewno wczesne, ale wątpliwego
+             pochodzenia. Wydają się dobrze pasować do reszty tekstu.^^";
+        print
+            "System punktacji jest oryginalny, z tym że nie traci się już
+             4 punktów za rezygnację (w grach Inform i tak nie widać wyniku
+             po rezygnacji, więc to bez różnicy) i - co kontrowersyjne -
+             przyznaję 5 punktów za samo noszenie skarbu, jak w niektórych
+             przeniesieniach z początku lat osiemdziesiątych. Nazwy rang są
+             trochę uporządkowane. Jedyna istotna zmiana zasad polega na tym,
+             że nie można używać magicznych słów, dopóki nie odwiedzi się
+             miejsc, do których prowadzą.^^";
+        print
+            "Krasnoludy poruszają się w prostszy sposób, ale za to dodałem
+             kilka komunikatów, żeby lepiej współgrały z resztą gry.
+             Prawdopodobieństwa są takie jak w oryginale.^^";
+        print
+            "W oryginale można było wpisać nazwę miejsca, żeby się do niego
+             przenieść: dla oszczędności kodu pominąłem tę możliwość, choć
+             z żalem. [RF: dodane w wydaniu 9.]^^";
+        print
+            "Sam tekst niemal wszędzie zachowano bez zmian, ale poprawiłem
+             trochę błędów ortograficznych i gramatycznych (i zmieniłem kilka
+             zupełnie mylących i zagadkowych uwag). Instrukcja jest nieco
+             zmieniona (z oczywistych powodów), ale w zasadzie taka, jak ją
+             napisano.^^";
+        "Dobrym źródłem szczegółów jest kod źródłowy Davida Baggetta,
+         który krąży w internecie.";
+    }
+    print "Czy wiesz, że...^^";
+    print
+        "Pięć krasnoludów ma 96% szans, że pójdzie za tobą, chyba że do
+         światła, w dół jamy albo kiedy podziwiają się w lustrze; a ich
+         paskudne małe noże trafiają w 9,5% przypadków.^^";
+    print "Smoki spalają krasnoludy (może dlatego, że krasnoludy jedzą
+           tylko węgiel).^^";
+    print
+        "Niedźwiedź (który lubi wulkan) jest za ciężki na most... a po
+         wskrzeszeniu można wrócić na miejsce wypadku.^^";
+    print
+        "Można się prześlizgnąć obok węża do tajnego kanionu wschód-zachód,
+         w każdym razie w 35% przypadków. A chodzenie po ciemku nie jest
+         takie straszne: grozi tylko w 25% upadkiem do jamy.^^";
+    print "Waza nie lubi kąpieli.^^";
+    print "Mroczne postacie mogą do siebie machać.^^";
+    print "Polanie zawiasów drzwi wodą znów je zardzewia.^^";
+    print
+        "Kiedy jaskinia się zamyka, krata zostaje zablokowana, klucze
+         wyrzucone, stworzenia uciekają, a kryształowy most znika...^^";
+    print
+        "...a na muszli olbrzymiej ostrygi w grze końcowej jest napisana
+         zupełnie bezużyteczna wskazówka. (Żeby była odrobinę uczciwsza,
+         zmieniłem jedno słowo i porozrzucałem podpowiedzi w innych
+         miejscach gry.)^^";
+    "Ostatni nędzny punkt można zdobyć... ale nie. To byłoby już
+     zdradzanie.";
+];
+
+[ HelpSub;
+    if (deadflag ~= 2)
+        DoMenu(
+            "Dostępne są informacje na następujące tematy:^
+            ^     Instrukcja gry
+            ^     Wstęp historyczny
+            ^     Na ile autentyczna jest ta wersja?^", HelpMenu, HelpInfo);
+    else
+        DoMenu(
+            "Dostępne są informacje na następujące tematy:^
+            ^     Instrukcja gry
+            ^     Wstęp historyczny
+            ^     Na ile autentyczna jest ta wersja?
+            ^     Czy wiesz, że...^", HelpMenu, HelpInfo);
+];
+
+[ Amusing; HelpSub(); ];
+
+! ------------------------------------------------------------------------------
+!   Gramatyka: zwykła polska gramatyka i kilka rozszerzeń
+! ------------------------------------------------------------------------------
+
+Include "PolskiG";
+
+Extend 'pomoc' replace
+    *                       -> Help;
+
+! ------------------------------------------------------------------------------
+
+[ OffSub;
+    if (brass_lantern notin player) "Nie masz lampy.";
+    <<SwitchOff brass_lantern>>;
+];
+
+[ OnSub;
+    if (brass_lantern notin player) "Nie masz lampy.";
+    <<SwitchOn brass_lantern>>;
+];
+
+Extend 'wyłącz' first
+    *                       -> Off;
+
+Extend 'włącz' first
+    *                       -> On;
+
+! ------------------------------------------------------------------------------
+
+[ CatchSub; "Nie da się złapać ", (dop) noun, "."; ];
+
+[ ReleaseSub; "Nie da się uwolnić ", (dop) noun, "."; ];
+
+Extend only 'złap' first
+    * creature              -> Catch
+    * creature 'do'/'w//' held -> Catch;
+
+Verb 'schwytaj' 'łap' 'pochwyć'
+    * creature              -> Catch
+    * creature 'do'/'w//' held -> Catch;
+
+Verb 'uwolnij' 'wypuść' 'oswobodź'
+    * creature              -> Release;
+
+! ------------------------------------------------------------------------------
+
+[ WaterSub;
+    if (bottle in player) <<Empty bottle>>;
+    "Wodą? Jaką wodą?";
+];
+
+[ OilSub;
+    if (bottle in player) <<Empty bottle>>;
+    "Olejem? Jakim olejem?";
+];
+
+Verb 'podlej' 'zlej' 'zmocz'
+    * noun                  -> Water;
+
+Verb 'naoliw' 'nasmaruj' 'smaruj' 'oliw'
+    * noun                  -> Oil;
+
+Verb 'polej'
+    * noun 'wodą'           -> Water
+    * noun 'olejem'/'oliwą' -> Oil
+    * 'wodą' noun           -> Water
+    * 'olejem'/'oliwą' noun -> Oil
+    * noun                  -> Water;
+
+Extend 'wylej' first
+    * 'wodę' 'na' noun      -> Water
+    * 'olej'/'oliwę' 'na' noun -> Oil;
+
+! ------------------------------------------------------------------------------
+
+[ BlastSub;
+    if (location ~= At_Sw_End or At_Ne_End) "Frustrujące, prawda?";
+    if (location == At_Sw_End && parent(black_mark_rod) == At_Ne_End) {
+        score = score + 35;
+        deadflag = 2;
+        "Rozlega się głośny wybuch i w przeciwległej ścianie pojawia się dwudziestostopowa dziura, a krasnoludy giną pod gruzami.
+         Przechodzisz przez dziurę i trafiasz do głównego biura, gdzie
+         wiwatujący oddział przyjaznych elfów niesie zwycięskiego
+         poszukiwacza przygód w stronę zachodzącego słońca.";
+    }
+    if (location == At_Ne_End && parent(black_mark_rod) == At_Sw_End) {
+        score = score + 20;
+        deadflag = 1;
+        "Rozlega się głośny wybuch i w przeciwległej ścianie pojawia się dwudziestostopowa dziura, a węże giną pod gruzami. Przez
+         dziurę wlewa się rzeka roztopionej lawy, niszcząc wszystko na swojej
+         drodze, łącznie z tobą!";
+    }
+    deadflag = 1;
+    "Rozlega się głośny wybuch, a ty nagle rozpryskujesz się po ścianach
+     komnaty.";
+];
+
+[ BlastWithSub;
+    if (second ~= black_mark_rod) "Do wysadzania potrzebny jest dynamit.";
+    "Znowu dziwne ciasteczka na deser?";
+];
+
+Verb 'wysadź' 'zdetonuj'
+    *                       -> Blast
+    * noun held             -> BlastWith
+    * noun 'za' 'pomocą' held -> BlastWith;
+
+! ------------------------------------------------------------------------------
+
+[ XyzzySub; "Nic się nie dzieje."; ];
+
+[ PlughSub; "Nic się nie dzieje."; ];
+
+[ PloverSub; "Nic się nie dzieje."; ];
+
+[ FeeSub; FthingSub(0); ];
+
+[ FieSub; FthingSub(1); ];
+
+[ FoeSub; FthingSub(2); ];
+
+[ FooSub; FthingSub(3); ];
+
+[ FthingSub i;
+    if (feefie_count ~= i) {
+        feefie_count = 0;
+        "Powiedz to porządnie, głuptasie!";
+    }
+    if (feefie_count++ == 3) {
+        feefie_count = 0;
+        if (golden_eggs in In_Giant_Room) "Nic się nie dzieje.";
+        if ((golden_eggs in player) || (golden_eggs in location))
+            print "Gniazdo ze złotymi jajami zniknęło!^";
+        else
+            print "Zrobione!";
+        if (golden_eggs in player) score = score - 5;
+        if (golden_eggs in Inside_Building)
+            score = score - golden_eggs.depositpoints;
+        move golden_eggs to In_Giant_Room;
+        if (location == In_Giant_Room)
+            "^^Znikąd pojawia się nagle wielkie gniazdo pełne złotych jaj!";
+    }
+    else
+        "Dobrze.";
+];
+
+[ OldMagicSub; "Niezła próba, ale to stare, wyświechtane magiczne słowo."; ];
+
+Verb 'xyzzy'
+    *                       -> Xyzzy;
+
+Verb 'plugh'
+    *                       -> Plugh;
+
+Verb 'plover'
+    *                       -> Plover;
+
+Verb 'fee'
+    *                       -> Fee;
+
+Verb 'fie'
+    *                       -> Fie;
+
+Verb 'foe'
+    *                       -> Foe;
+
+Verb 'foo'
+    *                       -> Foo;
+
+Verb 'sezamie' 'sezam' 'abrakadabra' 'hokus' 'pokus' 'shazam' 'foobar'
+     'frotz' 'sesame' 'abracadabra'
+    *                       -> OldMagic;
+
+Extend 'powiedz' first
+    * 'xyzzy'               -> Xyzzy
+    * 'plugh'               -> Plugh
+    * 'plover'              -> Plover
+    * 'fee'                 -> Fee
+    * 'fie'                 -> Fie
+    * 'foe'                 -> Foe
+    * 'foo'                 -> Foo
+    * 'sezamie'/'sezam'/'abrakadabra'/'hokus'/'pokus'/'shazam'/'foobar'/'frotz'
+                            -> OldMagic;
+
+! ------------------------------------------------------------------------------
+
+[ CountSub;
+    if (noun has multitude) "Jest ich mnóstwo.";
+    print "Widzę ";
+    if (noun has animate && RodzajObiektu(noun) == 0) print "jednego";
+    else Forma(noun, "jeden", "jedną", "jedno", "jedne", "jednych");
+    " (1): ", (bie) noun, ".";
+];
+
+[ KickSub;  <<Attack noun>>; ];         ! do kopania krasnoludów
+
+[ UseSub; "Musisz wyrazić się nieco dokładniej."; ];
+
+Verb 'policz' 'przelicz' 'zlicz'
+    * noun                  -> Count;
+
+Extend only 'kopnij' first
+    * noun                  -> Kick;
+
+Verb 'użyj' 'wykorzystaj'
+    *                       -> Use
+    * noun                  -> Use;
+
+! ------------------------------------------------------------------------------
+!   Teleportacja (korzysta też z punktu wejścia UnknownVerb)
+! ------------------------------------------------------------------------------
+
+[ TeleportScope
+    obj;
+    switch (scope_stage) {
+      1:    rfalse;
+      2:    objectloop (obj ofclass Room)
+                if (obj has visited) PlaceInScope(obj);
+            rtrue;
+      3:    return L__M(##Go, 2);
+    }
+];
+
+[ TeleportSub;
+    if (noun == location) "Przecież już tu jesteś!";
+    PlayerTo(noun);
+];
+
+Extend 'idź'
+    * scope=TeleportScope       -> Teleport
+    * 'do'/'na'/'w//'/'nad'/'pod'/'przed' scope=TeleportScope -> Teleport;
+
+#Ifndef DEBUG;
+
+Verb 'goto'
+    * scope=TeleportScope       -> Teleport;
+
+#Endif;
+
+! ------------------------------------------------------------------------------
+!   W wersji testowej: bez krasnoludów i pirata, magiczne słowa działają od
+!   początku
+! ------------------------------------------------------------------------------
+
+#Ifdef TEST_VERSION;
+
+[ XdetermSub;
+    StopDaemon(dwarf);
+    StopDaemon(pirate);
+    give In_Debris_Room visited;
+    give At_Y2 visited;
+    give In_Plover_Room visited;
+];
+
+Verb 'xdeterm'
+    *                       -> Xdeterm;
+
+#Endif;
+
+! ------------------------------------------------------------------------------
