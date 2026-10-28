@@ -13,6 +13,7 @@ Dokumentacja:
 - [docs/podrecznik.md](docs/podrecznik.md) – podręcznik pisania gier z tą biblioteką, prowadzący krok po kroku przez kod polskich „Ruin”,
 - [docs/suplement.md](docs/suplement.md) – suplement o budowaniu poszczególnych mechanizmów, z przykładami ze wszystkich gier przykładowych,
 - [docs/podrecznik_gracza.md](docs/podrecznik_gracza.md) – podręcznik dla graczy: jak grać i jakie polecenia rozumieją gry,
+- [CHANGELOG.md](CHANGELOG.md) – historia wydań,
 - [POCHODZENIE.md](POCHODZENIE.md) – skąd pochodzą poszczególne części biblioteki (poprzednia wersja 6/11/PL, metoda odmiany zapożyczona z rosyjskiego RInform, projekty źródłowe) i w czym pomagała sztuczna inteligencja (Claude firmy Anthropic).
 
 ## Założenia
