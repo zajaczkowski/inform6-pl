@@ -74,7 +74,7 @@ Skrypt kompiluje `games/ruins_pl.inf` do `build/ruins_pl.z5` (maszyna Z, wersja 
 ./build.sh ruins_pl -G
 ```
 
-Glulx oferuje znacznie więcej pamięci, ma jednak poważne ograniczenie: **polskie litery można wpisywać tylko w maszynie Z**. W Glulx biblioteka 6.12 odczytuje wiersz poleceń w kodowaniu Latin-1, w którym polskich liter nie ma. Nazwy przedmiotów zostaną wtedy rozpoznane także bez ogonków, ale czasowniki takie jak „weź” czy „otwórz” – już nie. Grę najlepiej więc pisać i testować w maszynie Z, a kompilację dla Glulx traktować jako sprawdzian przenośności kodu.
+Glulx oferuje znacznie więcej pamięci, ale **na razie gry pisze się i testuje w maszynie Z**. Gry kompilują się dla Glulx, jednak wersje `.ulx` nie zostały sprawdzone w interpreterze: tokenizer biblioteki 6.12.8 nie obsługuje słownika Unicode, którego wymagają polskie litery, a wiersz poleceń odczytuje w kodowaniu Latin-1. Kompilację dla Glulx warto więc traktować jako sprawdzian przenośności kodu.
 
 ### Uruchamianie
 
@@ -814,7 +814,7 @@ Object  priest "zmumifikowan/y kapłan/"
 
 ### Pytanie o temat: wszystkie formy słowa
 
-„Zapytaj kapłana o ruiny” daje akcję `Ask`, a pierwsze słowo tematu trafia do `second`. Po polsku temat może wystąpić w różnych przypadkach („o ruiny”, „o ruinach”, „o Xibalbę”), więc w `switch` trzeba wymienić **każdą formę**, jakiej gracz może użyć. Temat jest zwykłym słowem słownika, a nie nazwą obiektu, dlatego nie działa tu ani automatyczna odmiana, ani rozpoznawanie słów bez polskich liter. Jeśli gracz może napisać „o xibalbe”, trzeba dopisać także `'xibalbe'`.
+„Zapytaj kapłana o ruiny” daje akcję `Ask`, a pierwsze słowo tematu trafia do `second`. Po polsku temat może wystąpić w różnych przypadkach („o ruiny”, „o ruinach”, „o Xibalbę”), więc w `switch` trzeba wymienić **każdą formę**, jakiej gracz może użyć. Temat jest zwykłym słowem słownika, a nie nazwą obiektu, dlatego nie działa tu automatyczna odmiana. Działa za to pisanie bez ogonków: słowo spoza słownika („o xibalbe”) biblioteka zamienia na słowo ze słownika, które bez ogonków wygląda tak samo (`'xibalbę'`), więc form bez polskich liter nie trzeba dopisywać.
 
 ### Akcje rozmowy po polsku
 
@@ -935,7 +935,7 @@ Verb 'zrób'
 ### Zasady polskiej gramatyki
 
 - **Przypadek nie ma znaczenia dla parsera.** Token `noun` przyjmuje nazwę obiektu w każdym przypadku: „zrób zdjęcie figurki” (dopełniacz) i „sfotografuj figurkę” (biernik) działają tak samo. Osobne tokeny dla przypadków nie są potrzebne. Przypadek ma znaczenie tylko w pytaniach parsera („Co chcesz sfotografować?”), a ten dobierają tabele w `polski.h`.
-- **Czasownik w trybie rozkazującym.** Gracz pisze „weź”, „otwórz”, „zbadaj”, a nie „brać” czy „biorę”. Nazwy przedmiotów biblioteka rozpozna również bez polskich liter („zjedz cetkowany grzyb”), ale czasowniki i słowa w liniach gramatyki muszą być w słowniku dokładnie w tej postaci, w jakiej gracz je wpisze. Jeśli ma działać „zrob zdjecie”, trzeba dopisać `'zrob'` i `'zdjecie'` jako osobne słowa.
+- **Czasownik w trybie rozkazującym.** Gracz pisze „weź”, „otwórz”, „zbadaj”, a nie „brać” czy „biorę”. Czasowniki i inne słowa gramatyki wystarczy zapisać raz, z polskimi literami: jeśli gracz wpisze „zrob zdjecie”, biblioteka znajdzie w słowniku `'zrób'` i `'zdjęcie'`, porównując słowa z pominięciem ogonków. Tak samo rozpoznaje nazwy przedmiotów („zjedz cetkowany grzyb”).
 - **Słowo „się” jest usuwane** przed analizą polecenia, więc „rozejrzyj się” i „wespnij się na roślinę” trafiają do parsera jako „rozejrzyj” i „wespnij na roślinę”. Linia gramatyki z `'się'` nigdy by się więc nie dopasowała.
 - **Jednoliterowe przyimki** zapisuje się z `//`: `'w//'`, `'z//'`, `'o//'`. Bez tego dopisku kompilator potraktowałby `'w'` jako stałą znakową, a nie słowo słownika.
 - **Istniejący czasownik** rozszerza się przez `Extend`. Zmiana obejmuje wtedy wszystkie jego synonimy. Jeśli ma dotyczyć tylko jednego słowa, trzeba użyć `Extend only`, które odłącza je od grupy. Przykład z „Przygody”: „złap” jest synonimem „weź”, a łapanie ptaka ma działać tylko dla „złap”:
@@ -1071,7 +1071,7 @@ Po kompilacji z opcją `-D` (`./build.sh ruins_pl -D`) dostępne są polecenia d
 - **Brak rodzaju.** Bez `female`, `neuter` albo `pluralname` każda nazwa odmienia się jak męska, a komunikaty używają męskich końcówek.
 - **`PolskiZ` nie na początku.** Polskie litery w tekstach skompilowanych przed nim będą zniekształcone.
 - **`~~` bez nawiasów** (rozdział 15).
-- **Wejście w Glulx.** Glulx nie przyjmuje na wejściu polskich liter, a czasowniki bez ogonków nie są rozpoznawane. Grę w Glulx da się skompilować i uruchomić, ale wygodnie gra się tylko w maszynie Z.
+- **Glulx.** Wersje `.ulx` się kompilują, ale nie zostały sprawdzone w interpreterze: tokenizer biblioteki 6.12.8 nie obsługuje słownika Unicode. Grę testuje się w maszynie Z.
 
 ---
 

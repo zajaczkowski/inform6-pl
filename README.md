@@ -2,11 +2,11 @@
 
 [![testy](https://github.com/zajaczkowski/inform6-pl/actions/workflows/testy.yml/badge.svg)](https://github.com/zajaczkowski/inform6-pl/actions/workflows/testy.yml)
 
-Polska wersja biblioteki standardowej **Inform 6**, napisana od nowa dla biblioteki **6.12.8** (grudzień 2025) i kompilatora **Inform 6.44**. Gry napisane z jej pomocą odmieniają nazwy przedmiotów przez przypadki, rozumieją polecenia wpisane naturalną polszczyzną i działają w maszynie Z oraz w Glulx.
+Polska wersja biblioteki standardowej **Inform 6**, napisana od nowa dla biblioteki **6.12.8** (grudzień 2025) i kompilatora **Inform 6.44**. Gry napisane z jej pomocą odmieniają nazwy przedmiotów przez przypadki, rozumieją polecenia wpisane naturalną polszczyzną, także bez polskich liter, i działają w maszynie Z.
 
 Poprzednia wersja, oparta na bibliotece 6/11, znajduje się w repozytorium [inform-pl](https://github.com/zajaczkowski/inform-pl).
 
-> **In English:** a Polish translation of the Inform 6 Standard Library 6.12.8 for the Inform 6.44 compiler. It declines object names automatically through all six cases used in the game (the notation is inspired by the Russian RInform), understands commands typed with or without Polish diacritics, and works on both the Z-machine and Glulx. All example games from the IF Archive are translated and come with walkthrough scripts that `./test.sh` runs. Licensed like the Inform library itself (traditional Inform licence or Artistic License 2.0).
+> **In English:** a Polish translation of the Inform 6 Standard Library 6.12.8 for the Inform 6.44 compiler. It declines object names automatically through all six cases used in the game (the notation is inspired by the Russian RInform), understands commands typed with or without Polish diacritics, and runs on the Z-machine (Glulx builds compile but are not yet tested). All example games from the IF Archive are translated and come with walkthrough scripts that `./test.sh` runs. Licensed like the Inform library itself (traditional Inform licence or Artistic License 2.0).
 
 Dokumentacja:
 
@@ -20,7 +20,7 @@ Dokumentacja:
 
 - **Biblioteka bazowa pozostaje nietknięta.** Pliki `parser.h`, `verblib.h` i pozostałe są używane bez żadnych zmian, a cała polska część mieści się w plikach językowych w `lib/`. Przejście na kolejne wydanie biblioteki nie wymaga więc przenoszenia żadnych poprawek.
 - **Źródła są w UTF-8** (opcja kompilatora `-Cu`). Wersja legacy używała ISO-8859-2, co utrudniało edycję w nowoczesnych edytorach i wymianę plików.
-- **Obsługiwane są obie maszyny wirtualne:** Z-machine (`.z5`) i Glulx (`.ulx`), z jednym ograniczeniem opisanym niżej.
+- **Docelowo obsługiwane są obie maszyny wirtualne:** Z-machine (`.z5`) i Glulx (`.ulx`). Gry kompilują się dla obu, ale na razie sprawdzona jest tylko maszyna Z (zob. ograniczenia niżej).
 
 ## Struktura
 
@@ -76,6 +76,7 @@ Include "PolskiG";
 
 - **Z-machine.** `polskiz.h` przestawia alfabet maszyny Z tak, że polskie małe litery trafiają do alfabetu A1. Litera spoza alfabetu zajmuje w słowniku cztery z-znaki, a litera z alfabetu A1 tylko dwa, więc słowa z ogonkami mieszczą się w dziewięciu z-znakach słownika i nie tracą końcówek: „ścianę” i „ściany” pozostają dla parsera różnymi słowami. Plik musi być dołączony przed jakimkolwiek tekstem, bo zmienia sposób kodowania wszystkich napisów; tekst skompilowany wcześniej byłby zniekształcony. Bez niego `polski.h` przerywa kompilację z odpowiednim komunikatem.
 - **Glulx.** Słownik musi przechowywać znaki Unicode (`$DICT_CHAR_SIZE=4`); `build.sh` dodaje tę opcję samodzielnie, gdy podano `-G`.
+- **Pisanie bez polskich liter.** Każde słowo, którego nie ma w słowniku, biblioteka porównuje ze słowami słownika z pominięciem ogonków, więc „wez lampe”, „otworz drzwi”, „idz na polnocny zachod” czy „zapytaj kaplana o xibalbe” działają tak samo jak wersje z polskimi literami. `test.sh` przechodzi każdą grę dwa razy: z polskimi literami i bez nich.
 - Wpisywanie ą, ę, ł, ś, ź, ż, także wielkimi literami, sprawdzono w dfrotz:
 
 ```sh
@@ -125,7 +126,7 @@ W komunikatach używa się reguł wydruku `(mian)`, `(dop)`, `(cel)`, `(bie)`, `
 Ograniczenia ogólne:
 
 - komunikaty biblioteki są napisane wyłącznie w 2. osobie i w czasie teraźniejszym,
-- w Glulx nie da się wpisywać polskich liter, ponieważ biblioteka 6.12 odczytuje tam wiersz poleceń w kodowaniu Latin-1. Nazwy przedmiotów są rozpoznawane także bez ogonków, ale czasowniki z polskimi literami („weź”, „otwórz”) nie mają odpowiedników bez nich, więc wersje `.ulx` nadają się na razie głównie do sprawdzania, czy gra się kompiluje.
+- Glulx nie jest jeszcze sprawdzony. Gry kompilują się dla Glulx, ale nie zostały przetestowane w interpreterze. Tokenizer biblioteki 6.12.8 porównuje słowa bajt po bajcie, a polskie litery wymagają słownika Unicode (`$DICT_CHAR_SIZE=4`), którego ten tokenizer nie obsługuje, więc wersje `.ulx` najpewniej nie rozumieją poleceń. Ponadto biblioteka 6.12 odczytuje w Glulx wiersz poleceń w kodowaniu Latin-1, więc polskich liter nie da się tam wpisać. Do grania służą wersje `.z5`.
 
 ## Gramatyka
 

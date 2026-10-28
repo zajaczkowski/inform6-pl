@@ -659,6 +659,35 @@ Include "infix";
 Object  pl_rozszerzenie LibraryExtensions
   with  ext_beforeparsing [; return PL_NieznaneSlowa(); ];
 
+! Gdy jedno słowo pasuje do kilku obiektów ("wschód": wschód, północny wschód,
+! południowy wschód), parser wybiera ten, którego nazwa jest dokładnie tym
+! słowem.  Biblioteczne MatchWord porównuje znaki dosłownie; polska wersja
+! pomija ogonki i wielkość liter, żeby "wschod" też wybierało wschód.
+[ MatchWord p_obj p_word_no  len_name len_input start_input i;
+    p_word_no--;
+    PrintToBuffer(StorageForShortName, SHORTNAMEBUF_LEN, p_obj);
+    len_name = StorageForShortName-->0;
+    if (len_name > 9) {
+        for (i=9 : i<len_name : i++)
+            if (StorageForShortName->(WORDSIZE+i) == ' ') rfalse;
+        len_name = 9;
+    }
+    #Ifdef TARGET_ZCODE;
+    start_input = (parse+2)->(4*p_word_no+3);
+    len_input = (parse+2)->(4*p_word_no+2);
+    #Ifnot; ! TARGET_GLULX
+    start_input = parse-->((p_word_no+1)*3) - 2 + 2;
+    len_input = parse-->((p_word_no+1)*3 - 1);
+    #Endif; ! TARGET_
+    if (len_input > 9) len_input = 9;
+    if (len_name ~= len_input) rfalse;
+    for (i=0 : i<len_name : i++)
+        if (BezOgonka(LowerCase(StorageForShortName->(WORDSIZE+i))) ~=
+            BezOgonka(LowerCase(buffer->(start_input+i))))
+            rfalse;
+    rtrue;
+];
+
 [ Identical o1 o2;                                     ! zob. odmiana.h
     if (~~PL_Identical(o1, o2)) rfalse;
     return PL_IdenticalOryg(o1, o2);

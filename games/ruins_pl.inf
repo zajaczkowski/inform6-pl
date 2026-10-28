@@ -246,9 +246,12 @@ Object  -> "wyryt/e inskrypcj/e+y"
 
 ! DM4 §8
 Object  -> sunlight "snop/ światła"
-  with  name 'słońce' 'słońca' 'słońcem' 'promień' 'promienia' 'promieniem'
-             'promienie' 'promieni' 'promieniach' 'słoneczny' 'słonecznego'
-             'słonecznym' 'pyłki' 'pyłków' 'kurz' 'kurzu' 'powietrze',
+  with  name 'słońce' 'słońca' 'słońcu' 'słońcem' 'promień' 'promienia'
+             'promieniem' 'promieniu' 'promienie' 'promieni' 'promieniach'
+             'światło' 'światłu' 'światłem' 'świetle'
+             'smuga' 'smugi' 'smudze' 'smugę' 'smugą'
+             'słoneczny' 'słonecznego' 'słonecznym' 'pyłki' 'pyłków'
+             'kurz' 'kurzu' 'powietrze' 'powietrzu',
         description
             "Pyłki kurzu migoczą w rozświetlonym powietrzu, tak że snop
              wydaje się niemal namacalny.",

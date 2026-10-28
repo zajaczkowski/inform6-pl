@@ -41,13 +41,24 @@ done
 sed 's/^! Constant TEST_VERSION;/Constant TEST_VERSION;/' games/advent_pl.inf > build/advent_test.inf
 kompiluj build/advent_test.inf build/advent_test.z5 || blad "advent_test.z5"
 
+# Każdą grę przechodzimy dwa razy: skryptem z polskimi literami i tym samym
+# skryptem bez ogonków (build/*.ascii) - gracz może pisać "wez lampe".
+bez_ogonkow() {
+    sed 's/ą/a/g; s/ć/c/g; s/ę/e/g; s/ł/l/g; s/ń/n/g; s/ó/o/g; s/ś/s/g; s/ź/z/g; s/ż/z/g;
+         s/Ą/A/g; s/Ć/C/g; s/Ę/E/g; s/Ł/L/g; s/Ń/N/g; s/Ó/O/g; s/Ś/S/g; s/Ź/Z/g; s/Ż/Z/g' "$1"
+}
+
 echo "Przejścia:"
 sprawdz() {     # sprawdz <gra> <plik gry> <ziarno> <oczekiwany tekst>
-    if graj "$2" "$3" "games/$1.przejscie" | tr '\n' ' ' | grep -q "$4"; then
-        ok "$1: $4"
-    else
-        blad "$1: brak „$4”"
-    fi
+    bez_ogonkow "games/$1.przejscie" > "build/$1.ascii"
+    for skrypt in "games/$1.przejscie" "build/$1.ascii"; do
+        opis=$1; [ "$skrypt" = "build/$1.ascii" ] && opis="$1 (bez ogonków)"
+        if graj "$2" "$3" "$skrypt" | tr '\n' ' ' | grep -q "$4"; then
+            ok "$opis: $4"
+        else
+            blad "$opis: brak „$4”"
+        fi
+    done
 }
 sprawdz ruins_pl         build/ruins_pl.z5         1 "zdobyłeś 30 punktów na 30"
 sprawdz alice_pl         build/alice_pl.z5         1 "Zwyciężyłaś"
@@ -59,10 +70,14 @@ sprawdz advent_pl        build/advent_test.z5      3 "zdobyłeś 350 punktów na
 # "Muzeum" nie ma zakończenia: skrypt to wycieczka, w której parser ma
 # zrozumieć wszystko poza jednym celowo błędnym poleceniem
 # ("weź pomidor smażony czerwony" - pomidor wymaga przymiotników przed nazwą).
-n=$(graj build/museum_pl.z5 1 games/museum_pl.przejscie |
-    grep -cE 'Nie znam|Nie widzisz niczego|Nie zrozumiałem|Zrozumiałem tylko')
-if [ "$n" -eq 1 ]; then ok "museum_pl: wycieczka bez błędów parsera"
-else blad "museum_pl: $n błędów parsera (oczekiwano 1)"; fi
+bez_ogonkow games/museum_pl.przejscie > build/museum_pl.ascii
+for skrypt in games/museum_pl.przejscie build/museum_pl.ascii; do
+    opis=museum_pl; [ "$skrypt" = build/museum_pl.ascii ] && opis="museum_pl (bez ogonków)"
+    n=$(graj build/museum_pl.z5 1 "$skrypt" |
+        grep -cE 'Nie znam|Nie widzisz niczego|Nie zrozumiałem|Zrozumiałem tylko')
+    if [ "$n" -eq 1 ]; then ok "$opis: wycieczka bez błędów parsera"
+    else blad "$opis: $n błędów parsera (oczekiwano 1)"; fi
+done
 
 echo
 if [ "$bledy" -eq 0 ]; then echo "Wszystkie testy przeszły."; else echo "Błędów: $bledy"; fi

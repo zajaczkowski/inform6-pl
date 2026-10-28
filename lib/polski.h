@@ -107,15 +107,15 @@ Object Compass "kompas" has concealed;
 
 #Ifndef WITHOUT_DIRECTIONS;
 CompassDirection -> n_obj  with short_name "północ",  door_dir n_to,
-                                name 'pn' 'północ' 'polnoc' 'północy',
+                                name 'pn' 'północ' 'północy',
                            has female;
 CompassDirection -> s_obj  with short_name "południe", door_dir s_to,
-                                name 'pd' 'południe' 'poludnie' 'południa',
+                                name 'pd' 'południe' 'południa',
                            has neuter;
 CompassDirection -> e_obj  with short_name "wschód",  door_dir e_to,
-                                name 'w//' 'wsch' 'wschód' 'wschod' 'wschodu';
+                                name 'w//' 'wsch' 'wschód' 'wschodu';
 CompassDirection -> w_obj  with short_name "zachód",  door_dir w_to,
-                                name 'z//' 'zach' 'zachód' 'zachod' 'zachodu';
+                                name 'z//' 'zach' 'zachód' 'zachodu';
 CompassDirection -> ne_obj with short_name "północny wschód", door_dir ne_to,
                                 name 'pnw' 'północny' 'północnego' 'wschód' 'wschodu';
 CompassDirection -> nw_obj with short_name "północny zachód", door_dir nw_to,
@@ -125,14 +125,14 @@ CompassDirection -> se_obj with short_name "południowy wschód", door_dir se_to
 CompassDirection -> sw_obj with short_name "południowy zachód", door_dir sw_to,
                                 name 'pdz' 'południowy' 'południowego' 'zachód' 'zachodu';
 CompassDirection -> u_obj  with short_name "góra",    door_dir u_to,
-                                name 'g//' 'góra' 'górę' 'gory' 'gore' 'sufit' 'niebo',
+                                name 'g//' 'góra' 'górę' 'góry' 'sufit' 'niebo',
                            has female;
 CompassDirection -> d_obj  with short_name "dół",     door_dir d_to,
-                                name 'd//' 'dół' 'dol' 'podłoga' 'podłogę' 'ziemia' 'ziemię';
+                                name 'd//' 'dół' 'podłoga' 'podłogę' 'ziemia' 'ziemię';
 #Endif; ! WITHOUT_DIRECTIONS
 
 CompassDirection -> in_obj  with short_name "środek", door_dir in_to,
-                                 name 'środek' 'srodek' 'środka' 'wnętrze' 'wnętrza';
+                                 name 'środek' 'środka' 'wnętrze' 'wnętrza';
 CompassDirection -> out_obj with short_name "zewnątrz", door_dir out_to,
                                  name 'zewnątrz' 'zewnatrz' 'wyjście';
 
@@ -295,7 +295,8 @@ Array LanguageNumbers table
     ListaWPrzypadku(0);
     #Ifdef TARGET_ZCODE;
     ! "na północ", "w górę", "do góry", "na dół": sam kierunek bez czasownika
-    if (parse->1 >= 2 && parse-->1 == 'na' or 'w//' or 'do' && PL_Kierunek(parse-->3))
+    if (parse->1 >= 2 && parse-->1 == 'na' or 'w//' or 'do' &&
+        (PL_Kierunek(parse-->3) || (parse-->3 == 0 && PL_Kierunek(PL_SlowoBezOgonkow(2)))))
         for (j=0 : j<parse->4 : j++) buffer->(parse->5 + j) = ' ';
     for (i=0 : i<parse->1 : i++) {
         wlen = parse->(i*4+4); at = parse->(i*4+5);
@@ -304,27 +305,28 @@ Array LanguageNumbers table
             && buffer->(parse->(i*4+1)) == ',')
             buffer->(parse->(i*4+1)) = ' ';
         ! "połóż się" to leżenie ("kładź się"), a nie kładzenie czegoś
-        if (i > 0 && parse-->(i*2+1) == 'się' && parse-->(i*2-1) == 'połóż'
-            && parse->(i*4) == 5) {
+        if (i > 0 && parse-->(i*2+1) == 'się' or 'sie' && parse->(i*4) == 5
+            && (parse-->(i*2-1) == 'połóż' || PL_SlowoBezOgonkow(i) == 'połóż')) {
             j = parse->(i*4+1);
             buffer->j = 'k'; buffer->(j+1) = 'ł'; buffer->(j+2) = 'a';
             buffer->(j+3) = 'd'; buffer->(j+4) = 'ź';
         }
-        if (parse-->(i*2+1) == 'się' && ~~PL_WCudzyslowie(at))
+        if (parse-->(i*2+1) == 'się' or 'sie' && ~~PL_WCudzyslowie(at))
             for (j=0 : j<wlen : j++) buffer->(at+j) = ' ';
         if (parse-->(i*2+1) == 0 && ~~PL_WCudzyslowie(at))  ! spoza słownika: bez ogonków
             for (j=0 : j<wlen : j++) buffer->(at+j) = BezOgonka(buffer->(at+j));
     }
     start = 2; len = buffer->1 + 2;
     #Ifnot; ! TARGET_GLULX
-    if (parse-->0 >= 2 && parse-->1 == 'na' or 'w//' or 'do' && PL_Kierunek(parse-->4))
+    if (parse-->0 >= 2 && parse-->1 == 'na' or 'w//' or 'do' &&
+        (PL_Kierunek(parse-->4) || (parse-->4 == 0 && PL_Kierunek(PL_SlowoBezOgonkow(2)))))
         for (j=0 : j<parse-->2 : j++) buffer->(parse-->3 + j) = ' ';
     for (i=1 : i<parse-->0 : i++)
         if (parse-->(i*3+1) == THEN1__WD or THEN2__WD or THEN3__WD
             && buffer->(parse-->(i*3)) == ',')
             buffer->(parse-->(i*3)) = ' ';
     for (i=0 : i<parse-->0 : i++)
-        if (parse-->(i*3+1) == 'się') {
+        if (parse-->(i*3+1) == 'się' or 'sie') {
             wlen = parse-->(i*3+2); at = parse-->(i*3+3);
             for (j=0 : j<wlen : j++) buffer->(at+j) = ' ';
         }
@@ -411,7 +413,8 @@ Include "odmiana";
     if (obj provides name_bie && WordInProperty(wd, obj, name_bie)) rtrue;
     if (obj provides name_nar && WordInProperty(wd, obj, name_nar)) rtrue;
     if (obj provides name_mie && WordInProperty(wd, obj, name_mie)) rtrue;
-    if (wd == 0 or PL_NIEZNANE) {   ! słowo spoza słownika: porównaj bez ogonków
+    if (wd == 0 or PL_NIEZNANE || (wnum < 64 && pl_podmienione->wnum)) {
+        ! słowo spoza słownika: porównaj bez ogonków
         if (PL_WSlowach(obj, name, wnum)) rtrue;
         if (PL_WSlowach(obj, name_dop, wnum) || PL_WSlowach(obj, name_cel, wnum) ||
             PL_WSlowach(obj, name_bie, wnum) || PL_WSlowach(obj, name_nar, wnum) ||

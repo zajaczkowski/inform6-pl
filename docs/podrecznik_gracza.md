@@ -67,7 +67,7 @@ Gry są zapisane w formacie maszyny Z (pliki `.z5`) albo Glulx (`.ulx`). Do gran
 - **Gargoyle**, **Lectrote** albo **Spatterlight** – programy okienkowe,
 - **Parchment** – interpreter w przeglądarce.
 
-**Polskie litery można wpisywać tylko w wersji `.z5`.** W wersji `.ulx` nie docierają one do gry, więc trzeba pisać bez nich. Nazwy przedmiotów są wtedy rozpoznawane także bez ogonków („zbadaj cetkowany grzyb”), ale czasowniki z polskimi literami – nie: „wez lampe” nie zadziała. Dlatego do grania zalecana jest wersja `.z5`.
+**Do grania służą pliki `.z5`.** Wersje `.ulx` (Glulx) nie są jeszcze sprawdzone i mogą nie rozumieć poleceń.
 
 ---
 
@@ -143,7 +143,7 @@ Gra nie wymaga poprawnych przypadków – „weź lampa” też zostanie zrozumi
 
 ### Wielkość liter i polskie znaki
 
-Wielkość liter nie ma znaczenia. Nazwy przedmiotów można pisać bez polskich liter (`zjedz cetkowany grzyb`), ale czasowniki trzeba pisać poprawnie: `weź lampę` i `weź lampe` zadziałają, a `wez lampe` – nie.
+Wielkość liter nie ma znaczenia, a polskie litery można pomijać: `wez lampe`, `zjedz cetkowany grzyb` i `idz na polnocny zachod` działają tak samo jak wersje z ogonkami.
 
 ### Przymiotniki rozstrzygają wątpliwości
 

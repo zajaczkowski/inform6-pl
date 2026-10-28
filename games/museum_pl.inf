@@ -2036,6 +2036,7 @@ Object -> "pokrętł/o"
 !   nie wziął go za przyimek.  Po potarciu lampy dżin zamienia biel z czernią.
 
 [ BeforeParsing i w;
+  PL_NieznaneSlowa();     ! najpierw słowa bez ogonków ("bialy" -> 'biały')
   for (i=1 : i+2<=NumberWords() : i++)
   {   wn=i;
       w = NextWord();
@@ -2044,7 +2045,7 @@ Object -> "pokrętł/o"
           NextWord()=='bursztynie')
           UstawSlowo(i+1, 'bursztyn');
   }
-  if (genies_lamp hasnt general) return;
+  if (genies_lamp hasnt general) rfalse;    ! fałsz: biblioteka uruchomi swoje rozszerzenia
   for (i=1 : i<=NumberWords() : i++)
   {   wn=i;
       switch(NextWord())

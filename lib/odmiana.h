@@ -488,6 +488,24 @@ Array pl_wynik --> 2;
 ! prop ("miekki" pasuje do 'miękki')?  Słowa słownika są obcięte, więc dłuższe
 ! wpisane słowo pasuje też, jeśli zaczyna się od całego słowa słownika
 ! mającego co najmniej 6 liter.
+! Czy słowo słownika wypisane do pl_por (n znaków) zostało obcięte?  W maszynie
+! Z słowo ma najwyżej 9 z-znaków: mała litera ASCII zajmuje jeden, polska
+! litera dwa, inne znaki cztery.  W Glulx: DICT_WORD_SIZE znaków.
+[ PL_Obciete n  i z c;
+    #Ifdef TARGET_ZCODE;
+    for (i=0 : i<n : i++) {
+        c = pl_por-->i;
+        if (c >= 'a' && c <= 'z') z++;
+        else if (BezOgonka(c) ~= c) z = z + 2;
+        else z = z + 4;
+    }
+    return (z >= 8);
+    #Ifnot; ! TARGET_GLULX
+    i = z = c;
+    return (n >= DICT_WORD_SIZE);
+    #Endif; ! TARGET_
+];
+
 [ PL_WSlowach obj prop wnum  adr len k n m i;
     if (~~(obj provides prop)) rfalse;
     adr = WordAddress(wnum); len = WordLength(wnum);
@@ -497,7 +515,7 @@ Array pl_wynik --> 2;
         if (pl_g1 == 0) continue;
         pl_por_len = PL_Renderuj(pl_por, PL_SL_MAX, PL_Adres);
         if (PL_Porownaj(adr, len)) rtrue;
-        if (pl_por_len >= 6 && len > pl_por_len) {
+        if (len > pl_por_len && PL_Obciete(pl_por_len)) {   ! słowo obcięte w słowniku
             for (i=0 : i<pl_por_len : i++)
                 if (BezOgonka(LowerCase(adr->i)) ~= BezOgonka(LowerCase(pl_por-->i))) break;
             if (i == pl_por_len) rtrue;
@@ -514,6 +532,9 @@ Array pl_wynik --> 2;
 ! PL_IdenticalOryg nie może być tutaj: odwołanie w przód do procedury
 ! przemianowanej przez Replace kompilator zamienia na 0.
 Replace Identical PL_IdenticalOryg;
+
+! MatchWord zastąpione polską wersją (polskig.h): pomija ogonki.
+Replace MatchWord PL_MatchWordOryg;
 Replace Locale PL_LocaleOryg;      ! nowa wersja w polskig.h
 
 ! Fałsz, gdy obiekty mają różne nazwy zapisane z "/"; prawda w pozostałych
@@ -543,13 +564,92 @@ Replace Locale PL_LocaleOryg;      ! nowa wersja w polskig.h
 ! z rozszerzenia biblioteki w polskig.h, po tokenizacji polecenia.
 Constant PL_NIEZNANE = 'xxnieznane';
 
-[ PL_NieznaneSlowa  i;
+! Słowo spoza słownika, które jest słowem ze słownika wpisanym bez polskich
+! liter ("wez", "otworz", "miedzy", "o xibalbe"), zamieniane jest na to słowo
+! ('weź', 'otwórz', 'między', 'xibalbę').  Dzięki temu bez ogonków działają też
+! czasowniki, przyimki i tematy rozmów, a nie tylko nazwy przedmiotów.
+! pl_podmienione zapamiętuje podmienione słowa, bo LanguageRefers porównuje
+! je jeszcze z nazwami obiektu bez ogonków.
+Array pl_podmienione -> 64;
+
+[ PL_NieznaneSlowa  i w;
+    for (i=0 : i<64 : i++) pl_podmienione->i = 0;
     for (i=1 : i<=NumberWords() : i++) {
         #Ifdef TARGET_ZCODE;
-        if (parse-->(i*2-1) == 0) parse-->(i*2-1) = PL_NIEZNANE;
+        if (parse-->(i*2-1) == 0) {
+            w = PL_SlowoBezOgonkow(i);
+            if (w == 0) w = PL_NIEZNANE; else if (i < 64) pl_podmienione->i = 1;
+            parse-->(i*2-1) = w;
+        }
         #Ifnot; ! TARGET_GLULX
-        if (parse-->(i*3-2) == 0) parse-->(i*3-2) = PL_NIEZNANE;
+        if (parse-->(i*3-2) == 0) {
+            w = PL_SlowoBezOgonkow(i);
+            if (w == 0) w = PL_NIEZNANE; else if (i < 64) pl_podmienione->i = 1;
+            parse-->(i*3-2) = w;
+        }
         #Endif; ! TARGET_
     }
     rfalse;
+];
+
+Array pl_dslowo -> WORDSIZE + 40;      ! tekst słowa ze słownika
+[ PL_DrukSlowa w; print (address) w; ];
+
+! Szuka w słowniku słowa, które po zdjęciu ogonków jest
+! równy słowu nr wnum polecenia.  Słowa w słowniku są obcięte (maszyna Z:
+! 9 z-znaków, polska litera zajmuje dwa), więc obcięte słowo pasuje też
+! jako początek dłuższego ("przetrzasnij" do 'przetrząś'), ale tylko wtedy,
+! gdy nie ma słowa pasującego dokładnie; wygrywa wtedy najdłuższe ("polnocny" to
+! obcięte 'północn', a nie 'północ').
+[ PL_SlowoBezOgonkow wnum  adr len dict ile dl e k j n c obciete pocz pdl;
+    adr = WordAddress(wnum); len = WordLength(wnum);
+    if (len < 2) return 0;
+    #Ifdef TARGET_ZCODE;
+    dict = 0-->4; n = dict->0;
+    dl = dict->(n+1); ile = (dict+n+2)-->0; e = dict+n+4;
+    #Ifnot; ! TARGET_GLULX
+    dict = #dictionary_table; ile = dict-->0; e = dict+WORDSIZE;
+    #Ifdef DICT_IS_UNICODE;
+    dl = 12 + DICT_WORD_SIZE*4;
+    #Ifnot;
+    dl = 7 + DICT_WORD_SIZE;
+    #Endif;
+    #Endif; ! TARGET_
+    for (k=0 : k<ile : k++, e=e+dl) {
+        #Ifdef TARGET_ZCODE;
+        n = PrintToBuffer(pl_dslowo, 40, PL_DrukSlowa, e);
+        obciete = 0;
+        for (j=0 : j<n : j++) {
+            c = pl_dslowo->(WORDSIZE+j);
+            if (c >= 'a' && c <= 'z') obciete = obciete + 1;
+            else if (BezOgonka(c) ~= c) obciete = obciete + 2;
+            else obciete = obciete + 4;
+        }
+        obciete = (obciete >= 8);
+        #Ifnot; ! TARGET_GLULX
+        for (n=0 : n<DICT_WORD_SIZE : n++) {
+            #Ifdef DICT_IS_UNICODE;
+            c = (e+4)-->n;
+            #Ifnot;
+            c = e->(1+n);
+            #Endif;
+            if (c == 0) break;
+            pl_dslowo->(WORDSIZE+n) = BezOgonka(c);
+        }
+        obciete = (n == DICT_WORD_SIZE);
+        #Endif; ! TARGET_
+        if (n > len || (n < len && ~~obciete)) continue;
+        for (j=0 : j<n : j++) {
+            c = adr->j;
+            #Ifdef TARGET_GLULX;
+            c = glk_char_to_lower(c);
+            #Endif;
+            if (BezOgonka(pl_dslowo->(WORDSIZE+j)) ~= BezOgonka(c)) break;
+        }
+        if (j == n) {
+            if (n == len) return e;             ! dokładnie to słowo
+            if (n > pdl) { pocz = e; pdl = n; } ! obcięte: najdłuższe pasujące
+        }
+    }
+    return pocz;
 ];

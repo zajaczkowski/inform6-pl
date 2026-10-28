@@ -729,7 +729,7 @@ Object -> "biały kamyk"
        desc_nar "białym kamykiem", desc_mie "białym kamyku";
 ```
 
-Polska biblioteka również przerabia polecenie przed analizą: usuwa słowo „się”, zamienia „na północ” na „północ” i zdejmuje ogonki ze słów spoza słownika. Gra nie musi się tym zajmować, ale autor powinien wiedzieć, że `BeforeParsing` dostaje polecenie już po tych zmianach.
+Polska biblioteka również przerabia polecenie przed analizą: usuwa słowo „się” (także „sie”), zamienia „na północ” na „północ”, zdejmuje ogonki ze słów spoza słownika, a słowa, które bez ogonków odpowiadają słowu ze słownika („wez”, „xibalbe”), zamienia na to słowo (`'weź'`, `'xibalbę'`). Gra nie musi się tym zajmować, ale autor powinien wiedzieć, że `BeforeParsing` dostaje polecenie już po tych zmianach.
 
 ---
 
@@ -765,7 +765,7 @@ Tablica w biurze „Sklepu” i sześciany w „Równowadze” przyjmują tekst 
 
 Układ bufora wejścia jest inny w maszynie Z i w Glulx, stąd `#Ifdef TARGET_ZCODE`. W „Równowadze” procedura zwraca obiekt `burin` (rylec), który staje się pierwszym dopełnieniem akcji `WriteOn`; drugim jest sześcian.
 
-Polska biblioteka zdejmuje ogonki ze słów spoza słownika, ale tekst w cudzysłowie jest z tego wyłączony, więc na tablicy zostaje dokładnie to, co wpisał gracz. Dotyczy to maszyny Z; w Glulx polskich liter na wejściu w ogóle nie ma.
+Polska biblioteka zdejmuje ogonki ze słów spoza słownika, ale tekst w cudzysłowie jest z tego wyłączony, więc na tablicy zostaje dokładnie to, co wpisał gracz. Dotyczy to maszyny Z; Glulx nie jest na razie sprawdzony.
 
 ### Jedno dowolne słowo
 
@@ -1449,6 +1449,7 @@ Przy tłumaczeniu gier przykładowych powtarzały się te same problemy. Większ
 - **Listy wypisywane przez grę są w mianowniku.** `WriteListFrom` i `Locale` z własnym tekstem trzeba w razie potrzeby otoczyć wywołaniami `ListaWPrzypadku(…, PRZYP_BIE)` i `ListaWPrzypadku(0)`.
 - **Liczebniki.** Wszędzie tam, gdzie oryginał pisze „liczba + liczba mnoga”, po polsku potrzebne jest `Liczebnik(n, "moneta", "monety", "monet")`, a w rodzaju żeńskim także „dwie” zamiast „dwa”.
 - **Napisy od gracza tracą ogonki.** W słowach spoza słownika biblioteka zamienia polskie litery na litery bez ogonków, zanim gra je zobaczy. Tekst w cudzysłowie jest z tej zamiany wyłączony.
+- **`BeforeParsing` zwraca fałsz.** Jeśli zwróci prawdę (także przez gołe `return;`), biblioteka pomija swoje rozszerzenia, a wśród nich rozpoznawanie słów wpisanych bez ogonków. Gra, która w `BeforeParsing` porównuje słowa ze słownikiem, powinna na początku wywołać `PL_NieznaneSlowa()`, żeby widzieć `'biały'` także wtedy, gdy gracz napisał „bialy”.
 - **Słowo w słowniku maszyny Z ma najwyżej 9 z-znaków.** Dłuższe słowa są obcinane, więc „podpowiedź” i „podpowiedz” to dla parsera to samo słowo. Każda polska litera zajmuje w słowniku dwa z-znaki.
 - **Bezokoliczniki nowych czasowników.** Bez `PrintVerb` parser pyta „Co chcesz zwiń?” albo, przy dłuższych słowach, „Co chcesz przedziur?”. Każdy nowy czasownik, który może pojawić się w takim pytaniu, powinien mieć bezokolicznik w `PrintVerb` (rozdział 14).
 - **Temat rozmowy jest w `second`.** W akcji `Ask` i `Tell` słowo tematu leży w `second`, a postać w `noun`; w `Answer` jest odwrotnie (rozdział 10).
