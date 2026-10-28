@@ -481,7 +481,8 @@ Object  -> stone_table "kamienn/y ołtarz/"
 
 ```inform
 Object  -> sunlight "snop/ światła"
-  with  name 'słońce' 'słońca' ... 'promień' ... 'kurz' 'kurzu' 'powietrze',
+  with  name 'słońce' 'słońca' ... 'promień' ... 'światło' 'światłu' 'światłem' 'świetle'
+             'smuga' 'smugi' 'smudze' 'smugę' 'smugą' ... 'powietrze' 'powietrzu',
         description
             "Pyłki kurzu migoczą w rozświetlonym powietrzu ...",
         before [;
@@ -1063,7 +1064,7 @@ Po kompilacji z opcją `-D` (`./build.sh ruins_pl -D`) dostępne są polecenia d
 | `trace 2` | śledzenie parsera |
 | `showobj X` | wszystkie właściwości obiektu |
 
-`trace 2` pokazuje, jak parser podzielił polecenie i którą linię gramatyki wybrał. Słowa spoza słownika widać w nim jako `xxnieznan`. Tak biblioteka oznacza każde słowo, którego nie ma w słowniku, w tym formy z automatycznej odmiany; rozpoznaje je później, porównując znaki. To nie jest błąd.
+`trace 2` pokazuje, jak parser podzielił polecenie i którą linię gramatyki wybrał. Słowa spoza słownika widać w nim jako `xxnieznan`. Tak biblioteka oznacza każde słowo, którego nie ma w słowniku, w tym formy z automatycznej odmiany; rozpoznaje je później, porównując znaki. To nie jest błąd. Wyjątkiem są słowa wpisane bez polskich liter, które odpowiadają słowu ze słownika: przy „wez” `trace` pokaże już `weź`.
 
 ### Typowe pułapki
 

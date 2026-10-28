@@ -620,7 +620,7 @@ Koń w „Równowadze” reaguje na słowo „skrzydlaty” dopiero wtedy, gdy m
        ],
 ```
 
-`PL_NIEZNANE` to wartość, którą polska biblioteka nadaje słowom spoza słownika. `PL_WSlowach` porównuje takie słowo ze słowami właściwości z pominięciem polskich liter.
+`PL_NIEZNANE` to wartość, którą polska biblioteka nadaje słowom spoza słownika. Słowo wpisane bez polskich liter, które odpowiada słowu ze słownika, dostaje zamiast niej wartość tego słowa, więc sprawdzi je już `WordInProperty`. `PL_WSlowach` porównuje pozostałe słowa spoza słownika ze słowami właściwości z pominięciem polskich liter.
 
 ### Kolejność słów
 

@@ -122,7 +122,7 @@ Object "sta/rz=r/y ryba/c=k//y"   has pluralname animate male;   ! widzisz stary
 
 **Ręczna.** Formy podane we właściwościach `desc_dop` … `desc_mie` mają pierwszeństwo przed odmianą automatyczną, służą więc do wyjątków (`desc_cel "wielkiemu psu"`). Parser rozpoznaje również słowa z `desc_*`. Stare gry, które podają formy w `desc_*` i `name_dop` … `name_mie`, działają bez zmian. Przykład obiektu z synonimami w `name` i z procedurą `parse_name` wołającą `Refers` można znaleźć w `games/alice_pl.inf` (kotki).
 
-Ograniczenia: nazwa krótka może mieć najwyżej 160 znaków. Słowa spoza słownika dostają wartość `'xxnieznane'` (stała `PL_NIEZNANE`); dlatego na nieznane słowo parser odpowiada „Nie widzisz niczego takiego” zamiast „Nie znam słowa”. Polecenie `odmień X` w `games/test.inf` wypisuje wszystkie formy nazwy.
+Ograniczenia: nazwa krótka może mieć najwyżej 160 znaków. Słowa spoza słownika dostają wartość `'xxnieznane'` (stała `PL_NIEZNANE`), chyba że bez ogonków odpowiadają słowu ze słownika – wtedy dostają jego wartość. Dlatego na nieznane słowo parser odpowiada „Nie widzisz niczego takiego” zamiast „Nie znam słowa”. Polecenie `odmień X` w `games/test.inf` wypisuje wszystkie formy nazwy.
 
 W komunikatach używa się reguł wydruku `(mian)`, `(dop)`, `(cel)`, `(bie)`, `(nar)`, `(mie)` oraz ich wersji z wielką literą `(CMian)` … `(CMie)`. Polska wersja korzysta z haków biblioteki 6.12 (`LanguagePrintShortName`, `LanguageRefers`, `LanguageCommand`), dzięki czemu parsera nie trzeba łatać.
 
