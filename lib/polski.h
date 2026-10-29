@@ -679,7 +679,7 @@ Include "odmiana";
       'uderz':                      print "uderzyć";
       'walnij':                     print "walnąć";
       'kopnij':                     print "kopnąć";
-      'zablokuj':                   print "zablokować";
+      'zaklucz':                    print "zamknąć";
       'zajrzyj':                    print "zajrzeć";
       'załóż':                      print "założyć";
       'ubierz':                     print "ubrać";
@@ -1537,7 +1537,9 @@ Array pl_wielkosc --> 1;
         2:  print_ret (CMian) x1, " ", (JestSa) x1, " już ", (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), " na klucz.";
         3:  "Najpierw musisz zamknąć ", (bie) x1, ".";
         4:  print_ret (CMian) x1, " nie ", (nop) PL(x1, "pasuje", "pasują"), " do zamka.";
-        5:  Kto(actor, "Zamykasz", "zamyka"); " ", (bie) x1, " na klucz.";
+        5:  Kto(actor, "Zamykasz", "zamyka"); print " ", (bie) x1;   ! "mosiężnym kluczem", "łańcuchem"
+            if (second) print " ", (nar) second; else print " na klucz";
+            ".";
     }
   Look: switch (n) {
         1:  print " (na ", (mie) x1, ")";
@@ -1901,8 +1903,12 @@ Array pl_wielkosc --> 1;
         1:  "Tego nie da się otworzyć kluczem.";
         2:  print_ret (CMian) x1, " nie ", (JestSa) x1, " teraz ", (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), " na klucz.";
         3:  print_ret (CMian) x1, " nie ", (nop) PL(x1, "pasuje", "pasują"), " do zamka.";
-        4:  Kto(actor, "Otwierasz", "otwiera"); " zamek ", (dop) x1, ".";
-        5:  "(najpierw otwierasz zamek ", (dop) x1, ")";
+        4:  Kto(actor, "Otwierasz", "otwiera"); print " zamek ", (dop) x1;
+            if (second) print " ", (nar) second;
+            ".";
+        5:  print "(najpierw otwierasz zamek";      ! x2: klucz
+            if (x2) print " ", (nar) x2; else print " ", (dop) x1;
+            ")";
     }
   VagueGo:  "Musisz podać, w którą stronę chcesz iść.";
   Verify: switch (n) {

@@ -333,10 +333,12 @@ Verb 'opróżnij' 'wysyp' 'wylej' 'wypróżnij'
     * noun                                      -> Empty
     * noun 'do'/'na'/'w//'/'we' noun            -> EmptyT;
 
+! "otwórz drzwi kluczem" otwiera zamek i drzwi (OtworzKluczem); "odklucz"
+! i "odblokuj" zostają jako mniej typowe synonimy.
 Verb 'otwórz' 'odsłoń' 'rozwiń' 'odblokuj' 'odklucz'
     * noun                                      -> Open
-    * noun held                                 -> Unlock
-    * noun 'za' 'pomocą' held                   -> Unlock;
+    * noun held                                 -> OtworzKluczem
+    * noun 'za' 'pomocą' held                   -> OtworzKluczem;
 
 Verb 'pchnij' 'popchnij' 'przesuń' 'naciśnij' 'wciśnij' 'przyciśnij'
     * noun                                      -> Push
@@ -563,11 +565,18 @@ Verb 'wyjmij' 'wyciągnij' 'wydobądź' 'zdejmij' 'ściągnij'
 Verb 'wyłącz' 'zgaś'
     * noun                                      -> SwitchOff;
 
-Verb 'zablokuj' 'zamknij' 'zasłoń' 'zakryj'
+! "zamknij drzwi na klucz" bierze klucz pasujący do zamka, jakkolwiek się
+! nazywa (ZamknijNaKlucz); "na łańcuch", "na kłódkę" i narzędnik ("kluczem",
+! "wytrychem") wskazują przedmiot wprost.
+Verb 'zamknij' 'zaklucz'
     * noun                                      -> Close
+    * noun 'na' 'klucz'                         -> ZamknijNaKlucz
     * noun held                                 -> Lock
     * noun 'na' held                            -> Lock
     * noun 'za' 'pomocą' held                   -> Lock;
+
+Verb 'zasłoń' 'zakryj'
+    * noun                                      -> Close;
 
 Verb 'zajrzyj'
     * 'do'/'w//'/'we'/'przez' noun              -> Search
@@ -768,6 +777,60 @@ Array pl_wiersz --> INPUT_BUFFER_LEN;
 ];
 #Endif;
 #Endif;
+
+! Klucz do zamka obiektu o, jeśli aktor go trzyma (with_key), albo 0.
+[ PL_KluczDo o  k;
+    if (~~(o provides with_key)) return 0;
+    k = o.with_key;
+    if (k ofclass Object && k in actor) return k;
+    return 0;
+];
+[ PL_PasujeKlucz o k;
+    if (o.with_key ofclass Routine) return o.with_key() == k;
+    return o.with_key == k;
+];
+
+Global pl_klucz;    ! klucz podany w "otwórz X kluczem" dla ImplicitUnlock
+
+! "zamknij X na klucz"
+[ ZamknijNaKluczSub  k;
+    if (noun hasnt lockable) return L__M(##Lock, 1, noun);
+    k = PL_KluczDo(noun);
+    if (k == 0) {
+        if (noun has locked) return L__M(##Lock, 2, noun);
+        print_ret "Nie masz klucza do ", (dop) noun, ".";
+    }
+    <<Lock noun k, actor>>;
+];
+
+! "otwórz X kluczem": otwiera zamek (po cichu, jako działanie domyślne)
+! i sam obiekt.  Zły klucz, obiekt bez zamka albo zamek, którego nie da się
+! "otworzyć" jak drzwi (łańcuch, kajdany): zwykłe Unlock z jego komunikatem.
+[ OtworzKluczemSub;
+    if (noun hasnt lockable || noun hasnt openable ||
+        (noun has locked && ~~PL_PasujeKlucz(noun, second)))
+        <<Unlock noun second, actor>>;
+    pl_klucz = second;
+    <<Open noun, actor>>;
+];
+
+! Działanie domyślne biblioteki: "otwórz drzwi" przy zamku zamkniętym na
+! klucz.  Biblioteka 6.12 nie otwiera zamka sama; polska wersja otwiera go,
+! jeśli aktor ma właściwy klucz: "(najpierw otwierasz zamek mosiężnym kluczem)".
+[ ImplicitUnlock obj  k res ks;
+    if (obj hasnt locked) rfalse;
+    k = pl_klucz; pl_klucz = 0;
+    if (k == 0) k = PL_KluczDo(obj);
+    if (k == 0) rtrue;
+    res = CheckImplicitAction(##Unlock, obj, k);
+    if (res >= 2) rtrue;
+    ks = keep_silent; keep_silent = 1;
+    <Unlock obj k, actor>;
+    keep_silent = ks;
+    if (obj has locked) rtrue;
+    if (res == 0) L__M(##Unlock, 5, obj, k);
+    rfalse;
+];
 
 ! Gdy jedno słowo pasuje do kilku obiektów ("wschód": wschód, północny wschód,
 ! południowy wschód), parser wybiera ten, którego nazwa jest dokładnie tym

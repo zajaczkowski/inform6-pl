@@ -556,6 +556,8 @@ Replace Identical PL_IdenticalOryg;
 
 ! MatchWord zastąpione polską wersją (polskig.h): pomija ogonki.
 Replace MatchWord PL_MatchWordOryg;
+! ImplicitUnlock zastąpione polską wersją (polskig.h): otwiera zamek kluczem.
+Replace ImplicitUnlock PL_ImplicitUnlockOryg;
 
 ! Glulx: tokenizer biblioteki 6.12.8 zakłada słownik z jednobajtowymi znakami,
 ! a polskie litery wymagają słownika Unicode ($DICT_CHAR_SIZE=4).  Polska wersja

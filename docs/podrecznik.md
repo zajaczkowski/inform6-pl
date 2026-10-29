@@ -598,16 +598,17 @@ Object  -> StoneDoor "kamienn/e drzwi/"
 
 `found_in` umieszcza je w obu miejscach naraz. `door_to` i `door_dir` są procedurami, bo odpowiedź zależy od tego, po której stronie stoi gracz. `with_key` wskazuje klucz, który pasuje do zamka.
 
-Gracz otwiera je tak:
+Gracz otwiera je tak, jak mówi się po polsku – jednym poleceniem:
 
 ```
->odblokuj drzwi kluczem
-Otwierasz zamek kamiennych drzwi.
->otwórz drzwi
+>otwórz drzwi kluczem
+(najpierw otwierasz zamek kamiennym kluczem)
 Otwierasz kamienne drzwi.
 ```
 
-Działają też polecenia „otwórz drzwi kluczem” i „odblokuj drzwi za pomocą klucza”.
+Jeśli gracz ma klucz przy sobie, wystarczy samo „otwórz drzwi”: biblioteka sama otworzy zamek właściwym kluczem. Zamyka się analogicznie: „zamknij drzwi na klucz” (biblioteka znajdzie klucz pasujący do zamka, jakkolwiek by się nazywał), „zamknij drzwi kluczem” albo „zamknij drzwi na łańcuch”, jeśli zabezpieczeniem jest łańcuch. Odpowiedź gry nazywa użyty przedmiot w narzędniku: „Zamykasz kamienne drzwi kamiennym kluczem.”
+
+Po polsku nie ma osobnego czasownika na zamykanie zamka, dlatego „zablokuj” nie jest synonimem „zamknij na klucz”: gra może go użyć po swojemu, np. do zaklinowania drzwi.
 
 ---
 

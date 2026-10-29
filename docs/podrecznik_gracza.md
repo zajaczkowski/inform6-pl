@@ -306,13 +306,13 @@ Trzeba wtedy odłożyć coś niepotrzebnego.
 ```
 >otwórz pudełko
 >zamknij klatkę
->odblokuj drzwi kluczem
 >otwórz drzwi kluczem
 >otwórz kratę kluczami
 >zamknij drzwi na klucz
+>zamknij bramę na łańcuch
 ```
 
-Drzwi zamknięte na klucz trzeba najpierw **odblokować** kluczem (`odblokuj` albo `otwórz … kluczem`), a dopiero potem otworzyć.
+Drzwi zamknięte na klucz otwiera się kluczem: `otwórz drzwi kluczem`. Jeśli masz właściwy klucz przy sobie, wystarczy `otwórz drzwi` – gra sama otworzy zamek. Zamykasz `zamknij drzwi na klucz` albo `zamknij drzwi kluczem`; przy „na klucz” gra sama wybierze klucz, który pasuje.
 
 ### Włączanie i wyłączanie
 
@@ -561,7 +561,7 @@ RUCH          pn pd w z pnw pnz pdw pdz g d · idź na północ · na północ �
 
 PRZEDMIOTY    weź X · weź X z Y · upuść X · włóż X do Y · połóż X na Y
               ekwipunek (i) · co mam · weź wszystko · upuść wszystko oprócz X
-              otwórz/zamknij X · odblokuj X kluczem · otwórz X kluczem
+              otwórz/zamknij X · otwórz X kluczem · zamknij X na klucz
               włącz/zapal X · wyłącz/zgaś X · załóż/zdejmij X
               zjedz X · wypij X · napełnij X · opróżnij X
               pchnij X (na północ) · pociągnij X · przekręć X · rzuć X w Y

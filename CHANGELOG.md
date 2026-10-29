@@ -18,6 +18,12 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
   - „Miałeś w rękach: … lampę sodową” (biernik), „Odwiedzone miejsca: …”,
     szyk zaimków („Przecież go nie trzymasz”, „Masz go już na sobie”),
     „Ten interpreter nie pozwala cofać ruchów”, przecinek przed „aby”.
+- Zamki: „otwórz drzwi kluczem” otwiera zamek i drzwi jednym poleceniem,
+  samo „otwórz drzwi” otwiera zamek, jeśli gracz ma właściwy klucz
+  (`ImplicitUnlock`), „zamknij drzwi na klucz” wybiera pasujący klucz
+  niezależnie od jego nazwy, „na łańcuch” i narzędnik („wytrychem”) wskazują
+  przedmiot wprost; odpowiedzi w narzędniku („Zamykasz drzwi mosiężnym
+  kluczem.”).  Usunięte „zablokuj” jako synonim zamykania; dodane „zaklucz”.
 - Komentarze w kodzie biblioteki w całości po polsku; usunięte angielskie
   pozostałości (słowo „the” w `ConTopic`).
 - Wydania tworzy automatycznie GitHub Actions po wypchnięciu tagu
