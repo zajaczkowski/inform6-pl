@@ -1,6 +1,5 @@
 ! ==============================================================================
 !   ODMIANA:  automatyczna odmiana nazw obiektów przez przypadki
-!   (prototyp)
 !
 !   Copyright Bartosz Zajączkowski 2026
 !   Licencja: tradycyjna licencja Inform (DM4) lub Artistic License 2.0.
@@ -13,7 +12,7 @@
 !   się rdzeń, a biblioteka sama dobiera końcówki przypadków:
 !
 !       Object lampa "mosiężn/a lamp/a"  has female;
-!       Object stol  "st/ó=o/ł/+u"       has male;
+!       Object stol  "st/ó=o/ł/+u"       has supporter;
 !
 !   Zapis jednego słowa:  rdzeń / [wymiana /  rdzeń /]... końcówka [+wsk] [!]
 !
@@ -33,6 +32,11 @@
 !     brudn/e okn/a+ie       brudnych okien    spółgłoską w dopełniaczu)
 !     noc/e+y                nocy (+y: -y/-i, +ów: -ów, +0: bez końcówki)
 !     sta/rz=r/y ryba/c=k//y starych rybaków (męskoosobowy: animate male)
+!
+!   Oboczności rozpoznawane automatycznie: miękka spółgłoska na końcu rdzenia
+!   przed samogłoską (kość - kości, koń - konia), "j" po samogłosce przed -i
+!   (zbroja - zbroi), -ii w wyrazach obcych (historia - historii, ale ziemia -
+!   ziemi), wymiany przed -e (lampa - lampie, stół - stole).
 !
 !   Domyślny dopełniacz mnogi: rodzaj żeński i nijaki (oraz pusta końcówka:
 !   drzwi/) bez końcówki (lamp, pudełek), męski miękki -y/-i (kluczy, kowali),
@@ -54,7 +58,7 @@
 !   Parser rozpoznaje wszystkie wygenerowane formy (także wpisane bez
 !   polskich liter), więc właściwość name potrzebna jest tylko dla synonimów.
 !
-!   Ograniczenia prototypu: nazwa do PL_ZN_MAX znaków.
+!   Ograniczenie: nazwa krótka może mieć najwyżej PL_ZN_MAX znaków.
 ! ==============================================================================
 
 System_file;
@@ -182,6 +186,16 @@ Array pl_wynik --> 2;
         else     pl_n-->(pl_n_len++) = c;
     }
     for (i=0 : i<pl_k_len : i++) pl_n-->(pl_n_len++) = pl_k-->i;
+    ! Miękka spółgłoska na końcu rdzenia przed samogłoską końcówki: ć, ś, ź, ń
+    ! piszemy jako ci, si, zi, ni (kość - kości, koń - konia, pieśń - pieśni).
+    if (pl_s_len) {
+        c = pl_s-->(pl_s_len-1);
+        switch (c) {
+          'ć': c = 'c'; 'ś': c = 's'; 'ź': c = 'z'; 'ń': c = 'n';
+          default: c = 0;
+        }
+        if (c) { pl_s-->(pl_s_len-1) = c; pl_s-->(pl_s_len++) = 'i'; }
+    }
 ];
 
 ! Końcówka mianownika typowa dla przymiotnika w rodzaju r?
@@ -247,12 +261,18 @@ Array pl_wynik --> 2;
     }
 ];
 
-! Rdzeń + "-y" albo "-i": lampy, półki, kuchni, nocy, soli.
+[ PL_Samogl c; return c == 'a' or 'e' or 'i' or 'o' or 'u' or 'y' or 'ą' or 'ę' or 'ó'; ];
+
+! Rdzeń + "-y" albo "-i": lampy, półki, kuchni, nocy, soli, zbroi, lekcji.
 [ PL_YI miekkie  c d;
     c = PL_Ost(1); d = PL_Ost(2);
+    ! "j" po samogłosce znika przed "-i": zbroi, szyi, nadziei (ale lekcji)
+    if (c == 'j' && PL_Samogl(d)) { PL_DrukS(1); print "i"; return; }
     PL_DrukS(0);
-    ! -ia po n, c, s, z: kuchni, kości; po innych spółgłoskach: biżuterii
-    if (c == 'i') { if (d ~= 'n' or 'c' or 's' or 'z' or 'ń' && d ~= 0) print "i"; return; }
+    ! -ia w wyrazach obcych po r, l, d, t, g, k, ch, f: historii, linii,
+    ! partii; w rodzimych jedno "i": ziemi, kuchni, skrzyni (wyjątki, np.
+    ! "chemii", trzeba podać w desc_*)
+    if (c == 'i') { if (d == 'r' or 'l' or 'd' or 't' or 'g' or 'k' or 'h' or 'f') print "i"; return; }
     if (c == 'k' or 'g' or 'l' or 'j') { print "i"; return; }
     if (c == 'c' or 'ż' || (c == 'z' && d == 'c' or 's' or 'r' or 'd')) { print "y"; return; }
     if (miekkie) print "i"; else print "y";
@@ -347,6 +367,7 @@ Array pl_wynik --> 2;
             if (pl_wskazowka == 'i') print "ie"; else print "e";
             PL_Znak(PL_Ost(1));
         }
+        else if (PL_Ost(1) == 'j' && PL_Samogl(PL_Ost(2))) { PL_DrukS(1); print "i"; }  ! zbroi
         else PL_DrukS(0);
       1: PL_DrukS(0); print "ów";
       2: PL_YI(true);

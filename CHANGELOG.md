@@ -6,6 +6,20 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
 
 ## Niewydane
 
+- Polszczyzna komunikatów i odmiany (przegląd wszystkich komunikatów biblioteki
+  dla obiektów każdego rodzaju):
+  - przymiotniki w rodzaju męskoosobowym: „rybacy są zamknięci/puści/otwarci”
+    zamiast „zamknięte/puste/otwarte” (`PL_PrzymZ`, `PL_PrzymZL`),
+  - automatyczne „ze”/„we”: „ze stołu”, „ze skrzyni”, „we wraku” (wcześniej
+    tylko przez atrybuty `z_article`/`w_article`),
+  - odmiana: miękkie spółgłoski na końcu rdzenia (kość – kości, koń – konia),
+    „j” po samogłosce (zbroja – zbroi, pokój – pokoi), -ia w wyrazach rodzimych
+    (ziemia – ziemi, ale historia – historii),
+  - „Miałeś w rękach: … lampę sodową” (biernik), „Odwiedzone miejsca: …”,
+    szyk zaimków („Przecież go nie trzymasz”, „Masz go już na sobie”),
+    „Ten interpreter nie pozwala cofać ruchów”, przecinek przed „aby”.
+- Komentarze w kodzie biblioteki w całości po polsku; usunięte angielskie
+  pozostałości (słowo „the” w `ConTopic`).
 - Wydania tworzy automatycznie GitHub Actions po wypchnięciu tagu
   (`wydanie.sh`, `.github/workflows/wydanie.yml`).
 - `CONTRIBUTING.md`, szablon zgłoszenia błędu, link do pobrania gier w README,

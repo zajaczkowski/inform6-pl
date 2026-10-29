@@ -587,8 +587,8 @@ Verb 'nastaw' 'wyreguluj' 'dostosuj'
     * noun 'na' special                         -> SetTo;
 
 ! ------------------------------------------------------------------------------
-!  This routine is no longer used here, but provided to help existing games
-!  which use it as a general parsing routine:
+!  Procedura nieużywana w tej gramatyce; zostaje dla starszych gier, które
+!  używają jej jako tokenu (general parsing routine):
 
 [ ConTopic w;
     consult_from = wn;
@@ -599,7 +599,6 @@ Verb 'nastaw' 'wyreguluj' 'dostosuj'
     if (consult_words == 0) return -1;
     if (action_to_be == ##Answer or ##Ask or ##Tell) {
         w = wn; wn = consult_from; parsed_number = NextWord();
-        if (parsed_number == 'the' && consult_words > 1) parsed_number = NextWord();
         wn = w;
         return 1;
     }
@@ -607,7 +606,7 @@ Verb 'nastaw' 'wyreguluj' 'dostosuj'
 ];
 
 ! ------------------------------------------------------------------------------
-!  Final task: provide trivial routines if the user hasn't already:
+!  Puste wersje punktów wejścia, których gra nie zdefiniowała:
 ! ------------------------------------------------------------------------------
 
 Default Story          0;
@@ -663,7 +662,8 @@ Object  pl_rozszerzenie LibraryExtensions
 #Ifdef DICT_IS_UNICODE;
 ! Tokenizer dla słownika Unicode: jak Tokenise__ biblioteki 6.12.8, ale znaki
 ! słowa są czterobajtowe, a wpis słownika ma 12 + 4*DICT_WORD_SIZE bajtów
-! (zob. odmiana.h).  Wiersz poleceń jest nadal w Latin-1.
+! (zob. odmiana.h).  Wiersz poleceń, już bez liter spoza Latin-1, dostarcza
+! KeyboardPrimitive poniżej.
 Array pl_tokenbuf --> DICT_WORD_SIZE;
 
 [ Tokenise__ buf tab  cx numwords len bx ix wx wpos wlen val res dictlen entrylen;
@@ -907,7 +907,7 @@ Array pl_wiersz --> INPUT_BUFFER_LEN;
 ];
 
 
-[ pl_W_Duze o; if (o has w_article) return "We "; return "W "; ];
+[ pl_W_Duze o; if (PL_We(o, PRZYP_MIE)) return "We "; return "W "; ];
 
 ! ==============================================================================
 

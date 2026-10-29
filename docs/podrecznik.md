@@ -262,7 +262,9 @@ rdzeń / końcówka mianownika
 
 Pusta końcówka (`kamyk/`) też jest końcówką: tak zapisuje się rzeczownik męski zakończony spółgłoską. Ukośnik jest wtedy potrzebny, bo bez niego słowo w ogóle by się nie odmieniało – tak jak „z jadeitu” w `"mozaikow/a mask/a z jadeitu"`, które ma pozostać w każdym przypadku bez zmian.
 
-Końcówki przypadków biblioteka dobiera sama, na podstawie rodzaju obiektu, końcówki mianownika i ostatnich liter rdzenia. Zna też regularne wymiany spółgłosek: *lampa – lampie*, *półka – półce*, *noga – nodze*, *stół – stole*, *gazeta – gazecie*, *krzesło – krześle*.
+Końcówki przypadków biblioteka dobiera sama, na podstawie rodzaju obiektu, końcówki mianownika i ostatnich liter rdzenia. Zna też regularne wymiany spółgłosek: *lampa – lampie*, *półka – półce*, *noga – nodze*, *stół – stole*, *gazeta – gazecie*, *krzesło – krześle*. Miękką spółgłoskę na końcu rdzenia zapisuje przed samogłoską jako *ci, si, zi, ni* (*kość – kości*, *koń – konia*, *gęś – gęsią*), a *j* po samogłosce opuszcza przed końcówką *-i* (*zbroja – zbroi*, *nadzieja – nadziei*). W rzeczownikach na *-ia* rozróżnia wyrazy rodzime (*ziemia – ziemi*) i obce, w których po *r, l, d, t, g, k, ch, f* pisze się *-ii* (*historia – historii*).
+
+Przyimki *z* i *w* biblioteka zamienia sama na *ze* i *we* tam, gdzie wymaga tego wymowa: *ze stołu*, *ze skrzyni*, *ze szkła* (ale *z szafy*), *we wraku*, *we framudze*. Atrybuty `z_article` i `w_article` wymuszają formę rozszerzoną w nietypowych przypadkach.
 
 ### Które słowo jest rzeczownikiem
 

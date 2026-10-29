@@ -25,7 +25,7 @@ System_file;
                             ! w bibliotece standardowej
 
 ! ------------------------------------------------------------------------------
-!   Part I.   Preliminaries
+!   Część I.   Wstęp
 ! ------------------------------------------------------------------------------
 
 ! Bez EnglishNaturalLanguage: stary mechanizm zaimków biblioteki ustawia
@@ -137,7 +137,7 @@ CompassDirection -> out_obj with short_name "zewnątrz", door_dir out_to,
                                  name 'zewnątrz' 'zewnatrz' 'wyjście';
 
 ! ------------------------------------------------------------------------------
-!   Part II.   Vocabulary
+!   Część II.   Słownictwo
 ! ------------------------------------------------------------------------------
 
 Constant AGAIN1__WD     = 'powtórz';
@@ -251,7 +251,7 @@ Array LanguageNumbers table
     'dziewiętnaście' 19 'dwadzieścia' 20;
 
 ! ------------------------------------------------------------------------------
-!   Part III.   Translation
+!   Część III.   Przekład polecenia
 ! ------------------------------------------------------------------------------
 
 ! Polska litera zamieniona na literę bez ogonka (ą -> a, ł -> l, ...).
@@ -337,7 +337,7 @@ Array LanguageNumbers table
 ];
 
 ! ------------------------------------------------------------------------------
-!   Part IV.   Printing
+!   Część IV.   Wypisywanie
 ! ------------------------------------------------------------------------------
 
 Constant LanguageAnimateGender   = male;
@@ -943,8 +943,8 @@ Global pl_bez_przyimka;     ! pomija końcowy przyimek w LanguageCommand
 ];
 
 ! ----------------------------------------------------------------------------
-!  LanguageVerbIsDebugging is called by SearchScope.  It should return true
-!  if word w is a debugging verb which needs all objects to be in scope.
+!  LanguageVerbIsDebugging woła SearchScope.  Zwraca prawdę, jeśli słowo w jest
+!  czasownikiem debugowania, dla którego wszystkie obiekty muszą być w zasięgu.
 ! ----------------------------------------------------------------------------
 
 #Ifdef DEBUG;
@@ -1093,6 +1093,20 @@ Constant LIBRARYV__TX   = " Biblioteka v";
 ! Końcówka przymiotnika: "otwart", (KoncY) x1 -> otwarty/otwarta/otwarte
 [ KoncY o; Forma(o, "y", "a", "e", "e"); ];
 
+! Przymiotnik albo imiesłów z rdzenia; rodzaj męskoosobowy ma inną postać
+! rdzenia ("zamknięci", "puści", "włączeni"), więc podaje się ją w całości:
+! (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci") -> zamknięty/-a/-e/zamknięci.
+[ PL_PrzymZ o rdzen meskoos;
+    if (RodzajObiektu(o) == 4) { print (string) meskoos; return; }
+    print (string) rdzen; KoncY(o);
+];
+! To samo w dopisku na liście ("butelkę (pustą)"), zob. KoncYL.
+[ PL_PrzymZL o rdzen meskoos;
+    if (pl_lista_rodzic && pl_lista_przyp == PRZYP_BIE && o ofclass Object &&
+        parent(o) == pl_lista_rodzic) { print (string) rdzen; KoncYL(o); return; }
+    PL_PrzymZ(o, rdzen, meskoos);
+];
+
 ! Końcówka przymiotnika w dopisku na liście ("butelkę (pustą)"): w bierniku,
 ! jeśli lista jest drukowana w bierniku ("Widzisz tutaj ...", ekwipunek).
 [ KoncYL o;
@@ -1137,8 +1151,47 @@ Constant LIBRARYV__TX   = " Biblioteka v";
 ];
 
 ! Przyimki "z/ze" i "w/we"
-[ pl_z o; if (o has z_article) print "ze"; else print "z"; ];
-[ pl_w o; if (o has w_article) print "we"; else print "w"; ];
+! "z"/"ze" i "w"/"we": forma rozszerzona stoi przed zbitką spółgłosek, której
+! pierwsza głoska jest podobna do przyimka: "ze stołu", "ze skrzyni", "ze
+! źródła", "ze szkła" (ale "z szafy"), "we wraku", "we framudze".  Biblioteka
+! wypisuje nazwę w odpowiednim przypadku i sprawdza jej pierwsze litery;
+! atrybuty z_article i w_article wymuszają formę rozszerzoną.
+#Ifdef TARGET_ZCODE;
+Array pl_poczbuf -> WORDSIZE + 200;
+#Ifnot;
+Array pl_poczbuf --> 200;
+#Endif;
+Global pl_pocz_przyp;
+[ PL_NazwaPocz o; NazwaWPrzypadku(o, pl_pocz_przyp); ];
+[ PL_Pocz o c i  n;      ! i-ta litera nazwy o w przypadku c (małą literą)
+    pl_pocz_przyp = c;
+    #Ifdef TARGET_ZCODE;
+    n = PrintToBuffer(pl_poczbuf, 200, PL_NazwaPocz, o);
+    if (i >= n) return ' ';
+    return LowerCase(pl_poczbuf->(WORDSIZE+i));
+    #Ifnot;
+    n = PL_Renderuj(pl_poczbuf, 200, PL_NazwaPocz, o);
+    if (i >= n) return ' ';
+    return LowerCase(pl_poczbuf-->i);
+    #Endif;
+];
+[ PL_Ze o c  c1 c2 c3;
+    if (o has z_article) rtrue;
+    if (~~(o ofclass Object)) rfalse;
+    c1 = PL_Pocz(o, c, 0); c2 = PL_Pocz(o, c, 1);
+    if (c1 == 's' && c2 == 'z') { c3 = PL_Pocz(o, c, 2); return c3 ~= ' ' && ~~PL_Samogl(c3); }
+    if (c1 == 's' or 'z' or 'ś' or 'ź' or 'ż') return c2 ~= ' ' && ~~PL_Samogl(c2);
+    rfalse;
+];
+[ PL_We o c  c1 c2;
+    if (o has w_article) rtrue;
+    if (~~(o ofclass Object)) rfalse;
+    c1 = PL_Pocz(o, c, 0); c2 = PL_Pocz(o, c, 1);
+    if (c1 == 'w' or 'f') return c2 ~= ' ' && ~~PL_Samogl(c2);
+    rfalse;
+];
+[ pl_z o; if (PL_Ze(o, PRZYP_DOP)) print "ze"; else print "z"; ];
+[ pl_w o; if (PL_We(o, PRZYP_MIE)) print "we"; else print "w"; ];
 
 ! "na" dla podstawek (supporter), "w" dla pozostałych
 [ NaW o; if (o has supporter) print "na"; else pl_w(o); ];
@@ -1277,7 +1330,7 @@ Array pl_wielkosc --> 1;
     }
   Close: switch (n) {
         1:  "Tego nie da się zamknąć.";
-        2:  print_ret (CMian) x1, " ", (JestSa) x1, " już zamknięt", (KoncY) x1, ".";
+        2:  print_ret (CMian) x1, " ", (JestSa) x1, " już ", (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), ".";
         3:  Kto(actor, "Zamykasz", "zamyka"); " ", (bie) x1, ".";
         4:  "(najpierw zamykasz ", (bie) x1, ")";
     }
@@ -1315,7 +1368,7 @@ Array pl_wielkosc --> 1;
         1:  "Nie masz ", (JegoJejIch) x1, " na sobie.";
         2:  Kto(actor, "Zdejmujesz", "zdejmuje"); " ", (bie) x1, ".";
         3:  "(najpierw zdejmujesz ", (bie) x1, ")";
-        4:  "Najpierw musisz zdjąć ", (bie) noun, ".";
+        4:  "Najpierw musisz zdjąć ", (bie) x1, ".";
     }
   Drink:    "Nie ma tu nic, co nadawałoby się do picia.";
   Drop: switch (n) {
@@ -1331,12 +1384,12 @@ Array pl_wielkosc --> 1;
         1:  "Tego nie da się zjeść.";
         2:  Kto(actor, "Zjadasz", "zjada"); print " ", (bie) x1;
             if (actor ~= player) ".";
-            print ". Smaczn"; KoncY(x1); ".";        ! smaczny / smaczna / smaczne
+            print ". "; PL_PrzymZ(x1, "Smaczn", "Smaczni"); ".";
     }
   EmptyT: switch (n) {
         1:  print_ret (CMian) x1, " nie ", (nop) PL(x1, "może", "mogą"), " niczego zawierać.";
-        2:  print_ret (CMian) x1, " ", (JestSa) x1, " zamknięt", (KoncY) x1, ".";
-        3:  print_ret (CMian) x1, " ", (JestSa) x1, " już pust", (KoncY) x1, ".";
+        2:  print_ret (CMian) x1, " ", (JestSa) x1, " ", (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), ".";
+        3:  print_ret (CMian) x1, " ", (JestSa) x1, " już ", (nop) PL_PrzymZ(x1, "pust", "puści"), ".";
         4:  "To niczego by nie opróżniło.";
     }
   Enter: switch (n) {
@@ -1363,12 +1416,13 @@ Array pl_wielkosc --> 1;
         2:  print_ret (CMian) x1, " nie ", (nop) PL(x1, "wyróżnia", "wyróżniają"),
                 " się niczym szczególnym.";
         3:  print (CMian) x1, " ", (JestSa) x1, " teraz ";
-            if (x1 has on) print "włączon"; else print "wyłączon";
-            print_ret (KoncY) x1, ".";
+            if (x1 has on) PL_PrzymZ(x1, "włączon", "włączeni");
+            else PL_PrzymZ(x1, "wyłączon", "wyłączeni");
+            ".";
     }
   Exit: switch (n) {
         1:  "Nie masz z czego wyjść.";
-        2:  "Nie możesz wyjść, bo ", (mian) x1, " ", (JestSa) x1, " zamknięt", (KoncY) x1, ".";
+        2:  "Nie możesz wyjść, bo ", (mian) x1, " ", (JestSa) x1, " ", (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), ".";
         3:  if (x1 has supporter) Kto(actor, "Schodzisz", "schodzi");
             else Kto(actor, "Wychodzisz", "wychodzi");
             " ", (pl_z) x1, " ", (dop) x1, ".";
@@ -1412,7 +1466,7 @@ Array pl_wielkosc --> 1;
         1:  "Musisz najpierw wziąć ", (bie) x1, ", żeby ", (GoJaJe) x1,
             " gdzieś włożyć.";
         2:  print_ret (CMian) x1, " nie ", (nop) PL(x1, "może", "mogą"), " niczego zawierać.";
-        3:  print_ret (CMian) x1, " ", (JestSa) x1, " zamknięt", (KoncY) x1, ".";
+        3:  print_ret (CMian) x1, " ", (JestSa) x1, " ", (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), ".";
         4:  "Najpierw musisz ", (GoJaJe) x1, " zdjąć.";
         5:  "Nie można włożyć czegoś do samego siebie.";
         6:  "(najpierw zdejmujesz ", (GoJaJe) x1, ")";
@@ -1444,22 +1498,22 @@ Array pl_wielkosc --> 1;
   Listen:   Kto(actor, "Nie słyszysz", "nie słyszy"); " niczego niezwykłego.";
   ListMiscellany: switch (n) {
         1:  print " (świeci)";
-        2:  print " (zamknięt", (KoncYL) x1, ")";
-        3:  print " (zamknięt", (KoncYL) x1, ", świeci)";
-        4:  print " (pust", (KoncYL) x1, ")";
-        5:  print " (pust", (KoncYL) x1, ", świeci)";
-        6:  print " (zamknięt", (KoncYL) x1, " i pust", (KoncYL) x1, ")";
-        7:  print " (zamknięt", (KoncYL) x1, ", pust", (KoncYL) x1, ", świeci)";
+        2:  print " (", (nop) PL_PrzymZL(x1, "zamknięt", "zamknięci"), ")";
+        3:  print " (", (nop) PL_PrzymZL(x1, "zamknięt", "zamknięci"), ", świeci)";
+        4:  print " (", (nop) PL_PrzymZL(x1, "pust", "puści"), ")";
+        5:  print " (", (nop) PL_PrzymZL(x1, "pust", "puści"), ", świeci)";
+        6:  print " (", (nop) PL_PrzymZL(x1, "zamknięt", "zamknięci"), " i ", (nop) PL_PrzymZL(x1, "pust", "puści"), ")";
+        7:  print " (", (nop) PL_PrzymZL(x1, "zamknięt", "zamknięci"), ", ", (nop) PL_PrzymZL(x1, "pust", "puści"), ", świeci)";
         8:  print " (świeci, masz ", (GoJaJe) x1, " na sobie";
         9:  print " (świeci";
         10: print " (masz ", (GoJaJe) x1, " na sobie";
         11: print " (";
-        12: print "otwart", (KoncYL) x1;
-        13: print "otwart", (KoncYL) x1, ", ale pust", (KoncYL) x1;
-        14: print "zamknięt", (KoncYL) x1;
-        15: print "zamknięt", (KoncYL) x1, " na klucz";
-        16: print " i pust", (KoncYL) x1;
-        17: print " (pust", (KoncYL) x1, ")";
+        12: print (nop) PL_PrzymZL(x1, "otwart", "otwarci");
+        13: print (nop) PL_PrzymZL(x1, "otwart", "otwarci"), ", ale ", (nop) PL_PrzymZL(x1, "pust", "puści");
+        14: print (nop) PL_PrzymZL(x1, "zamknięt", "zamknięci");
+        15: print (nop) PL_PrzymZL(x1, "zamknięt", "zamknięci"), " na klucz";
+        16: print " i ", (nop) PL_PrzymZL(x1, "pust", "puści");
+        17: print " (", (nop) PL_PrzymZL(x1, "pust", "puści"), ")";
         18: print ", zawiera ";
         19: print " (na ", (KtorymKtorej) x1, " ";
         20: print ", na ", (KtorymKtorej) x1, " ";
@@ -1480,14 +1534,14 @@ Array pl_wielkosc --> 1;
              jeszcze nieodwiedzonych.";
   Lock: switch (n) {
         1:  "Tego nie da się zamknąć na klucz.";
-        2:  print_ret (CMian) x1, " ", (JestSa) x1, " już zamknięt", (KoncY) x1, " na klucz.";
+        2:  print_ret (CMian) x1, " ", (JestSa) x1, " już ", (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), " na klucz.";
         3:  "Najpierw musisz zamknąć ", (bie) x1, ".";
         4:  print_ret (CMian) x1, " nie ", (nop) PL(x1, "pasuje", "pasują"), " do zamka.";
         5:  Kto(actor, "Zamykasz", "zamyka"); " ", (bie) x1, " na klucz.";
     }
   Look: switch (n) {
         1:  print " (na ", (mie) x1, ")";
-        2:  print " (w ", (mie) x1, ")";
+        2:  print " (", (pl_w) x1, " ", (mie) x1, ")";
         3:  print " (jako ", (name) x1, ")";
         4:  print "^Na ", (mie) x1;
             PL_ListaZCzasownikiem(child(x1),
@@ -1497,7 +1551,7 @@ Array pl_wielkosc --> 1;
             new_line;
             if (x1 ~= location) {
                 if (x1 has supporter) print "Na ";
-                else { if (x1 has w_article) print "We "; else print "W "; }
+                else { if (PL_We(x1, PRZYP_MIE)) print "We "; else print "W "; }
                 print (mie) x1, " ";
                 Kto(actor, "widzisz", "widzi");
             }
@@ -1530,7 +1584,7 @@ Array pl_wielkosc --> 1;
             if (deadflag == 2 && AMUSING_PROVIDED == 0)
                 print ", zobaczyć kilka zabawnych pomysłów (ZABAWNE)";
             print " czy zakończyć (KONIEC)?";
-        6:  "[Twój interpreter nie pozwala ~cofnąć~ ruchu. Przykro mi!]";
+        6:  "[Ten interpreter nie pozwala cofać ruchów. Przykro mi!]";
             #Ifdef TARGET_ZCODE;
         7:  "Nie udało się ~cofnąć~ ruchu. [Nie wszystkie interpretery to potrafią.]";
             #Ifnot; ! TARGET_GLULX
@@ -1553,7 +1607,9 @@ Array pl_wielkosc --> 1;
         21: "Tego raczej nie da się powtórzyć.";
         22: "Polecenie nie może zaczynać się od przecinka.";
         23: "Wygląda na to, że chcesz z kimś porozmawiać, ale nie wiem z kim.";
-        24: "Nie możesz rozmawiać z ", (nar) x1, ".";
+        24: print "Nie możesz rozmawiać ";
+            if (PL_Ze(x1, PRZYP_NAR)) print "ze "; else print "z ";
+            print_ret (nar) x1, ".";
         25: "Aby z kimś porozmawiać, napisz na przykład ~kowalu, cześć~.";
         26: "(najpierw bierzesz ", (bie) x1, ")";
         27: "Nie zrozumiałem tego polecenia.";
@@ -1591,7 +1647,7 @@ Array pl_wielkosc --> 1;
             print " o ", (number) x1, " ";
             Liczebnik(x1, "punkt", "punkty", "punktów");
         51: "(Wydarzyło się coś ważnego, więc pozostałe polecenia zostały pominięte.)";
-        52: "^Wpisz liczbę od 1 do ", x1, ", 0 aby wyświetlić menu ponownie, albo naciśnij ENTER.";
+        52: "^Wpisz liczbę od 1 do ", x1, ", 0, aby ponownie wyświetlić menu, albo naciśnij ENTER.";
         53: "^[Naciśnij SPACJĘ.]";
         54: "[Komentarz zapisany.]";
         55: "[Komentarz NIE został zapisany.]";
@@ -1608,22 +1664,23 @@ Array pl_wielkosc --> 1;
             "Powiadamianie o wyniku wyłączone.";
   NotifyOn: "Powiadamianie o wyniku włączone.";
   Objects: switch (n) {
-        1:  print "Rzeczy, które ", (nop) Gracz("miałeś", "miałaś"), " w rękach";
+        1:  print (nop) Gracz("Miałeś", "Miałaś"), " w rękach";
+            short_name_case = PRZYP_BIE;    ! lista w bierniku: "lampę sodową"
         2:  "Nie ", (nop) Gracz("miałeś", "miałaś"), " jeszcze niczego w rękach.";
         3:  print " (na sobie)";
         4:  print " (przy sobie)";
         5:  print " (oddane)";
         6:  print " (", (name) x1, ")";
         7:  print " (", (mian) x1, ")";
-        8:  print " (w ", (mie) x1, ")";
+        8:  print " (", (pl_w) x1, " ", (mie) x1, ")";
         9:  print " (na ", (mie) x1, ")";
         10: print " (zgubione)";
     }
   Open: switch (n) {
         1:  "Tego nie da się otworzyć.";
-        2:  print_ret (CMian) x1, " ", (JestSa) x1, " chyba zamknięt",
-                (KoncY) x1, " na klucz.";
-        3:  print_ret (CMian) x1, " ", (JestSa) x1, " już otwart", (KoncY) x1, ".";
+        2:  print_ret (CMian) x1, " ", (JestSa) x1, " chyba ",
+                (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), " na klucz.";
+        3:  print_ret (CMian) x1, " ", (JestSa) x1, " już ", (nop) PL_PrzymZ(x1, "otwart", "otwarci"), ".";
         4:  Kto(actor, "Otwierasz", "otwiera"); print " ", (bie) x1, ". W środku";
             if (PL_ListaZCzasownikiem(child(x1), ENGLISH_BIT+TERSE_BIT+CONCEAL_BIT+ISARE_BIT) == 0)
                 " nic nie ma.";
@@ -1633,7 +1690,8 @@ Array pl_wielkosc --> 1;
     }
   Order:    print_ret (CMian) x1, " ", (nop) PL(x1, "ma", "mają"), " ciekawsze rzeczy do roboty.";
   Places: switch (n) {
-        1:  print "Odwiedzone miejsca";
+        1:  print "Odwiedzone miejsca";       ! biblioteka dopisze ":" tylko w układzie pionowym
+            if (~~(places_style & INDENT_BIT)) print ":";
         2:  ".";
         3:  "Nie ", (nop) Gracz("odwiedziłeś", "odwiedziłaś"), " jeszcze żadnego miejsca.";
     }
@@ -1649,7 +1707,7 @@ Array pl_wielkosc --> 1;
     }
   Pull,Push,Turn: switch (n) {
         1:  "Karanie samego siebie w ten sposób niczego nie poprawi.";
-        2:  print_ret (CMian) x1, " ", (JestSa) x1, " przymocowan", (KoncY) x1, " na stałe.";
+        2:  print_ret (CMian) x1, " ", (JestSa) x1, " ", (nop) PL_PrzymZ(x1, "przymocowan", "przymocowani"), " na stałe.";
         3:  "Nie dasz rady tego zrobić.";
         4:  "Nic szczególnego się nie dzieje.";
         5:  "To byłoby niegrzeczne.";
@@ -1677,7 +1735,7 @@ Array pl_wielkosc --> 1;
         2:  print "Czy na pewno chcesz zakończyć grę? ";
     }
   Remove: switch (n) {
-        1:  print_ret "Niestety, ", (mian) x1, " ", (JestSa) x1, " zamknięt", (KoncY) x1, ".";
+        1:  print_ret "Niestety, ", (mian) x1, " ", (JestSa) x1, " ", (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), ".";
         2:  "Ale ", (JegoJejIch) x1, " tam teraz nie ma.";
         3:  "Wzięte.";
         4:  print_ret "Ale ", (mian) x1, " nie ", (nop) PL(x1, "znajduje", "znajdują"),
@@ -1757,8 +1815,8 @@ Array pl_wielkosc --> 1;
             ".";
         4:  Kto(actor, "Nie znajdujesz", "nie znajduje"); " niczego ciekawego.";
         5:  "Nie widać, co jest w środku, bo ", (mian) x1, " ", (JestSa) x1,
-            " zamknięt", (KoncY) x1, ".";
-        6:  print_ret (CMian) x1, " ", (JestSa) x1, " pust", (KoncY) x1, ".";
+            " ", (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), ".";
+        6:  print_ret (CMian) x1, " ", (JestSa) x1, " ", (nop) PL_PrzymZ(x1, "pust", "puści"), ".";
         7:  print "W ", (mie) x1;
             PL_ListaZCzasownikiem(child(x1), ENGLISH_BIT+TERSE_BIT+CONCEAL_BIT+ISARE_BIT);
             ".";
@@ -1785,12 +1843,12 @@ Array pl_wielkosc --> 1;
   Swing:    "Nie ma tu niczego, na czym można by się rozhuśtać.";
   SwitchOff: switch (n) {
         1:  "Tego nie da się wyłączyć.";
-        2:  print_ret (CMian) x1, " ", (JestSa) x1, " już wyłączon", (KoncY) x1, ".";
+        2:  print_ret (CMian) x1, " ", (JestSa) x1, " już ", (nop) PL_PrzymZ(x1, "wyłączon", "wyłączeni"), ".";
         3:  Kto(actor, "Wyłączasz", "wyłącza"); " ", (bie) x1, ".";
     }
   SwitchOn: switch (n) {
         1:  "Tego nie da się włączyć.";
-        2:  print_ret (CMian) x1, " ", (JestSa) x1, " już włączon", (KoncY) x1, ".";
+        2:  print_ret (CMian) x1, " ", (JestSa) x1, " już ", (nop) PL_PrzymZ(x1, "włączon", "włączeni"), ".";
         3:  Kto(actor, "Włączasz", "włącza"); " ", (bie) x1, ".";
     }
 
@@ -1805,10 +1863,10 @@ Array pl_wielkosc --> 1;
         5:  "Już masz ", (bie) x1, ".";
         6:  print_ret (CMian) x2, " ", (nop) PL(x2, "należy", "należą"), " do ", (dop) x1, ".";
         7:  print_ret (CMian) x2, " ", (JestSa) x2, " częścią ", (dop) x1, ".";
-        8:  print_ret (CMian) x1, " nie ", (JestSa) x1, " dostępn", (KoncY) x1, ".";
-        9:  print_ret (CMian) x1, " nie ", (JestSa) x1, " otwart", (KoncY) x1, ".";
+        8:  print_ret (CMian) x1, " nie ", (JestSa) x1, " ", (nop) PL_PrzymZ(x1, "dostępn", "dostępni"), ".";
+        9:  print_ret (CMian) x1, " nie ", (JestSa) x1, " ", (nop) PL_PrzymZ(x1, "otwart", "otwarci"), ".";
         10: "Tego nie da się przenieść.";
-        11: print_ret (CMian) x1, " ", (JestSa) x1, " przymocowan", (KoncY) x1, " na stałe.";
+        11: print_ret (CMian) x1, " ", (JestSa) x1, " ", (nop) PL_PrzymZ(x1, "przymocowan", "przymocowani"), " na stałe.";
         12: "Masz już przy sobie za dużo rzeczy.";
         13: "(wkładasz ", (bie) x1, " do ", (dop) x2, ", żeby zrobić miejsce)";
     }
@@ -1841,7 +1899,7 @@ Array pl_wielkosc --> 1;
 ! Turn: see Pull.
   Unlock:  switch (n) {
         1:  "Tego nie da się otworzyć kluczem.";
-        2:  print_ret (CMian) x1, " nie ", (JestSa) x1, " teraz zamknięt", (KoncY) x1, " na klucz.";
+        2:  print_ret (CMian) x1, " nie ", (JestSa) x1, " teraz ", (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), " na klucz.";
         3:  print_ret (CMian) x1, " nie ", (nop) PL(x1, "pasuje", "pasują"), " do zamka.";
         4:  Kto(actor, "Otwierasz", "otwiera"); " zamek ", (dop) x1, ".";
         5:  "(najpierw otwierasz zamek ", (dop) x1, ")";
@@ -1855,7 +1913,7 @@ Array pl_wielkosc --> 1;
   Wake:     "Niestety, to nie jest sen.";
   WakeOther:"To chyba niepotrzebne.";
   Wave: switch (n) {
-        1:  "Przecież nie trzymasz ", (JegoJejIch) x1, ".";
+        1:  "Przecież ", (JegoJejIch) x1, " nie trzymasz.";
         2:  print "Wyglądasz śmiesznie, machając ", (nar) x1;
             if (x2) " w stronę ", (dop) x2, ".";
             ".";
@@ -1871,7 +1929,7 @@ Array pl_wielkosc --> 1;
   Wear: switch (n) {
         1:  "Nie da się ", (JegoJejIch) x1, " założyć.";
         2:  "Nie trzymasz ", (JegoJejIch) x1, ".";
-        3:  "Masz już ", (GoJaJe) x1, " na sobie.";
+        3:  "Masz ", (GoJaJe) x1, " już na sobie.";
         4:  Kto(actor, "Zakładasz", "zakłada"); " ", (bie) x1, ".";
         5:  print "Najpierw musisz ";
             if (x2 has container) print "wyjąć "; else print "zdjąć ";
