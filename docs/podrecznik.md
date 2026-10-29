@@ -608,7 +608,7 @@ Otwierasz kamienne drzwi.
 
 Jeśli gracz ma klucz przy sobie, wystarczy samo „otwórz drzwi”: biblioteka sama otworzy zamek właściwym kluczem. Zamyka się analogicznie: „zamknij drzwi na klucz” (biblioteka znajdzie klucz pasujący do zamka, jakkolwiek by się nazywał), „zamknij drzwi kluczem” albo „zamknij drzwi na łańcuch”, jeśli zabezpieczeniem jest łańcuch. Odpowiedź gry nazywa użyty przedmiot w narzędniku: „Zamykasz kamienne drzwi kamiennym kluczem.”
 
-Po polsku nie ma osobnego czasownika na zamykanie zamka, dlatego „zablokuj” nie jest synonimem „zamknij na klucz”: gra może go użyć po swojemu, np. do zaklinowania drzwi.
+Po polsku nie ma osobnego czasownika na zamykanie zamka, dlatego „zablokuj” nie jest synonimem „zamknij na klucz”: gra może go użyć po swojemu, np. do zaklinowania drzwi. Jak pisać reguły dla zamków, zmieniać komunikaty i wyłączać automatyczne otwieranie zamka, opisuje [suplement](suplement.md#zamki-i-klucze).
 
 ---
 

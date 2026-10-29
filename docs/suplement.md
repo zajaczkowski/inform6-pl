@@ -1215,7 +1215,7 @@ Extend 'zamknij' first * noun = DefaultLockTest -> DefaultLock;
 Extend 'otwórz' first * noun = DefaultUnlockTest -> DefaultUnlock;
 ```
 
-Po angielsku zamykanie i zamykanie na klucz to dwa różne czasowniki (*close* i *lock*), podobnie jak otwieranie i otwieranie kluczem (*open* i *unlock*). Po polsku „zamknij” i „otwórz” służą do obu czynności. Dlatego w odróżnieniu od oryginału filtry sprawdzają też stan przedmiotu: „zamknij” otwartą szafkę po prostu zamyka, a dopiero „zamknij” zamkniętą – zamyka na klucz. Tak samo „otwórz” otwiera kluczem tylko szafkę zamkniętą na klucz.
+Po angielsku zamykanie i zamykanie na klucz to dwa różne czasowniki (*close* i *lock*), podobnie jak otwieranie i otwieranie kluczem (*open* i *unlock*). Po polsku „zamknij” i „otwórz” służą do obu czynności. Dlatego w odróżnieniu od oryginału filtry sprawdzają też stan przedmiotu: „zamknij” otwartą szafkę po prostu zamyka, a dopiero „zamknij” zamkniętą – zamyka na klucz. Otwieranie zamka przy „otwórz” robi dziś sama biblioteka (rozdział 16, „Zamki i klucze”), więc w „Muzeum” filtr „otwórz” jest przede wszystkim przykładem techniki.
 
 ### Podmiana całej akcji: Replace
 
@@ -1276,6 +1276,46 @@ Kładka w „Muzeum” to drzwi, których `door_to` może zabić gracza – jeś
        door_to
        [;  if (children(player)~=0)
             {   deadflag=1;
+```
+
+### Zamki i klucze
+
+Obiekt z zamkiem ma atrybuty `lockable` (ma zamek) i `locked` (jest zamknięty na klucz) oraz właściwość `with_key`, która wskazuje klucz. Do zamykanych drzwi i pojemników dochodzi `openable`. Polska biblioteka tłumaczy polecenia gracza na zwykłe akcje biblioteki, więc **reguły `before` i `after` pisze się dla `Open`, `Close`, `Unlock` i `Lock`**:
+
+| Polecenie gracza | Co robi biblioteka |
+|---|---|
+| `otwórz drzwi` | `Open`; jeśli drzwi są zamknięte na klucz, a gracz ma właściwy klucz, najpierw `Unlock` jako działanie domyślne: „(najpierw otwierasz zamek mosiężnym kluczem)” |
+| `otwórz drzwi kluczem` | to samo, z kluczem wskazanym przez gracza; zły klucz: „Mosiężny klucz nie pasuje do zamka.” |
+| `otwórz łańcuch kluczem` | obiekt bez `openable`: samo `Unlock` |
+| `zamknij drzwi` | `Close` |
+| `zamknij drzwi na klucz` | `Lock` z kluczem, który gracz ma przy sobie i który pasuje do zamka – jakkolwiek się nazywa |
+| `zamknij drzwi kluczem`, `zamknij bramę na łańcuch` | `Lock` ze wskazanym przedmiotem; otwarte drzwi biblioteka najpierw zamyka |
+
+Komunikaty nazywają użyty przedmiot w narzędniku („Zamykasz kamienne drzwi kamiennym kluczem.”), więc pasują i do klucza, i do łańcucha czy karty. Obrazowy tekst dla konkretnego zabezpieczenia daje reguła `after`. Żadna z gier przykładowych nie ma takiego zamka, więc ten i następny przykład są napisane specjalnie dla suplementu:
+
+```inform
+Object -> brama "żelazn/a bram/a"
+  with with_key lancuch,
+       before_implicit [; if (action == ##Unlock) return 1; ],
+       after [;
+           Lock: "Owijasz łańcuch wokół prętów bramy i zatrzaskujesz kłódkę.";
+           Unlock: print "Zdejmujesz łańcuch z bramy.^"; rtrue;
+       ],
+  has static openable lockable female;
+```
+
+```
+>otwórz bramę
+Zdejmujesz łańcuch z bramy.
+Otwierasz żelazną bramę.
+```
+
+Właściwość `before_implicit` decyduje o działaniach domyślnych (tu: o otwieraniu zamka przy „otwórz bramę”). Zwraca 0 – wykonaj i powiedz „(najpierw …)”, 1 – wykonaj po cichu (tu tekst daje reguła `after`), 2 – nie wykonuj. Przy 2 samo „otwórz drzwi” odpowie, że drzwi są zamknięte na klucz, ale „otwórz drzwi kluczem” nadal zadziała, bo gracz wskazał klucz wprost. Globalna zmienna `no_implicit_actions` wyłącza wszystkie działania domyślne naraz.
+
+Jeśli do zamka pasuje kilka kluczy, `with_key` może być procedurą: dostaje kandydata w `second` i zwraca klucz, który pasuje.
+
+```inform
+       with_key [; if (second == klucz or wytrych) return second; return klucz; ],
 ```
 
 ### Drzwi, które powstają w czasie gry

@@ -24,6 +24,9 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
   niezależnie od jego nazwy, „na łańcuch” i narzędnik („wytrychem”) wskazują
   przedmiot wprost; odpowiedzi w narzędniku („Zamykasz drzwi mosiężnym
   kluczem.”).  Usunięte „zablokuj” jako synonim zamykania; dodane „zaklucz”.
+  `with_key` może być procedurą także dla „na klucz”; `before_implicit`
+  wyłącza tylko automatyczne otwieranie zamka, nie jawne „otwórz X kluczem”.
+  Opis dla autorów: suplement, rozdział 16, „Zamki i klucze”.
 - Komentarze w kodzie biblioteki w całości po polsku; usunięte angielskie
   pozostałości (słowo „the” w `ConTopic`).
 - Wydania tworzy automatycznie GitHub Actions po wypchnięciu tagu

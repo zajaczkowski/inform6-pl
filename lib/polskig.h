@@ -779,9 +779,19 @@ Array pl_wiersz --> INPUT_BUFFER_LEN;
 #Endif;
 
 ! Klucz do zamka obiektu o, jeśli aktor go trzyma (with_key), albo 0.
-[ PL_KluczDo o  k;
+! with_key może być procedurą, która dostaje kandydata w second.
+[ PL_KluczDo o  k i s;
     if (~~(o provides with_key)) return 0;
     k = o.with_key;
+    if (k ofclass Routine) {
+        s = second;
+        objectloop (i in actor) {
+            second = i;
+            if (o.with_key() == i) { second = s; return i; }
+        }
+        second = s;
+        return 0;
+    }
     if (k ofclass Object && k in actor) return k;
     return 0;
 ];
@@ -817,13 +827,16 @@ Global pl_klucz;    ! klucz podany w "otwórz X kluczem" dla ImplicitUnlock
 ! Działanie domyślne biblioteki: "otwórz drzwi" przy zamku zamkniętym na
 ! klucz.  Biblioteka 6.12 nie otwiera zamka sama; polska wersja otwiera go,
 ! jeśli aktor ma właściwy klucz: "(najpierw otwierasz zamek mosiężnym kluczem)".
-[ ImplicitUnlock obj  k res ks;
+! Gdy klucz podał gracz ("otwórz drzwi wytrychem"), before_implicit może
+! tylko wyciszyć komunikat (1), ale nie zablokować otwarcia zamka.
+[ ImplicitUnlock obj  k res ks jawny;
     if (obj hasnt locked) rfalse;
     k = pl_klucz; pl_klucz = 0;
+    jawny = (k ~= 0);
     if (k == 0) k = PL_KluczDo(obj);
     if (k == 0) rtrue;
     res = CheckImplicitAction(##Unlock, obj, k);
-    if (res >= 2) rtrue;
+    if (res >= 2) { if (jawny) res = 0; else rtrue; }
     ks = keep_silent; keep_silent = 1;
     <Unlock obj k, actor>;
     keep_silent = ks;
