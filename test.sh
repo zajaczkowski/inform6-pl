@@ -16,7 +16,7 @@ blad() { printf '  BŁĄD  %s\n' "$1"; bledy=$((bledy + 1)); }
 
 kompiluj() {    # kompiluj <plik .inf> <plik wynikowy> [opcje]
     zrodlo=$1; wynik=$2; shift 2
-    log=$("$INFORM6" -s "+include_path=lib,$INFORM6LIB" "$@" "$zrodlo" "$wynik" 2>&1)
+    log=$("$INFORM6" -s "+include_path=lib,extensions,$INFORM6LIB" "$@" "$zrodlo" "$wynik" 2>&1)
     if [ $? -ne 0 ] || printf '%s' "$log" | grep -qi 'warning'; then
         printf '%s\n' "$log" | grep -iE 'warning|error' | head -5
         return 1
@@ -108,6 +108,30 @@ if [ -n "$GLULXE" ]; then
 else
     echo "  (brak glulxe - przejścia Glulx pominięte; zob. ./przygotuj.sh)"
 fi
+
+# Dodatki (extensions/*.h): każdy ma grę przykładową <nazwa>_przyklad.inf
+# i skrypt przejścia, który kończy ją zwycięstwem.
+echo "Dodatki:"
+for zrodlo in extensions/*_przyklad.inf; do
+    [ -e "$zrodlo" ] || continue
+    g=$(basename "$zrodlo" .inf)
+    skrypt=extensions/$g.przejscie
+    bez_ogonkow "$skrypt" > "build/$g.ascii"
+    if kompiluj "$zrodlo" "build/$g.z5"; then
+        for s in "$skrypt" "build/$g.ascii"; do
+            opis="$g"; [ "$s" = "build/$g.ascii" ] && opis="$g (bez ogonków)"
+            if graj "build/$g.z5" 1 "$s" | grep -q "Zwyciężyłeś"; then ok "$opis"; else blad "$opis"; fi
+        done
+    else blad "$g.z5"; fi
+    if kompiluj "$zrodlo" "build/$g.ulx" -G '$DICT_CHAR_SIZE=4'; then
+        if [ -n "$GLULXE" ]; then
+            for s in "$skrypt" "build/$g.ascii"; do
+                opis="$g (Glulx)"; [ "$s" = "build/$g.ascii" ] && opis="$g (Glulx, bez ogonków)"
+                if graj_glulx "build/$g.ulx" 1 "$s" | grep -q "Zwyciężyłeś"; then ok "$opis"; else blad "$opis"; fi
+            done
+        fi
+    else blad "$g.ulx"; fi
+done
 
 echo
 if [ "$bledy" -eq 0 ]; then echo "Wszystkie testy przeszły."; else echo "Błędów: $bledy"; fi

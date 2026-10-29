@@ -808,7 +808,7 @@ Global pl_klucz;    ! klucz podany w "otwórz X kluczem" dla ImplicitUnlock
     k = PL_KluczDo(noun);
     if (k == 0) {
         if (noun has locked) return L__M(##Lock, 2, noun);
-        print_ret "Nie masz klucza do ", (dop) noun, ".";
+        return L__M(##Lock, 6, noun);
     }
     <<Lock noun k, actor>>;
 ];

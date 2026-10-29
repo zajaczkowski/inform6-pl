@@ -1540,6 +1540,7 @@ Array pl_wielkosc --> 1;
         5:  Kto(actor, "Zamykasz", "zamyka"); print " ", (bie) x1;   ! "mosiężnym kluczem", "łańcuchem"
             if (second) print " ", (nar) second; else print " na klucz";
             ".";
+        6:  "Nie masz klucza do ", (dop) x1, ".";   ! "zamknij X na klucz" bez klucza
     }
   Look: switch (n) {
         1:  print " (na ", (mie) x1, ")";
@@ -1680,7 +1681,7 @@ Array pl_wielkosc --> 1;
     }
   Open: switch (n) {
         1:  "Tego nie da się otworzyć.";
-        2:  print_ret (CMian) x1, " ", (JestSa) x1, " chyba ",
+        2:  print_ret (CMian) x1, " ", (JestSa) x1, " ",
                 (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), " na klucz.";
         3:  print_ret (CMian) x1, " ", (JestSa) x1, " już ", (nop) PL_PrzymZ(x1, "otwart", "otwarci"), ".";
         4:  Kto(actor, "Otwierasz", "otwiera"); print " ", (bie) x1, ". W środku";
@@ -1917,7 +1918,7 @@ Array pl_wielkosc --> 1;
     }
   Wait:     "Mija trochę czasu.";
   Wake:     "Niestety, to nie jest sen.";
-  WakeOther:"To chyba niepotrzebne.";
+  WakeOther:"Nie ma takiej potrzeby.";
   Wave: switch (n) {
         1:  "Przecież ", (JegoJejIch) x1, " nie trzymasz.";
         2:  print "Wyglądasz śmiesznie, machając ", (nar) x1;

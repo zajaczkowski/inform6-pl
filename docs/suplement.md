@@ -1318,6 +1318,8 @@ Jeśli do zamka pasuje kilka kluczy, `with_key` może być procedurą: dostaje k
        with_key [; if (second == klucz or wytrych) return second; return klucz; ],
 ```
 
+Zamki otwierane kodem („otwórz sejf kodem 15432”) nie należą do biblioteki standardowej; obsługuje je osobny dodatek [`szyfr.h`](../extensions/szyfr_instrukcja.md).
+
 ### Drzwi, które powstają w czasie gry
 
 Cyprys w „Krainie Przygód” pełni rolę drzwi prowadzących w górę. Po jego ścięciu gra usuwa drzewo, wstawia pień i przestawia wyjścia bagna:

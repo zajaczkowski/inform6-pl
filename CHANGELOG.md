@@ -17,7 +17,9 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
     (ziemia – ziemi, ale historia – historii),
   - „Miałeś w rękach: … lampę sodową” (biernik), „Odwiedzone miejsca: …”,
     szyk zaimków („Przecież go nie trzymasz”, „Masz go już na sobie”),
-    „Ten interpreter nie pozwala cofać ruchów”, przecinek przed „aby”.
+    „Ten interpreter nie pozwala cofać ruchów”, przecinek przed „aby”,
+  - bez kalki „chyba” (ang. *seems*): „Kamienne drzwi są zamknięte na klucz.”,
+    „Nie ma takiej potrzeby.”
 - Zamki: „otwórz drzwi kluczem” otwiera zamek i drzwi jednym poleceniem,
   samo „otwórz drzwi” otwiera zamek, jeśli gracz ma właściwy klucz
   (`ImplicitUnlock`), „zamknij drzwi na klucz” wybiera pasujący klucz
@@ -27,6 +29,14 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
   `with_key` może być procedurą także dla „na klucz”; `before_implicit`
   wyłącza tylko automatyczne otwieranie zamka, nie jawne „otwórz X kluczem”.
   Opis dla autorów: suplement, rozdział 16, „Zamki i klucze”.
+- Nowy katalog `extensions/` na dodatki spoza biblioteki standardowej;
+  pierwszy dodatek `szyfr.h` – zamki szyfrowe (właściwości `with_code`
+  i `lock_for`; „otwórz sejf kodem 15432”,
+  „wpisz 15432”, „zamknij sejf na szyfr”) z instrukcją
+  `szyfr_instrukcja.md` i grą przykładową sprawdzaną przez `test.sh`.
+  `build.sh` i `test.sh` mają `extensions/` na ścieżce dołączania.
+- Komunikat „Nie masz klucza do …” (`Lock` 6) idzie przez `L__M`, więc gra
+  i dodatki mogą go zmienić.
 - Komentarze w kodzie biblioteki w całości po polsku; usunięte angielskie
   pozostałości (słowo „the” w `ConTopic`).
 - Wydania tworzy automatycznie GitHub Actions po wypchnięciu tagu

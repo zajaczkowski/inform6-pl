@@ -1,0 +1,71 @@
+!% -Cu
+!% +language_name=polski
+! ==============================================================================
+!   Przykład użycia dodatku szyfr.h (zob. szyfr_instrukcja.md).
+!   Kompilacja z katalogu inform6-pl:
+!       narzedzia/bin/inform6 +include_path=lib,extensions,narzedzia/inform6lib \
+!           extensions/szyfr_przyklad.inf build/szyfr_przyklad.z5
+! ==============================================================================
+
+Include "PolskiZ";
+
+Constant Story "SZYFR";
+Constant Headline "^Przykład dodatku szyfr.h^";
+Constant MAX_SCORE 2;
+
+Include "Parser";
+Include "VerbLib";
+
+Object  Gabinet "Gabinet"
+  with  description
+            "Ciasny gabinet. W ścianie tkwi stalowy sejf, a na wschód prowadzą
+             pancerne drzwi z klawiaturą obok framugi.",
+        e_to drzwi,
+  has   light;
+
+Object  -> kartka "pożółkł/a kartk/a"
+  with  name 'notatka' 'notatkę' 'notatki',
+        description "Ktoś zapisał ołówkiem: ~sejf 15-43-2, drzwi 0042~.",
+  has   female;
+
+! Kod jako napis: liczą się wszystkie cyfry, także zera z przodu.
+Object  -> sejf "stalow/y sejf/"
+  with  with_code "15432",
+        description "Ciężki sejf z klawiaturą numeryczną.",
+        after [;
+            UnlockWithCode: "Zamek sejfu cicho szczęka i drzwiczki odskakują.";
+        ],
+  has   static container openable lockable locked;
+
+Object  -> -> akta "tajn/e akt/a+0"
+  with  name 'teczka' 'teczkę' 'dokumenty',
+        after [; Take: score++; "Bierzesz tajne akta. Teraz tylko stąd wyjść."; ],
+  has   pluralname neuter;
+
+! Kod jako liczba: zera z przodu nie mają znaczenia ("0042" i "42").
+Object  -> drzwi "pancern/e drzwi/"
+  with  with_code 42,
+        door_to Korytarz,
+        door_dir e_to,
+        description "Masywne drzwi bez klamki.",
+  has   scenery door openable lockable locked pluralname;
+
+! Osobny obiekt zamka: "wpisz kod na klawiaturze", "otwórz zamek kodem 42".
+Object  -> klawiatura "klawiatur/a"
+  with  name 'zamek' 'zamka' 'zamkiem' 'zamku',
+        lock_for drzwi,
+        description "Dziesięć wytartych klawiszy.",
+  has   scenery female;
+
+Object  Korytarz "Korytarz"
+  with  description "Korytarz prowadzi do wyjścia.",
+        w_to Gabinet,
+        initial [;
+            if (akta in player) { score++; deadflag = 2; }
+        ],
+  has   light;
+
+[ Initialise; location = Gabinet; ];
+
+Include "PolskiG";
+Include "szyfr";

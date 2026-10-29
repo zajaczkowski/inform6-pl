@@ -36,6 +36,7 @@ games/           gry: ruins_pl, alice_pl, toyshop_pl, advent_pl, balances_pl,
                  museum_pl, adventureland_pl (*.inf), gra testowa test.inf
                  oraz skrypty przejść *.przejscie
 docs/            podręcznik autora, suplement i podręcznik gracza
+extensions/      dodatki spoza biblioteki standardowej (np. szyfr.h – zamki szyfrowe)
 przygotuj.sh     pobiera i buduje narzędzia (do katalogu narzedzia/)
 build.sh         kompiluje jedną grę
 test.sh          kompiluje wszystkie gry i sprawdza je skryptami przejść
@@ -156,6 +157,14 @@ Wszystkie gry w `games/` to polskie tłumaczenia [przykładowych gier Inform 6 z
 | `adventureland_pl.inf` | „Kraina Przygód” | „Adventureland” (Scott Adams, wersja Inform Grahama Nelsona) | 100/100 punktów |
 
 „Ruiny” są przykładem, na którym opiera się [podręcznik](docs/podrecznik.md), a [suplement](docs/suplement.md) omawia mechanizmy z pozostałych gier.
+
+## Dodatki
+
+Katalog `extensions/` zawiera dodatki: funkcje, których nie ma w bibliotece standardowej Inform 6 i które nie są częścią polskiej wersji biblioteki. Gra dołącza je sama, po `Include "PolskiG";`. Każdy dodatek ma szczegółową instrukcję i grę przykładową, którą sprawdza `test.sh`.
+
+| Dodatek | Co robi | Instrukcja |
+|---|---|---|
+| `szyfr.h` | zamki szyfrowe: „otwórz sejf kodem 15432”, „wpisz 15432” | [szyfr_instrukcja.md](extensions/szyfr_instrukcja.md) |
 
 ## Testy
 

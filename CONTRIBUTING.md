@@ -18,6 +18,10 @@ Sztywne lub niepoprawne sformułowania w komunikatach to też błędy – warto 
 
 Te same testy uruchamia GitHub Actions przy każdym pushu i pull requeście.
 
+## Dodatki
+
+Funkcje, których nie ma w bibliotece standardowej Inform 6 (np. zamki szyfrowe), trafiają do katalogu `extensions/`, a nie do `lib/`. Dodatek to plik `.h` dołączany po `PolskiG`, z instrukcją `<nazwa>_instrukcja.md` i grą przykładową `<nazwa>_przyklad.inf` ze skryptem `<nazwa>_przyklad.przejscie`, który kończy ją zwycięstwem – `test.sh` sprawdza ją automatycznie. Komunikaty dodatek dodaje przez `LibraryExtensions` (`ext_messages`, `ext_printverb`), bez zmian w `lib/`.
+
 ## Styl
 
 - Kod biblioteki naśladuje styl biblioteki Inform 6.12: wcięcia czterema spacjami, komentarze po polsku.

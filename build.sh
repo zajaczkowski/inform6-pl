@@ -13,4 +13,4 @@ shift
 ext=z5
 case " $* " in *" -G "*) ext=ulx; set -- "\$DICT_CHAR_SIZE=4" "$@" ;; esac
 mkdir -p build
-"$INFORM6" -s "+include_path=lib,$INFORM6LIB" "$@" "games/$game.inf" "build/$game.$ext"
+"$INFORM6" -s "+include_path=lib,extensions,$INFORM6LIB" "$@" "games/$game.inf" "build/$game.$ext"

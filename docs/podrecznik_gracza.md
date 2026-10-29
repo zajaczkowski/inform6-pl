@@ -312,7 +312,7 @@ Trzeba wtedy odłożyć coś niepotrzebnego.
 >zamknij bramę na łańcuch
 ```
 
-Drzwi zamknięte na klucz otwiera się kluczem: `otwórz drzwi kluczem`. Jeśli masz właściwy klucz przy sobie, wystarczy `otwórz drzwi` – gra sama otworzy zamek. Zamykasz `zamknij drzwi na klucz` albo `zamknij drzwi kluczem`; przy „na klucz” gra sama wybierze klucz, który pasuje.
+Drzwi zamknięte na klucz otwiera się kluczem: `otwórz drzwi kluczem`. Jeśli masz właściwy klucz przy sobie, wystarczy `otwórz drzwi` – gra sama otworzy zamek. Zamykasz `zamknij drzwi na klucz` albo `zamknij drzwi kluczem`; przy „na klucz” gra sama wybierze klucz, który pasuje. W grach z zamkami szyfrowymi kod podaje się tak: `otwórz sejf kodem 15432` albo `wpisz 15432`.
 
 ### Włączanie i wyłączanie
 
