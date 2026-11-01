@@ -4227,9 +4227,10 @@ Verb 'policz' 'przelicz' 'zlicz'
 Extend only 'kopnij' first
     * noun                  -> Kick;
 
-Verb 'użyj' 'wykorzystaj'
+Extend 'użyj' replace
     *                       -> Use
     * noun                  -> Use;
+Verb 'wykorzystaj' = 'użyj';
 
 ! ------------------------------------------------------------------------------
 !   Teleportacja (korzysta też z punktu wejścia UnknownVerb)

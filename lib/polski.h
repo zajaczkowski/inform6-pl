@@ -164,10 +164,10 @@ Constant BUT3__WD       = 'wyjąwszy';
 Constant ME1__WD        = 'mnie';
 Constant ME2__WD        = 'siebie';
 Constant ME3__WD        = 'sobie';
-Constant OF1__WD        = 'z//';
-Constant OF2__WD        = 'ze';
+Constant OF1__WD        = 'spośród';
+Constant OF2__WD        = 'pośród';
 Constant OF3__WD        = 'spośród';
-Constant OF4__WD        = 'spośród';
+Constant OF4__WD        = 'pośród';
 Constant OTHER1__WD     = 'inny';
 Constant OTHER2__WD     = 'inna';
 Constant OTHER3__WD     = 'inne';
@@ -290,6 +290,14 @@ Array LanguageNumbers table
 ! - słowa, których nie ma w słowniku, próbuje rozpoznać bez polskich liter
 !   ("królowa" pasuje do 'krolowa' w starszych grach),
 ! - przywraca mianownik jako bieżący przypadek nazw.
+#Ifdef TARGET_GLULX;
+[ PL_SlowoGlulx i  w;
+    w = parse-->(i*3+1);
+    if (w == 0) w = PL_SlowoBezOgonkow(i+1);
+    return w;
+];
+#Endif; ! TARGET_
+
 [ LanguageToInformese i j start len at wlen;
     short_name_case = PRZYP_MIAN;
     ListaWPrzypadku(0);
@@ -304,6 +312,13 @@ Array LanguageNumbers table
         if (i > 0 && parse-->(i*2+1) == THEN1__WD or THEN2__WD or THEN3__WD
             && buffer->(parse->(i*4+1)) == ',')
             buffer->(parse->(i*4+1)) = ' ';
+        ! "weź klucz i potem upuść go": spójnik przed "potem" też nie łączy przedmiotów
+        if (i > 0 && parse-->(i*2+1) == THEN1__WD or THEN2__WD or THEN3__WD
+            && parse-->(i*2-1) == AND1__WD or AND2__WD or AND3__WD)
+        {
+            for (j=0 : j<parse->(i*4) : j++) buffer->(parse->(i*4+1)+j) = ' ';
+            if (i > 1 && buffer->(parse->(i*4-3)) == ',') buffer->(parse->(i*4-3)) = ' ';
+        }
         ! "połóż się" to leżenie ("kładź się"), a nie kładzenie czegoś
         if (i > 0 && parse-->(i*2+1) == 'się' or 'sie' && parse->(i*4) == 5
             && (parse-->(i*2-1) == 'połóż' || PL_SlowoBezOgonkow(i) == 'połóż')) {
@@ -321,12 +336,27 @@ Array LanguageNumbers table
     if (parse-->0 >= 2 && parse-->1 == 'na' or 'w//' or 'do' &&
         (PL_Kierunek(parse-->4) || (parse-->4 == 0 && PL_Kierunek(PL_SlowoBezOgonkow(2)))))
         for (j=0 : j<parse-->2 : j++) buffer->(parse-->3 + j) = ' ';
-    for (i=1 : i<parse-->0 : i++)
-        if (parse-->(i*3+1) == THEN1__WD or THEN2__WD or THEN3__WD
-            && buffer->(parse-->(i*3)) == ',')
-            buffer->(parse-->(i*3)) = ' ';
+    ! Na tym etapie słowa z polskimi literami nie mają jeszcze wpisu ze słownika.
+    for (i=1 : i<parse-->0 : i++) {
+        wlen = PL_SlowoGlulx(i);
+        at = PL_SlowoGlulx(i-1);
+        if (wlen == THEN1__WD or THEN2__WD or THEN3__WD) {
+            if (buffer->(parse-->(i*3)) == ',') buffer->(parse-->(i*3)) = ' ';
+            if (at == AND1__WD or AND2__WD or AND3__WD) {
+                for (j=0 : j<parse-->(i*3-1) : j++) buffer->(parse-->(i*3)+j) = ' ';
+                if (i > 1 && buffer->(parse-->(i*3-3)) == ',')
+                    buffer->(parse-->(i*3-3)) = ' ';
+            }
+        }
+        ! "połóż się" to leżenie: "kladz" bez ogonków czyta się jak 'kładź'.
+        if (wlen == 'się' or 'sie' && at == 'połóż') {
+            j = parse-->(i*3);
+            buffer->j = 'k'; buffer->(j+1) = 'l'; buffer->(j+2) = 'a';
+            buffer->(j+3) = 'd'; buffer->(j+4) = 'z';
+        }
+    }
     for (i=0 : i<parse-->0 : i++)
-        if (parse-->(i*3+1) == 'się' or 'sie') {
+        if (PL_SlowoGlulx(i) == 'się' or 'sie') {
             wlen = parse-->(i*3+2); at = parse-->(i*3+3);
             for (j=0 : j<wlen : j++) buffer->(at+j) = ' ';
         }
@@ -334,6 +364,9 @@ Array LanguageNumbers table
     #Endif; ! TARGET_
     for (i=start+1 : i<len : i++)
         if (buffer->i == '-' && buffer->(i-1) == 'y') buffer->i = ' ';
+    ! "weź klucz!", "gdzie jest klucz?": znaki na końcu zdania nic nie znaczą
+    for (i=start : i<len : i++)
+        if (buffer->i == '!' or '?' && ~~PL_WCudzyslowie(i)) buffer->i = ' ';
 ];
 
 ! ------------------------------------------------------------------------------
@@ -781,6 +814,70 @@ Include "odmiana";
       'nastaw':                      print "nastawić";
       'wyreguluj':                   print "wyregulować";
       'dostosuj':                    print "dostosować";
+      'c//':                         print "poczekać";
+      'zapisz', 'save':              print "zapisać grę";
+      'wczytaj', 'załaduj', 'odczytaj', 'restore':
+                                     print "wczytać grę";
+      'koniec', 'zakończ', 'skończ', 'quit', 'q//', 'die':
+                                     print "zakończyć grę";
+      'restart', 'zrestartuj':       print "zacząć od nowa";
+      'weryfikuj', 'zweryfikuj', 'verify':
+                                     print "sprawdzić plik gry";
+      'zapis', 'transkrypcja', 'script', 'transcript':
+                                     print "zapisywać przebieg gry";
+      'noscript', 'unscript':        print "przestać zapisywać przebieg gry";
+      'nagrywaj', 'recording':       print "nagrywać polecenia";
+      'odtwórz', 'replay':           print "odtworzyć polecenia";
+      'graj':                        print "zagrać";
+      'mów':                         print "powiedzieć";
+      'ukryj':                       print "ukryć";
+      'łam', 'złam':                 print "złamać";
+      'zepsuj':                      print "zepsuć";
+      'budź':                        print "obudzić";
+      'zamykaj':                     print "zamknąć";
+      'otwieraj':                    print "otworzyć";
+      'siadaj':                      print "usiąść";
+      'wstawaj':                     print "wstać";
+      'użyj':                        print "użyć";
+      'wróć':                        print "wrócić";
+      'opisy', 'brief', 'verbose', 'long', 'superbrief', 'short', 'normal':
+                                     print "zmienić tryb opisów";
+      'powiadamiaj', 'powiadomienia', 'notify':
+                                     print "zmienić powiadamianie o wyniku";
+      'zaimki', 'pronouns', 'nouns': print "sprawdzić zaimki";
+      'wynik', 'punkty', 'score':    print "sprawdzić wynik";
+      'pełny', 'fullscore', 'full':  print "sprawdzić pełny wynik";
+      'wersja', 'version':           print "sprawdzić wersję gry";
+      'przedmioty', 'objects':       print "zobaczyć listę przedmiotów";
+      'miejsca', 'places':           print "zobaczyć listę miejsc";
+      'pomoc', 'help', 'instrukcja', 'podpowiedź', 'pomocy':
+                                     print "przeczytać pomoc";
+      'nie', 'n//':                  print "odpowiedzieć ~nie~";
+      'tak', 't//':                  print "odpowiedzieć ~tak~";
+      'przepraszam', 'wybacz', 'sorry':
+                                     print "przeprosić";
+      'obudź', 'zbudź', 'przebudź':  print "obudzić";
+      'ocknij':                      print "ocucić";
+      'pływaj':                      print "pływać";
+      'zanurkuj', 'nurkuj':          print "zanurkować";
+      'skocz':                       print "skoczyć";
+      'podskocz':                    print "podskoczyć";
+      'skacz':                       print "skakać";
+      'podskakuj':                   print "podskakiwać";
+      'zamachaj':                    print "zamachać";
+      'rozmyślaj':                   print "rozmyślać";
+      'rozglądaj', 'opis':           print "się rozejrzeć";
+      'nasłuchuj':                   print "nasłuchiwać";
+      'śpij':                        print "spać";
+      'zaśnij':                      print "zasnąć";
+      'ugnieć':                      print "ugnieść";
+      'zanuć':                       print "zanucić";
+      'nuć':                         print "nucić";
+      'chwyć':                       print "chwycić";
+      'umieść':                      print "umieścić";
+      'wyczyść':                     print "wyczyścić";
+      'obwąchaj':                    print "obwąchać";
+      'kręć':                        print "kręcić";
       default: rfalse;
     }
     rtrue;
@@ -810,7 +907,8 @@ Include "odmiana";
     if (nr > 1) return PRZYP_NAR;
     switch (v) {
       'napij', 'dotknij', 'szukaj', 'poszukaj', 'odszukaj', 'słuchaj',
-      'posłuchaj', 'użyj', 'skosztuj', 'spróbuj':
+      'posłuchaj', 'użyj', 'skosztuj', 'spróbuj', 'dotykaj', 'posmakuj',
+      'nasłuchuj':
           return PRZYP_DOP;
       'przyjrzyj':
           return PRZYP_CEL;
@@ -818,6 +916,14 @@ Include "odmiana";
           return PRZYP_NAR;
     }
     return PRZYP_BIE;
+];
+
+! Przyimek, którego czasownik wymaga, gdy gracz go pominął ("dmuchnij lampę":
+! "dmuchnąć w lampę", "wespnij drzewo": "się wspiąć na drzewo").
+[ PL_PrzyimekCzasownika v;
+    if (v == 'dmuchnij' or 'dmuchaj' or 'dmij' or 'zadmij') return "w";
+    if (v == 'wdrap' or 'wespnij' or 'wspnij' or 'wspinaj') return "na";
+    return 0;
 ];
 
 [ PrzypadekPoPrzyimku p v;
@@ -877,7 +983,11 @@ Global pl_bez_przyimka;     ! pomija końcowy przyimek w LanguageCommand
                 LanguageDirection(i.door_dir);
             else {
                 nr++;
-                if (przyp < 0) przyp = PrzypadekCzasownika(verb_word, i, nr);
+                if (przyp < 0) {
+                    przyp = PrzypadekCzasownika(verb_word, i, nr);
+                    if (nr == 1 && PL_PrzyimekCzasownika(verb_word))
+                        print (string) PL_PrzyimekCzasownika(verb_word), " ";
+                }
                 NazwaWPrzypadku(i, przyp);
             }
             przyp = -1;
@@ -909,10 +1019,17 @@ Global pl_bez_przyimka;     ! pomija końcowy przyimek w LanguageCommand
 ! Zadaje pytanie o brakujące dopełnienie, np. "Co chcesz wziąć?",
 ! "Do czego chcesz włożyć klucz?", "Komu chcesz dać klucz?".
 [ PytanieOBrak osoba aktor  k i p;
+    if (verb_word == 'powiedz' && aktor == player or nothing) "Komu chcesz to powiedzieć?";
+    if (verb_word == 'odpowiedz' && aktor == player or nothing) "Komu chcesz odpowiedzieć?";
     k = pcount - 1;
     while (k > 0 && pattern-->k == PATTERN_NULL) k--;
     i = pattern-->k;
-    if (k > 0 && i >= REPARSE_CODE) {
+    if (k == 0 && PL_PrzyimekCzasownika(verb_word)) {
+        if (PL_PrzyimekCzasownika(verb_word) == "w") print "W ";
+        else print "Na ";
+        ZaimekPytajacy(PRZYP_BIE, osoba);
+    }
+    else if (k > 0 && i >= REPARSE_CODE) {
         p = No__Dword(i-REPARSE_CODE);
         CapAddress(p);      ! przyimek z wielkiej litery, np. "Do"
         print " ";
@@ -1396,7 +1513,8 @@ Array pl_wielkosc --> 1;
             print ". "; PL_PrzymZ(x1, "Smaczn", "Smaczni"); ".";
     }
   EmptyT: switch (n) {
-        1:  print_ret (CMian) x1, " nie ", (nop) PL(x1, "może", "mogą"), " niczego zawierać.";
+        1:  if (x1 == player) "Nie jesteś pojemnikiem.";
+            print_ret (CMian) x1, " nie ", (nop) PL(x1, "może", "mogą"), " niczego zawierać.";
         2:  print_ret (CMian) x1, " ", (JestSa) x1, " ", (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), ".";
         3:  print_ret (CMian) x1, " ", (JestSa) x1, " już ", (nop) PL_PrzymZ(x1, "pust", "puści"), ".";
         4:  "To niczego by nie opróżniło.";
@@ -1440,6 +1558,15 @@ Array pl_wielkosc --> 1;
             "(najpierw wychodzisz ", (pl_z) x1, " ", (dop) x1, ")";
         6:  Kto(actor, "Wstajesz", "wstaje"); ".";
     }
+  PLGreet:    "Witaj.";
+  PLNoNeed:   "Nie ma takiej potrzeby.";
+  PLThanks:   "Nie ma za co.";
+  PLUse:      "Napisz dokładniej, co chcesz z tym zrobić.";
+  PLFind: switch (n) {
+        1:  print_ret (CMian) x1, " ", (JestSa) x1, " tutaj.";
+        2:  "Masz ", (GoJaJe) x1, " przy sobie.";
+        3:  "Nie musisz siebie szukać.";
+    }
   Fill: switch (n) {
         1:  "Nie ma tu niczego, czym można by napełnić ", (bie) x1, ".";
         2:  "Napełnianie ", (dop) x1, " ", (pl_z) x2, " ", (dop) x2, " nie miałoby sensu.";
@@ -1472,7 +1599,8 @@ Array pl_wielkosc --> 1;
         7:  Kto(actor, "Odchodzisz", "odchodzi"); ".";
     }
   Insert: switch (n) {
-        1:  "Musisz najpierw wziąć ", (bie) x1, ", żeby ", (GoJaJe) x1,
+        1:  if (x1 == player) "Siebie nie da się nigdzie włożyć.";
+            "Musisz najpierw wziąć ", (bie) x1, ", żeby ", (GoJaJe) x1,
             " gdzieś włożyć.";
         2:  print_ret (CMian) x1, " nie ", (nop) PL(x1, "może", "mogą"), " niczego zawierać.";
         3:  print_ret (CMian) x1, " ", (JestSa) x1, " ", (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), ".";
@@ -1637,7 +1765,8 @@ Array pl_wielkosc --> 1;
         37: "Można to zrobić tylko z kimś żywym.";
         38: "Nie znam takiego czasownika.";
         39: "W tej grze nie musisz się tym zajmować.";
-        40: "Nie widzisz teraz ~", (address) x1, "~ (", (dop) x2, ").";
+        40: if (x2 == player) "Nie zrozumiałem tego polecenia.";
+            "Nie widzisz teraz ~", (address) x1, "~ (", (dop) x2, ").";
         41: "Nie zrozumiałem końcówki tego polecenia.";
         42: if (x1 == 0) "Żadna z tych rzeczy nie jest dostępna.";
             if (x1 == 1) "Jest tylko jedna sztuka.";
@@ -1732,7 +1861,8 @@ Array pl_wielkosc --> 1;
         3:  "Nie w tę stronę.";
     }
   PutOn: switch (n) {
-        1:  "Musisz najpierw wziąć ", (bie) x1, ", żeby ", (GoJaJe) x1,
+        1:  if (x1 == player) "Siebie nie da się nigdzie położyć.";
+            "Musisz najpierw wziąć ", (bie) x1, ", żeby ", (GoJaJe) x1,
             " gdzieś położyć.";
         2:  "Nie można położyć czegoś na samym sobie.";
         3:  "Kładzenie czegokolwiek na ", (mie) x1, " nic by nie dało.";

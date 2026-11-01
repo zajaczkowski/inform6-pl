@@ -562,6 +562,15 @@ Global pl_wpis_rodzic;
             if (idx == n && r < 3 && o has animate) {
                 pl_por_len = PL_Renderuj(pl_por, PL_SL_MAX, PL_WolaczG);
                 if (pl_por_len && PL_Porownaj(adr, len)) rtrue;
+                ! Celownik na -u obok -owi: "daj kotu", "psu", "bratu".
+                if (r == 0) {
+                    PL_Rozbierz(i, j);
+                    if (pl_s_len < PL_SL_MAX) {
+                        for (p=0 : p<pl_s_len : p++) pl_por-->p = pl_s-->p;
+                        pl_por-->pl_s_len = 'u'; pl_por_len = pl_s_len+1;
+                        if (PL_Porownaj(adr, len)) rtrue;
+                    }
+                }
             }
             idx++;
         }
@@ -715,6 +724,8 @@ Array pl_podmienione -> 64;
     for (i=1 : i<=NumberWords() : i++) {
         #Ifdef TARGET_ZCODE;
         ! Stałych ALL*__WD jest pięć: "oba" i jego odmiany parser czyta jak "obie".
+        ! Podobnie ME*__WD: "daj mi klucz" czyta się jak "daj mnie klucz".
+        if (parse-->(i*2-1) == 'mi' or 'mną' or 'ja') parse-->(i*2-1) = ME1__WD;
         if (parse-->(i*2-1) == 'oba' or 'obaj' or 'obydwa' or 'obydwie')
             parse-->(i*2-1) = ALL5__WD;
         if (parse-->(i*2-1) == 0) {
@@ -723,6 +734,7 @@ Array pl_podmienione -> 64;
             parse-->(i*2-1) = w;
         }
         #Ifnot; ! TARGET_GLULX
+        if (parse-->(i*3-2) == 'mi' or 'mną' or 'ja') parse-->(i*3-2) = ME1__WD;
         if (parse-->(i*3-2) == 'oba' or 'obaj' or 'obydwa' or 'obydwie')
             parse-->(i*3-2) = ALL5__WD;
         if (parse-->(i*3-2) == 0) {

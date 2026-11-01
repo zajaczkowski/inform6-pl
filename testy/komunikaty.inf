@@ -31,7 +31,7 @@ Array proby table o_m o_f o_n o_p o_a o_k o_r;
 Array akcje table
     ##Answer ##Ask ##Attack ##Blow ##Burn ##Buy ##Climb ##Close
     ##Consult ##Cut ##Dig ##Disrobe ##Drink ##Drop
-    ##Eat ##EmptyT ##Enter ##Examine ##Exit ##Fill ##FullScore ##GetOff ##Give
+    ##Eat ##EmptyT ##Enter ##Examine ##Exit ##Fill ##PLFind ##FullScore ##PLGreet ##PLNoNeed ##PLThanks ##PLUse ##GetOff ##Give
     ##Go ##Insert ##Inv ##Jump ##JumpIn ##JumpOn ##JumpOver ##Kiss ##Listen
     ##Lock ##Look ##LookUnder ##Mild ##No ##NotifyOff ##NotifyOn ##Objects
     ##Open ##Order ##Places ##Pray ##Pull ##Push ##PushDir ##PutOn ##Remove

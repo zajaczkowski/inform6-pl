@@ -267,7 +267,7 @@ Verb 'nakarm' 'karm'
     *                                           -> Nakarm
     * creature held                             -> Give reverse;
 
-Verb 'dmuchnij' 'dmuchaj' 'dmij' 'zadmij' 'zagraj'
+Verb 'dmuchnij' 'dmuchaj' 'dmij' 'zadmij' 'zagraj' 'graj'
     * held                                      -> Blow
     * 'w//'/'we'/'na' held                      -> Blow;
 
@@ -321,7 +321,7 @@ Verb 'nie' 'n//'
 Verb 'obejrzyj' 'zbadaj' 'opisz' 'ob' 'x//' 'przyjrzyj' 'zobacz' 'oglądaj'
     * noun                                      -> Examine;
 
-Verb 'obudź' 'zbudź' 'ocknij' 'przebudź'
+Verb 'obudź' 'zbudź' 'ocknij' 'przebudź' 'budź'
     *                                           -> Wake
     * creature                                  -> WakeOther;
 
@@ -335,7 +335,7 @@ Verb 'opróżnij' 'wysyp' 'wylej' 'wypróżnij'
 
 ! "otwórz drzwi kluczem" otwiera zamek i drzwi (OtworzKluczem); "odklucz"
 ! i "odblokuj" zostają jako mniej typowe synonimy.
-Verb 'otwórz' 'odsłoń' 'rozwiń' 'odblokuj' 'odklucz'
+Verb 'otwórz' 'odsłoń' 'rozwiń' 'odblokuj' 'odklucz' 'otwieraj'
     * noun                                      -> Open
     * noun held                                 -> OtworzKluczem
     * noun 'za' 'pomocą' held                   -> OtworzKluczem;
@@ -424,7 +424,7 @@ Verb 'powąchaj' 'wąchaj' 'obwąchaj'
     *                                           -> Smell
     * noun                                      -> Smell;
 
-Verb 'powiedz'
+Verb 'powiedz' 'mów'
     * creature 'o//' topic                      -> Tell
     * creature topic                            -> Answer reverse
     * topic 'do' creature                       -> Answer;
@@ -469,7 +469,7 @@ Verb 'rzuć' 'ciśnij' 'wyrzuć' 'upuść' 'porzuć'
     * multiexcept 'do' noun                     -> Insert
     * multiexcept 'na' noun                     -> PutOn;
 
-Verb 'schowaj' 'włóż' 'wsadź' 'wrzuć' 'wetknij'
+Verb 'schowaj' 'włóż' 'wsadź' 'wrzuć' 'wetknij' 'ukryj'
     * held                                      -> Wear
     * multiexcept 'do'/'w//'/'we' noun          -> Insert
     * multiexcept 'pod'/'na' noun               -> PutOn;
@@ -496,10 +496,34 @@ Verb 'sprawdź' 'skonsultuj'
 Verb 'spróbuj' 'skosztuj' 'posmakuj' 'poliż'
     * noun                                      -> Taste;
 
-Verb 'stań' 'usiądź' 'siądź' 'kładź'
+Verb 'stań' 'usiądź' 'siądź' 'siadaj' 'kładź'
     * 'na'/'w//'/'we' noun                      -> Enter;
 
+! Polecenia bez odpowiednika w bibliotece standardowej, których gracz może
+! spróbować: odpowiedź zamiast "Nie znam takiego czasownika".
+[ PLGreetSub;  L__M(##PLGreet);  ];
+[ PLNoNeedSub; L__M(##PLNoNeed); ];
+[ PLThanksSub; L__M(##PLThanks); ];
+[ PLUseSub;    L__M(##PLUse);    ];
+
+Verb 'cześć' 'witaj' 'żegnaj' *   -> PLGreet;
+Verb 'dziękuję' 'dzięki'              *   -> PLThanks;
+Verb 'rozbierz'                       *   -> PLNoNeed;
+Verb 'wróć'                           *   -> VagueGo;
+Verb 'użyj'                           * noun -> PLUse;
+Extend only 'umyj' first              *   -> PLNoNeed
+                                      * 'ręce'/'twarz' -> PLNoNeed;
+
+! "znajdź klucz", "szukaj klucza": w zasięgu, bo inaczej parser odpowie, że
+! niczego takiego nie widać.
+[ PLFindSub;
+    if (noun == player) return L__M(##PLFind, 3);
+    if (noun in player) return L__M(##PLFind, 2, noun);
+    L__M(##PLFind, 1, noun);
+];
+
 Verb 'szukaj' 'poszukaj' 'odszukaj' 'znajdź'
+    * noun                                      -> PLFind
     * topic 'w//'/'we' noun                     -> Consult
     * 'w//'/'we'/'na' noun                      -> Search
     * 'pod'/'za' noun                           -> LookUnder;
@@ -513,7 +537,7 @@ Verb 'śpiewaj' 'zaśpiewaj' 'zanuć' 'nuć'
 Verb 'tak' 't//'
     *                                           -> Yes;
 
-Verb 'uderz' 'walnij' 'kopnij' 'zaatakuj' 'atakuj' 'zabij' 'zniszcz' 'rozbij' 'połam' 'bij'
+Verb 'uderz' 'walnij' 'kopnij' 'zaatakuj' 'atakuj' 'zabij' 'zniszcz' 'rozbij' 'połam' 'łam' 'złam' 'zepsuj' 'bij'
     * noun                                      -> Attack
     * 'w//'/'we' noun                           -> Attack
     * noun held                                 -> Attack;
@@ -542,7 +566,7 @@ Verb 'zapal' 'odpal'
     * noun                                      -> Burn
     * noun held                                 -> Burn;
 
-Verb 'wstań' 'wysiądź' 'wyjdź' 'zsiądź'
+Verb 'wstań' 'wysiądź' 'wyjdź' 'zsiądź' 'wstawaj'
     *                                           -> Exit
     * noun=ADirection                           -> Go
     * 'na'/'w//'/'do' noun=ADirection           -> Go
@@ -568,7 +592,7 @@ Verb 'wyłącz' 'zgaś'
 ! "zamknij drzwi na klucz" bierze klucz pasujący do zamka, jakkolwiek się
 ! nazywa (ZamknijNaKlucz); "na łańcuch", "na kłódkę" i narzędnik ("kluczem",
 ! "wytrychem") wskazują przedmiot wprost.
-Verb 'zamknij' 'zaklucz'
+Verb 'zamknij' 'zaklucz' 'zamykaj'
     * noun                                      -> Close
     * noun 'na' 'klucz'                         -> ZamknijNaKlucz
     * noun held                                 -> Lock
@@ -583,7 +607,12 @@ Verb 'zajrzyj'
     * 'pod'/'za' noun                           -> LookUnder;
 
 Verb 'załóż' 'ubierz' 'nałóż' 'wdziej'
-    * held                                      -> Wear;
+    * held                                      -> Wear
+    * creature held                             -> Give reverse
+    * held creature                             -> Give;
+
+Extend only 'ubierz' first
+    *                                           -> PLNoNeed;
 
 Verb 'zapytaj' 'pytaj' 'spytaj'
     * creature 'o//' topic                      -> Ask;

@@ -847,7 +847,7 @@ Object  priest "zmumifikowan/y kapłan/"
 | `daj gazetę kapłanowi` | `Give` | gazeta | kapłan |
 | `kapłanie, idź na północ` | rozkaz: `Go` w `orders` | | |
 
-W rozkazach gracz zwraca się do postaci w wołaczu. U żywych postaci w liczbie pojedynczej biblioteka rozumie go sama: wołacz rzeczowników męskich jest zwykle równy miejscownikowi („kapłanie”, „kucharzu”), a rzeczowniki na -a dostają -o lub, po si, ci, zi, ni, -u („kucharko”, „królowo”, „Kasiu”, „ciociu”). Formy nieregularne i zdrobnienia trzeba dopisać do `name` (w „Sklepie z zabawkami”: `'krzysiu'`).
+W rozkazach gracz zwraca się do postaci w wołaczu. U żywych postaci w liczbie pojedynczej biblioteka rozumie go sama: wołacz rzeczowników męskich jest zwykle równy miejscownikowi („kapłanie”, „kucharzu”), a rzeczowniki na -a dostają -o lub, po si, ci, zi, ni, -u („kucharko”, „królowo”, „Kasiu”, „ciociu”). Formy nieregularne i zdrobnienia trzeba dopisać do `name` (w „Sklepie z zabawkami”: `'krzysiu'`). Tak samo biblioteka rozumie celownik męski na -u („kotu”, „psu”), choć drukuje go z -owi; właściwą formę drukowaną podaje `desc_cel`.
 
 ---
 

@@ -181,7 +181,7 @@ Polecenie `zaimki` pokazuje, do czego odnosi się teraz każdy zaimek.
 >weź grzyb, potem zjedz go
 ```
 
-Kolejne polecenia oddziela kropka albo słowo „potem”. Słowo `wszystko` działa przy braniu, odkładaniu i wkładaniu. Tak samo liczba mnoga: `weź klucze` bierze wszystkie klucze w zasięgu.
+Kolejne polecenia oddziela kropka albo słowo „potem”. Znaki `!` i `?` na końcu polecenia nie przeszkadzają, a kolejne polecenie może zaczynać się od „i potem” lub „a następnie”. Słowo `wszystko` działa przy braniu, odkładaniu i wkładaniu. Tak samo liczba mnoga: `weź klucze` bierze wszystkie klucze w zasięgu.
 
 ### „Się” możesz pomijać
 

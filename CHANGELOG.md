@@ -6,6 +6,21 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
 
 ## Niewydane
 
+- Najdziwniejsze polecenia (każdy czasownik gramatyki z obiektami każdego rodzaju):
+  - bezokoliczniki wszystkich czasowników w „Zrozumiałem tylko tyle, że chcesz…”,
+    dopełniacz („dotykać kota”) i przyimek („dmuchnąć w lampę”, „się wspiąć na
+    drzewo”, „W co chcesz dmuchnąć?”),
+  - celownik na -u: „daj kotu”, „psu”, „bratu”; „daj mi klucz” („mi”, „mną”, „ja”),
+  - „znajdź klucz”, „szukaj klucza”; „wyjmij wszystko ze skrzyni” (dotąd „ze” było
+    czytane jak angielskie *of*),
+  - „weź klucz i potem upuść go”, „…, a następnie…”; „!” i „?” na końcu polecenia,
+  - „załóż kotu czapkę”, „Komu chcesz to powiedzieć?”, „Nie jesteś pojemnikiem.”,
+  - nowe słowa: użyj, wróć, cześć, witaj, żegnaj, dziękuję, dzięki, rozbierz,
+    „umyj się”, „ubierz się”, ukryj, złam, łam, zepsuj, mów, graj, budź, zamykaj,
+    otwieraj, siadaj, wstawaj.  **Gra, która sama definiowała któryś z tych
+    czasowników dyrektywą `Verb`, musi użyć `Extend ... replace`.**
+- Glulx: „połóż się”, „potem” i „następnie” działają tak samo jak w maszynie Z.
+
 - Liczebniki na listach: właściwość `plural` można zapisać z „/” (`plural
   "złot/e monet/y"`) – biblioteka dobiera wtedy formę do liczby: „dwie złote
   monety”, „pięć złotych monet”, „dwadzieścia dwa małe klucze”.  Liczebnik zna
