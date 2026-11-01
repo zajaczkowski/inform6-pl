@@ -406,7 +406,7 @@ Include "odmiana";
 ! name_cel itd. (tak samo jak name); słowa spoza słownika porównywane są
 ! z name i name_* bez ogonków.
 [ LanguageRefers obj wnum  wd k;
-    if (PL_Odmienna(obj) && PL_Pasuje(obj, wnum)) rtrue;
+    if (PL_Odmienna(obj) && (PL_Mnoga(obj, wnum) || PL_Pasuje(obj, wnum))) rtrue;
     k = wn; wn = wnum; wd = NextWordStopped(); wn = k;
     if (obj provides name_dop && WordInProperty(wd, obj, name_dop)) rtrue;
     if (obj provides name_cel && WordInProperty(wd, obj, name_cel)) rtrue;
@@ -487,14 +487,16 @@ Include "odmiana";
 
 ! ------------------------------------------------------------------------------
 
-[ LanguageNumber n f;
+[ LanguageNumber n f  k;
     if (n == 0)    { print "zero"; rfalse; }
     if (n < 0)     { print "minus "; n = -n; }
     if (n >= 1000) {
         f = n/1000;
         if (f == 1) print "tysiąc";
         else {
+            k = pl_lista_wpis; pl_lista_wpis = 0;
             LanguageNumber(f);
+            pl_lista_wpis = k;
             Liczebnik(f, "", " tysiące", " tysięcy");
         }
         n = n%1000; f = 1;
@@ -518,7 +520,8 @@ Include "odmiana";
     if (f == 1) print " ";
     switch (n) {
       1:    print "jeden";
-      2:    print "dwa";
+      2:    if (pl_lista_wpis && pl_lista_wpis has female) print "dwie";
+            else print "dwa";
       3:    print "trzy";
       4:    print "cztery";
       5:    print "pięć";
@@ -1225,25 +1228,31 @@ Global pl_lista_od;
     return w;
 ];
 
-[ PL_CzasownikListy o  s n;
+! Z argumentem wtekscie drukuje wariant do wtrącenia: "(w którym jest ...)".
+[ PL_CzasownikListy o wtekscie  s n;
     while (o && o has concealed or scenery) o = sibling(o);
-    if (o == 0 || o has pluralname) { print (string) ARE__TX; return; }
-    if (o.list_together ~= 0) {
+    if (o == 0 || o has pluralname) n = 2;
+    else if (o.list_together ~= 0) {
         objectloop (s in parent(o)) if (s.list_together == o.list_together) n++;
     }
     else if (o.plural ~= 0) {
         objectloop (s in parent(o)) if (s.plural ~= 0 && Identical(o, s)) n++;
     }
     if (n >= 2 && n%10 >= 2 && n%10 <= 4 && (n%100 < 12 || n%100 > 14)) {
-        print (string) ARE__TX; return;
+        if (wtekscie) print (string) ARE2__TX; else print (string) ARE__TX;
+        return;
     }
-    print (string) IS__TX;
+    if (wtekscie) print (string) IS2__TX; else print (string) IS__TX;
 ];
 
 [ Tense present past;
     if (present == ARE__TX && pl_lista_od && ~~(player provides narrative_tense &&
         player.narrative_tense == PAST_TENSE)) {
         PL_CzasownikListy(pl_lista_od); return;
+    }
+    if (present == ARE2__TX && pl_wpis_rodzic && ~~(player provides narrative_tense &&
+        player.narrative_tense == PAST_TENSE)) {
+        PL_CzasownikListy(child(pl_wpis_rodzic), true); return;
     }
     if (player provides narrative_tense && player.narrative_tense == PAST_TENSE) {
         if (past == false) return;

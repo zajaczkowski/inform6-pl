@@ -851,7 +851,7 @@ Polecenie „Krzysztofie, połóż niebieski klocek na żółtym klocku” trafi
            give self ~general; rtrue;
 ```
 
-Reguły klocków sprawdzają flagę i wiedzą, że to wprawne ręce Krzysztofa, a nie niezgrabne ręce gracza. Gracz zwraca się do postaci w wołaczu, a biblioteka nie tworzy go sama, dlatego `name` Krzysztofa zawiera `'krzysztofie'` i `'krzysiu'`.
+Reguły klocków sprawdzają flagę i wiedzą, że to wprawne ręce Krzysztofa, a nie niezgrabne ręce gracza. Wołacz „Krzysztofie” biblioteka rozumie sama, bo jest równy miejscownikowi, ale zdrobnienia nie zgadnie, dlatego `name` Krzysztofa zawiera `'krzysiu'`.
 
 ### Postać, która rozumie polecenia po swojemu: grammar
 

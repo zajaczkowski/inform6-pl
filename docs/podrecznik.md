@@ -357,6 +357,22 @@ przerażająca przepaść / przerażającej przepaści / przerażającej przepa�
 przerażającą przepaść / przerażającą przepaścią / przerażającej przepaści
 ```
 
+### Identyczne obiekty i liczebniki
+
+Identyczne obiekty biblioteka zbiera na listach w jeden wpis, jeśli mają właściwość `plural`. Po polsku forma zależy od liczby, dlatego `plural` zapisuje się tak jak nazwę z `pluralname`, ze znakiem „/”:
+
+```inform
+Class Moneta
+  with short_name "złot/a monet/a", plural "złot/e monet/y"
+  has  female;
+```
+
+Biblioteka napisze wtedy „dwie złote monety”, ale „pięć złotych monet”, i dobierze czasownik: „są dwie”, ale „jest pięć”. Dopełniacz mnogi z alternacją podaje się jak zwykle: `"czerwon/e jabł/k=ek/a"`, `"biał/e owc/e+ie"`. Napis bez „/” jest drukowany dosłownie, a procedura sama decyduje o formie (przykład w `games/balances_pl.inf`).
+
+Dwa ograniczenia: liczebnik rodzaju męskoosobowego („dwaj rycerze”, „dwóch rycerzy”) nie jest obsługiwany, a napis w `list_together` zawsze dostaje liczebnik męski. Przy rzeczach rodzaju żeńskiego lepsza jest procedura `list_together` (zob. `games/toyshop_pl.inf`).
+
+Gracz może użyć liczby mnogiej w poleceniu nawet wtedy, gdy obiekty nie mają `plural`: „weź klucze” bierze wszystkie klucze w zasięgu, a przy poleceniach dla jednego obiektu („zbadaj klucze”) biblioteka pyta, o który chodzi. Końcówki liczby mnogiej biblioteka zgaduje; forma nieregularna („ludzie”, „dzieci”) wymaga słowa z flagą `//p` w `name`.
+
 ---
 
 ## 6. Teksty, które się zgadzają: przypadki, rodzaj i liczba
@@ -831,7 +847,7 @@ Object  priest "zmumifikowan/y kapłan/"
 | `daj gazetę kapłanowi` | `Give` | gazeta | kapłan |
 | `kapłanie, idź na północ` | rozkaz: `Go` w `orders` | | |
 
-W rozkazach gracz zwraca się do postaci w wołaczu: „kapłanie”. Biblioteka nie tworzy wołacza automatycznie, więc jeśli różni się on od mianownika, trzeba go dopisać do `name` (w „Sklepie z zabawkami”: `'krzysztofie'`).
+W rozkazach gracz zwraca się do postaci w wołaczu. U żywych postaci w liczbie pojedynczej biblioteka rozumie go sama: wołacz rzeczowników męskich jest zwykle równy miejscownikowi („kapłanie”, „kucharzu”), a rzeczowniki na -a dostają -o lub, po si, ci, zi, ni, -u („kucharko”, „królowo”, „Kasiu”, „ciociu”). Formy nieregularne i zdrobnienia trzeba dopisać do `name` (w „Sklepie z zabawkami”: `'krzysiu'`).
 
 ---
 

@@ -1,0 +1,129 @@
+!% -Cu
+!% +language_name=polski
+! ==============================================================================
+!   Test odmiany.  Przy starcie drukuje tabelę przypadków i listy z liczebnikami,
+!   a skrypt odmiana.przejscie sprawdza formy wpisywane przez gracza.  Wynik jest
+!   porównywany z plikiem odmiana.oczekiwane (zob. test.sh).
+! ==============================================================================
+
+Include "PolskiZ";
+
+Constant Story "ODMIANA";
+Constant Headline "^Test odmiany^";
+
+Include "Parser";
+Include "VerbLib";
+
+Class Moneta
+  with short_name "złot/a monet/a", plural "złot/e monet/y"
+  has  female;
+
+Class Klucz
+  with short_name "mał/y klucz/", plural "mał/e klucz/e";
+
+Class Jablko
+  with short_name "czerwon/e jabłk/o", plural "czerwon/e jabł/k=ek/a"
+  has  neuter;
+
+Object Sklad "Skład";
+Moneta -> m1;  Moneta -> m2;  Moneta -> m3;  Moneta -> m4;  Moneta -> m5;
+Moneta -> m6;  Moneta -> m7;  Moneta -> m8;  Moneta -> m9;  Moneta -> m10;
+Moneta -> m11; Moneta -> m12; Moneta -> m13; Moneta -> m14; Moneta -> m15;
+Moneta -> m16; Moneta -> m17; Moneta -> m18; Moneta -> m19; Moneta -> m20;
+Moneta -> m21; Moneta -> m22; Moneta -> m23; Moneta -> m24; Moneta -> m25;
+Klucz -> k1;  Klucz -> k2;  Klucz -> k3;  Klucz -> k4;  Klucz -> k5;
+Klucz -> k6;  Klucz -> k7;  Klucz -> k8;  Klucz -> k9;  Klucz -> k10;
+Klucz -> k11; Klucz -> k12; Klucz -> k13; Klucz -> k14; Klucz -> k15;
+Klucz -> k16; Klucz -> k17; Klucz -> k18; Klucz -> k19; Klucz -> k20;
+Klucz -> k21; Klucz -> k22; Klucz -> k23; Klucz -> k24; Klucz -> k25;
+Jablko -> j1;  Jablko -> j2;  Jablko -> j3;  Jablko -> j4;  Jablko -> j5;
+Jablko -> j6;  Jablko -> j7;  Jablko -> j8;  Jablko -> j9;  Jablko -> j10;
+Jablko -> j11; Jablko -> j12; Jablko -> j13; Jablko -> j14; Jablko -> j15;
+Jablko -> j16; Jablko -> j17; Jablko -> j18; Jablko -> j19; Jablko -> j20;
+Jablko -> j21; Jablko -> j22; Jablko -> j23; Jablko -> j24; Jablko -> j25;
+
+Object Pokoj "Pokój"
+  with description "Pusty pokój.",
+  has  light;
+
+Object -> skrzynia "skrzyni/a"
+  with name 'skrzynia' 'skrzynię' 'skrzyni' 'skrzynią'
+  has  female container open;
+
+Object -> kucharka "kuchark/a"
+  with orders [; Go: "Kucharka słucha."; ],
+  has  animate female;
+
+Object -> krolowa "królow/a!"
+  with orders [; Go: "Królowa słucha."; ],
+  has  animate female;
+
+Object -> kasia "Kasi/a"
+  with orders [; Go: "Kasia słucha."; ],
+  has  animate female proper;
+
+Object -> mlotek "ciężk/i młot/e=/k+e";
+
+Object -> klucz1 "żelazn/y klucz/";
+Object -> klucz2 "miedzian/y klucz/";
+Object -> lampa1 "czerwon/a lamp/a" has female;
+Object -> lampa2 "zielon/a lamp/a" has female;
+
+Object -> tablica "tablic/a"
+  with before [; Examine: print "Koniec^"; quit; ],
+  has  female;
+
+! Słowa nazw, odmiana każdego rodzaju w każdym przypadku.
+Object Probki "(próbki)";
+Object -> "stalow/y miecz/";
+Object -> "star/y kapłan/+ie" has animate;
+Object -> "pieśń/" has female;
+Object -> "kość/" has female;
+Object -> "krótk/a księg/a" has female;
+Object -> "ciepł/e mlek/o" has neuter;
+Object -> "drewnian/e drzwi/" has pluralname;
+Object -> "biał/e owc/e+ie" has pluralname female;
+Object -> "dzieln/i rycerz/e" has pluralname animate male;
+
+[ Tabela  o;
+    objectloop (o in Probki)
+        print (mian) o, " | ", (dop) o, " | ", (cel) o, " | ", (bie) o, " | ",
+              (nar) o, " | ", (mie) o, "^";
+];
+
+Global pl_rodzaj_testu;
+
+[ PierwszaKlasy  o;
+    objectloop (o in Sklad) {
+        if (pl_rodzaj_testu == 0 && o ofclass Moneta) return o;
+        if (pl_rodzaj_testu == 1 && o ofclass Klucz)  return o;
+        if (pl_rodzaj_testu == 2 && o ofclass Jablko) return o;
+    }
+    return 0;
+];
+
+[ Listy k  i;
+    while (child(skrzynia)) move child(skrzynia) to Sklad;
+    for (i=0 : i<k : i++) move PierwszaKlasy() to skrzynia;
+    print k, ": ";
+    <Search skrzynia>;
+    print k, ": ";
+    <Inv>;
+];
+
+Array liczby table 2 3 4 5 11 12 13 14 21 22 23 25;
+
+[ Initialise  i;
+    location = Pokoj;
+    move skrzynia to player;
+    print "Początek^Liczebniki w słowach:";
+    for (i=1 : i<=liczby-->0 : i++) print " ", (number) liczby-->i;
+    print " ", (number) 2000, " ", (number) 22000, "^";
+    Tabela();
+    for (pl_rodzaj_testu=0 : pl_rodzaj_testu<3 : pl_rodzaj_testu++)
+        for (i=1 : i<=liczby-->0 : i++) Listy(liczby-->i);
+    while (child(skrzynia)) move child(skrzynia) to Sklad;
+    move skrzynia to location;
+];
+
+Include "PolskiG";

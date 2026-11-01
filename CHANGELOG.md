@@ -6,6 +6,21 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
 
 ## Niewydane
 
+- Liczebniki na listach: właściwość `plural` można zapisać z „/” (`plural
+  "złot/e monet/y"`) – biblioteka dobiera wtedy formę do liczby: „dwie złote
+  monety”, „pięć złotych monet”, „dwadzieścia dwa małe klucze”.  Liczebnik zna
+  rodzaj żeński („dwie”, „dwadzieścia dwie”), a czasownik zgadza się z liczbą
+  także we wtrąceniu: „(w którym jest pięć monet)”.
+- Wołacz rzeczowników na -a u żywych postaci: „kucharko”, „królowo”, „Kasiu”.
+- Liczba mnoga w poleceniach bez `plural` i bez `//p`: „weź klucze”, „upuść
+  lampy” działają na wszystkie pasujące rzeczy; biblioteka rozumie też „oba”,
+  „obaj”, „obydwa” i „obydwie”.
+- Przymiotniki męskoosobowe na -i: „dzielnych rycerzy” zamiast „dzielnich”.
+- Glulx: nazwa pisana wielką literą nie gubi już polskich liter
+  („Krótka księga” zamiast „Krótka ksi?ga”).
+- Testy: `testy/odmiana.inf` i `testy/komunikaty.inf`, których wynik `test.sh`
+  porównuje co do znaku z plikami `testy/*.oczekiwane`.
+
 - Polszczyzna komunikatów i odmiany (przegląd wszystkich komunikatów biblioteki
   dla obiektów każdego rodzaju):
   - przymiotniki w rodzaju męskoosobowym: „rybacy są zamknięci/puści/otwarci”

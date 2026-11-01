@@ -874,6 +874,89 @@ Global pl_klucz;    ! klucz podany w "otwórz X kluczem" dla ImplicitUnlock
     rtrue;
 ];
 
+#Ifdef TARGET_GLULX;
+! Tekst w StorageForShortName trafia też, znak po znaku, do pl_nazwa_uni; bajty
+! zostają dla procedur, które je czytają (MatchWord).
+Constant PL_NAZWA_MAX 400;
+Array pl_nazwa_uni --> PL_NAZWA_MAX;
+Global pl_nazwa_uni_len;
+
+[ PrintToBuffer buf len a b c d e  i n str s;
+    if (buf ~= StorageForShortName)
+        return PL_PrintToBufferOryg(buf, len, a, b, c, d, e);
+    str = glk_stream_get_current();
+    s = glk_stream_open_memory_uni(pl_nazwa_uni, PL_NAZWA_MAX, filemode_Write, 0);
+    glk_stream_set_current(s);
+    if (b == 0) PrintAnything(a);
+    else if (metaclass(a) == Object && a.#b == WORDSIZE && metaclass(a.b) == String)
+        PrintAnything(a.b);
+    else PrintAnything(a, b, c, d, e);
+    glk_stream_set_current(str);
+    glk_stream_close(s, pl_wynik);
+    n = pl_wynik-->1; if (n > PL_NAZWA_MAX) n = PL_NAZWA_MAX;
+    pl_nazwa_uni_len = n;
+    if (n > len) n = len;
+    for (i=0 : i<n : i++) {
+        s = pl_nazwa_uni-->i;
+        if (s > 255) s = '?';
+        buf->(WORDSIZE+i) = s;
+    }
+    buf-->0 = n;
+    return n;
+];
+
+[ PrintFromBuffer buf no_break set_case centred  i j k;
+    if (buf ~= StorageForShortName)
+        return PL_PrintFromBufferOryg(buf, no_break, set_case, centred);
+    j = pl_nazwa_uni_len;
+    if (j && pl_nazwa_uni-->(j-1) == 10 or 13) j--;
+    if (centred) {
+        k = (ScreenWidth() - j) / 2;
+        if (k > 0) spaces k;
+    }
+    for (i=0 : i<j : i++) {
+        k = pl_nazwa_uni-->i;
+        switch (set_case) {
+          0:    break;
+          1:    if (i) set_case = 0;
+                else   k = UpperCase(k);
+          2:    if (i) k = LowerCase(k);
+                else   k = UpperCase(k);
+          3:           k = LowerCase(k);
+          4:           k = UpperCase(k);
+        }
+        PL_Znak(k);
+    }
+    if (no_break == false) new_line;
+    return j;
+];
+#Endif; ! TARGET_GLULX
+
+! Liczebniki na listach.  WriteListR drukuje "print (number) n, ' '", a potem
+! właściwość plural; liczebnik musi znać rodzaj, a plural liczbę, więc obiekt
+! wpisu i liczba idą przez zmienne ustawiane w obudowanych procedurach.
+[ EnglishNumber n; pl_liczba = n; LanguageNumber(n); ];
+
+[ PrintOrRun obj prop flag;
+    if (prop == plural && obj.#prop <= WORDSIZE && metaclass(obj.prop) == String) {
+        PL_DrukujMnoga(obj);
+        rtrue;
+    }
+    return PL_PrintOrRunOryg(obj, prop, flag);
+];
+
+[ WriteBeforeEntry o depth ipos sentencepos  r;
+    r = PL_WriteBeforeEntryOryg(o, depth, ipos, sentencepos);
+    if (r == 0) pl_lista_wpis = o;
+    return r;
+];
+
+[ WriteAfterEntry o depth stack_p;
+    pl_lista_wpis = 0; pl_wpis_rodzic = o;
+    PL_WriteAfterEntryOryg(o, depth, stack_p);
+    pl_wpis_rodzic = 0;
+];
+
 [ Identical o1 o2;                                     ! zob. odmiana.h
     if (~~PL_Identical(o1, o2)) rfalse;
     return PL_IdenticalOryg(o1, o2);

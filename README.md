@@ -40,6 +40,7 @@ extensions/      dodatki spoza biblioteki standardowej (np. szyfr.h – zamki sz
 przygotuj.sh     pobiera i buduje narzędzia (do katalogu narzedzia/)
 build.sh         kompiluje jedną grę
 test.sh          kompiluje wszystkie gry i sprawdza je skryptami przejść
+testy/           gry testowe odmiany i komunikatów z oczekiwanym wynikiem
 sciezki.sh       ustala, gdzie są narzędzia (używany przez build.sh i test.sh)
 ```
 
@@ -173,6 +174,8 @@ Katalog `extensions/` zawiera dodatki: funkcje, których nie ma w bibliotece sta
 ```
 
 Skrypt kompiluje wszystkie gry dla maszyny Z i dla Glulx – każde ostrzeżenie kompilatora jest traktowane jak błąd – a potem przechodzi każdą grę jej skryptem i sprawdza wynik końcowy z tabeli powyżej. Każda gra jest przechodzona w maszynie Z i w Glulx, skryptem z polskimi literami i tym samym skryptem bez ogonków. Te same testy uruchamia GitHub Actions przy każdej zmianie w repozytorium; skompilowane gry można pobrać z zakładki *Actions* jako artefakt `gry`.
+
+Katalog `testy/` zawiera dwie gry testowe. `odmiana.inf` sprawdza formy nazw, liczebniki na listach, wołacz i liczbę mnogą w poleceniach, a `komunikaty.inf` drukuje wszystkie komunikaty biblioteki dla obiektów każdego rodzaju. Wynik musi się zgadzać co do znaku z plikami `testy/*.oczekiwane`.
 
 Pojedynczą grę można przejść ręcznie:
 

@@ -390,7 +390,8 @@ Array pl_wynik --> 2;
     zen = (anim & 2 ~= 0); anim = anim & 1;
     PL_Rozbierz(b, e);
     przym = pl_przym || ((~~ostatnie) && PL_KoncPrzym(r));
-    if (przym || pl_k_len > 1) PL_PrzeniesI();
+    ! "dzielni rycerze": "i" to tutaj końcówka mianownika, nie część rdzenia.
+    if ((przym || pl_k_len > 1) && ~~(przym && r == 4)) PL_PrzeniesI();
     if (r >= 3) {
         if (przym) PL_PrzymiotnikMn(c, r == 4);
         else       PL_RzeczownikMn(c, r == 4, zen);
@@ -452,6 +453,95 @@ Array pl_wynik --> 2;
 
 [ PL_Desc o; PrintOrRun(o, pl_g1, true); ];
 
+! Wołacz rzeczowników na -a, jedyny, który różni się od pozostałych form:
+! "kucharko", "królowo", ale "Kasiu", "ciociu" (po si, ci, zi, ni).  Wołacz
+! pozostałych jest zwykle równy miejscownikowi ("kapłanie", "kucharzu").
+[ PL_WolaczG  i c;
+    PL_Rozbierz(pl_g1, pl_g2);
+    if (pl_n_len < 2 || pl_n-->(pl_n_len-1) ~= 'a') return;
+    for (i=0 : i<pl_n_len-1 : i++) PL_Znak(pl_n-->i);
+    if (pl_n_len >= 3 && pl_n-->(pl_n_len-2) == 'i') {
+        c = pl_n-->(pl_n_len-3);
+        if (c == 's' or 'c' or 'z' or 'n') { print "u"; return; }
+    }
+    print "o";
+];
+
+! Czy słowo adr/len to rdzeń pl_s z końcówką mianownika liczby mnogiej?
+! Reguła jest szeroka, bo typ końcówki zależy od rdzenia, a wpisane słowo
+! i tak musi zaczynać się od rdzenia tego obiektu.
+[ PL_KoncowkaMn adr len;
+    if (pl_s_len < 2 || pl_s_len+2 > PL_SL_MAX) rfalse;
+    for (pl_por_len=0 : pl_por_len<pl_s_len : pl_por_len++)
+        pl_por-->pl_por_len = pl_s-->pl_por_len;
+    pl_por_len = pl_s_len+1;
+    pl_por-->pl_s_len = 'y'; if (PL_Porownaj(adr, len)) rtrue;
+    pl_por-->pl_s_len = 'i'; if (PL_Porownaj(adr, len)) rtrue;
+    pl_por-->pl_s_len = 'e'; if (PL_Porownaj(adr, len)) rtrue;
+    pl_por-->pl_s_len = 'a'; if (PL_Porownaj(adr, len)) rtrue;
+    pl_por-->pl_s_len = 'i'; pl_por-->(pl_s_len+1) = 'e'; pl_por_len++;
+    return PL_Porownaj(adr, len);
+];
+
+! Czy słowo wnum to liczba mnoga słowa z nazwy obiektu wczytanej przez
+! PL_Odmienna(o) ("klucze", "złote", gdy obiektem jest "złot/y klucz/")?
+! Forma równa mianownikowi lub biernikowi liczby pojedynczej ("złote jabłko")
+! się nie liczy.  Przy tokenach wielu obiektów słowo działa jak "wszystkie":
+! "weź klucze" bierze wszystkie klucze.  Znacznik DICT_PLUR ustawiony tutaj
+! zostaje, bo TryGivenObject sprawdza słowa po kolei przez Refers.
+[ PL_Mnoga o wnum  adr len i j r anim c;
+    if (o has pluralname) rfalse;
+    adr = WordAddress(wnum); len = WordLength(wnum);
+    r = PL_Rodzaj(o); anim = (o has animate) + 2*(o has female);
+    while (i < pl_zn_len) {
+        if (pl_zn-->i == ' ') { i++; continue; }
+        j = i; while (j < pl_zn_len && pl_zn-->j ~= ' ') j++;
+        if (PL_MaUkosnik(i, j)) {
+            PL_Rozbierz(i, j);
+            if (PL_KoncPrzym(r) || pl_przym || pl_k_len > 1) PL_PrzeniesI();
+            if (PL_KoncowkaMn(adr, len)) {
+                pl_g1 = i; pl_g2 = j; pl_g5 = r; pl_g6 = anim;
+                for (c=PRZYP_MIAN : c<=PRZYP_BIE : c=c+PRZYP_BIE) {
+                    pl_g3 = c; pl_g4 = true;
+                    pl_por_len = PL_Renderuj(pl_por, PL_SL_MAX, PL_SlowoG);
+                    if (PL_Porownaj(adr, len)) rfalse;
+                    pl_g4 = false;
+                    pl_por_len = PL_Renderuj(pl_por, PL_SL_MAX, PL_SlowoG);
+                    if (PL_Porownaj(adr, len)) rfalse;
+                }
+                if (found_ttype == ELEMENTARY_TT && found_tdata == MULTI_TOKEN or
+                    MULTIHELD_TOKEN or MULTIEXCEPT_TOKEN or MULTIINSIDE_TOKEN)
+                    dict_flags_of_noun = dict_flags_of_noun | DICT_PLUR;
+                rtrue;
+            }
+        }
+        i = j;
+    }
+    rfalse;
+];
+
+! Liczba, przed którą stoi nazwa w liczbie mnogiej na liście, i obiekt, który
+! ją wymienia (zob. EnglishNumber i WriteBeforeEntry w polskig.h).
+Global pl_liczba;
+Global pl_lista_wpis;
+Global pl_wpis_rodzic;
+
+[ PL_SurowaMn o; print (string) o.plural; ];
+
+! Właściwość plural zapisana z "/": po 2, 3, 4 (22, 23...) mianownik ("dwie
+! złote monety"), po pozostałych liczbach dopełniacz ("pięć złotych monet").
+[ PL_DrukujMnoga o  i n p;
+    pl_zn_len = PL_Renderuj(pl_zn, PL_ZN_MAX, PL_SurowaMn, o);
+    for (i=0 : i<pl_zn_len : i++) if (pl_zn-->i == '/') n = 1;
+    if (n == 0) { print (string) o.plural; return; }
+    n = pl_liczba%10; p = PRZYP_DOP;
+    if (n >= 2 && n <= 4 && (pl_liczba%100 < 12 || pl_liczba%100 > 14)) p = PRZYP_MIAN;
+    if (o has pluralname) { PL_DrukujOdmiane(o, p); return; }
+    give o pluralname;
+    PL_DrukujOdmiane(o, p);
+    give o ~pluralname;
+];
+
 ! Czy słowo wnum to jakaś forma któregoś słowa z nazwy wczytanej przez
 ! PL_Odmienna(o), albo słowo z ręcznej formy desc_*?  Słowa nieodmienne
 ! ("wełny", "nad kominkiem") pasują w niezmienionej postaci.
@@ -468,6 +558,10 @@ Array pl_wynik --> 2;
                 pl_g3 = c;
                 pl_por_len = PL_Renderuj(pl_por, PL_SL_MAX, PL_SlowoG);
                 if (PL_Porownaj(adr, len)) rtrue;
+            }
+            if (idx == n && r < 3 && o has animate) {
+                pl_por_len = PL_Renderuj(pl_por, PL_SL_MAX, PL_WolaczG);
+                if (pl_por_len && PL_Porownaj(adr, len)) rtrue;
             }
             idx++;
         }
@@ -558,6 +652,11 @@ Replace Identical PL_IdenticalOryg;
 Replace MatchWord PL_MatchWordOryg;
 ! ImplicitUnlock zastąpione polską wersją (polskig.h): otwiera zamek kluczem.
 Replace ImplicitUnlock PL_ImplicitUnlockOryg;
+! Liczebniki na listach (polskig.h): "dwie monety", "pięć złotych monet".
+Replace EnglishNumber PL_EnglishNumberOryg;
+Replace PrintOrRun PL_PrintOrRunOryg;
+Replace WriteBeforeEntry PL_WriteBeforeEntryOryg;
+Replace WriteAfterEntry PL_WriteAfterEntryOryg;
 
 ! Glulx: tokenizer biblioteki 6.12.8 zakłada słownik z jednobajtowymi znakami,
 ! a polskie litery wymagają słownika Unicode ($DICT_CHAR_SIZE=4).  Polska wersja
@@ -565,6 +664,10 @@ Replace ImplicitUnlock PL_ImplicitUnlockOryg;
 ! czyta wiersz poleceń w Unicode (biblioteka czyta go w Latin-1, w którym nie
 ! ma większości polskich liter).
 #Ifdef TARGET_GLULX;
+! Glulx: PrintToBuffer zapisuje bajty, więc nazwa pisana wielką literą traciła
+! znaki spoza Latin-1 ("Krótka ksi?ga").  Polskie wersje w polskig.h.
+Replace PrintToBuffer PL_PrintToBufferOryg;
+Replace PrintFromBuffer PL_PrintFromBufferOryg;
 #Ifdef DICT_IS_UNICODE;
 Replace Tokenise__ PL_TokeniseOryg;
 Replace KeyboardPrimitive PL_KeyboardPrimitiveOryg;
@@ -611,12 +714,17 @@ Array pl_podmienione -> 64;
     for (i=0 : i<64 : i++) pl_podmienione->i = 0;
     for (i=1 : i<=NumberWords() : i++) {
         #Ifdef TARGET_ZCODE;
+        ! Stałych ALL*__WD jest pięć: "oba" i jego odmiany parser czyta jak "obie".
+        if (parse-->(i*2-1) == 'oba' or 'obaj' or 'obydwa' or 'obydwie')
+            parse-->(i*2-1) = ALL5__WD;
         if (parse-->(i*2-1) == 0) {
             w = PL_SlowoBezOgonkow(i);
             if (w == 0) w = PL_NIEZNANE; else if (i < 64) pl_podmienione->i = 1;
             parse-->(i*2-1) = w;
         }
         #Ifnot; ! TARGET_GLULX
+        if (parse-->(i*3-2) == 'oba' or 'obaj' or 'obydwa' or 'obydwie')
+            parse-->(i*3-2) = ALL5__WD;
         if (parse-->(i*3-2) == 0) {
             w = PL_SlowoBezOgonkow(i);
             if (w == 0) w = PL_NIEZNANE; else if (i < 64) pl_podmienione->i = 1;

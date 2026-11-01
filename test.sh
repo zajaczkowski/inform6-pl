@@ -133,6 +133,36 @@ for zrodlo in extensions/*_przyklad.inf; do
     else blad "$g.ulx"; fi
 done
 
+# Odmiana i komunikaty: wynik gry testowej ma się zgadzać co do znaku z plikiem
+# testy/*.oczekiwane.  Po świadomej zmianie brzmienia plik odświeża
+# ./test.sh --odswiez.
+normalizuj() {  # usuwa pasek stanu, znak zachęty, puste wiersze i powtórzenia
+    sed -n '/^Początek/,/^Koniec$/p' | sed 's/^> *//; s/^[0-9.]*: *//; s/ *$//' |
+        grep -vE 'Wynik: |Numer seryjny' | grep -v '^$' | awk '!s[$0]++'
+}
+
+echo "Odmiana i komunikaty:"
+for g in odmiana komunikaty; do
+    [ -e "testy/$g.przejscie" ] && wejscie=testy/$g.przejscie || wejscie=/dev/null
+    bez_ogonkow "$wejscie" > "build/$g.ascii"
+    if ! kompiluj "testy/$g.inf" "build/$g.z5"; then blad "$g.z5"; continue; fi
+    "$DFROTZ" -m -Z 0 -s 1 -w 250 "build/$g.z5" < "$wejscie" 2>&1 | normalizuj > "build/$g.wynik"
+    if [ "$1" = "--odswiez" ]; then cp "build/$g.wynik" "testy/$g.oczekiwane"; fi
+    for s in "$wejscie" "build/$g.ascii"; do
+        opis="$g"; [ "$s" = "build/$g.ascii" ] && opis="$g (bez ogonków)"
+        "$DFROTZ" -m -Z 0 -s 1 -w 250 "build/$g.z5" < "$s" 2>&1 | normalizuj > "build/$g.wynik"
+        if diff -u "testy/$g.oczekiwane" "build/$g.wynik" > "build/$g.roznice"; then ok "$opis"
+        else blad "$opis (zob. build/$g.roznice)"; fi
+    done
+    if kompiluj "testy/$g.inf" "build/$g.ulx" -G '$DICT_CHAR_SIZE=4'; then
+        if [ -n "$GLULXE" ]; then
+            graj_glulx "build/$g.ulx" 1 "$wejscie" | normalizuj > "build/$g.wynik"
+            if diff -u "testy/$g.oczekiwane" "build/$g.wynik" > "build/$g.roznice"; then ok "$g (Glulx)"
+            else blad "$g (Glulx; zob. build/$g.roznice)"; fi
+        fi
+    else blad "$g.ulx"; fi
+done
+
 echo
 if [ "$bledy" -eq 0 ]; then echo "Wszystkie testy przeszły."; else echo "Błędów: $bledy"; fi
 [ "$bledy" -eq 0 ]

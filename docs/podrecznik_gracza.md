@@ -400,6 +400,8 @@ Postaci można wydać polecenie: najpierw jej imię lub nazwa i przecinek, potem
 "Nie wolno mi opuszczać sanktuarium."
 ```
 
+Wołacz działa też przy imionach i nazwach żeńskich: `kucharko, idź na północ`, `Kasiu, daj mi klucz`.
+
 Nie każda postać cię posłucha – większość ma własne zdanie.
 
 W „Muzeum Informu” polecenia przyjmują także maszyny, w ten sam sposób – nazwa, przecinek, polecenie:
