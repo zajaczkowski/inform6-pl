@@ -83,3 +83,16 @@ Przy tworzeniu tej wersji korzystałem z asystenta AI – **Claude** firmy Anthr
 - testowaniu: przygotowaniu skryptów przejścia gier i wyszukiwaniu błędów językowych.
 
 Kierunek prac, decyzje projektowe i ocena wyników należały do mnie. Kod i teksty przygotowane z pomocą AI sprawdzałem przez kompilację, przejście gier skryptami testowymi i przegląd polszczyzny. Mimo to mogą zawierać błędy – zgłoszenia i poprawki są mile widziane.
+
+### Zakres testów
+
+Na końcu prac asystent wykonał serię szerokich testów językowych. Stale, przy każdej zmianie w repozytorium, działa `./test.sh`, a pozostałe testy były jednorazowe:
+
+- **Stałe (`./test.sh`):** kompilacja wszystkich gier dla maszyny Z i Glulx, każde ostrzeżenie kompilatora jest błędem; przejście każdej gry w obu maszynach, z polskimi literami i bez nich; porównanie co do znaku tabeli odmiany, liczebników na listach i około 1300 różnych wierszy komunikatów biblioteki, dla gracza, graczki i postaci każdego rodzaju jako wykonawców.
+- **Każdy czasownik z każdym rodzajem:** około 6700 poleceń, czyli każdy czasownik gramatyki z rzeczownikami wszystkich rodzajów, w czterech wariantach (maszyna Z i Glulx, z ogonkami i bez nich). Wyniki wariantów różniły się tylko wierszem z wersją interpretera.
+- **Odmiana w obie strony:** każda forma każdego obiektu ze wszystkich gier, zapisanego z ukośnikami, została podana parserowi, żeby sprawdzić, czy trafia we właściwy obiekt.
+- **Polecenia w prawdziwych grach:** ponad 8000 poleceń na maszynie Z i ponad 9000 na Glulxie, na obiektach dostępnych w wielu punktach przejścia każdej gry.
+- **Rzadkie sytuacje:** około 41 000 poleceń: dwa rzeczowniki naraz, rozkazy dla postaci, polecenia dla wielu rzeczy.
+- **Komunikaty parsera:** wywołane prawdziwymi poleceniami i dopisane do stałych testów.
+
+Testy automatyczne wykrywają błędy programu i rozbieżności, ale nie oceniają brzmienia tekstu. Odpowiedzi z tych testów AI przeglądało w dużej części, a nie w całości, zwłaszcza tam, gdzie powtarzał się jeden wzór. Automatyczna odmiana obejmuje też obiekty z gier, ale nie zastępuje czytelnika: proza tłumaczonych gier i podręczniki nie przeszły pełnej korekty człowieka. Nie sprawdzono też wyglądu w interpreterach graficznych.
