@@ -458,7 +458,7 @@ Nowego imienia nie ma w słowniku, dlatego `parse_name` porównuje je z poleceni
 
 ### Obiekty z klasy
 
-Osiem świec w „Sklepie” ma wspólną definicję w klasie, a każdą z nich tworzy krótki wiersz `Candle -> ->;`. Słowo słownika z dopiskiem `//p` jest oznaczone jako forma liczby mnogiej, dzięki czemu „weź świece” bierze wszystkie, a „weź świecę” – jedną:
+Osiem świec w „Sklepie” ma wspólną definicję w klasie, a każdą z nich tworzy krótki wiersz `Candle -> ->;`. Słowo słownika z dopiskiem `//p` jest oznaczone jako forma liczby mnogiej, dzięki czemu „weź świece” bierze wszystkie, a „weź świecę” – jedną. Mianownik liczby mnogiej („świece”) biblioteka rozpoznałaby sama (podręcznik, rozdział 5), ale pozostałe formy mnogie trzeba podać tak jak tutaj:
 
 ```inform
         name 'świece//p' 'świec//p' 'świecom//p' 'świecami//p' 'świecach//p'
@@ -482,7 +482,7 @@ Wartość -1 znaczy „identyczne”, a -2 – „różne”. Monety I Ching w �
 
 ### Wypisywanie grupy: list_together
 
-Angielska biblioteka wypisuje grupę jako „liczebnik + liczba mnoga”, co po polsku dałoby „osiem woskowe świece” i „dwa świece”. Polski liczebnik zgadza się bowiem z rodzajem (*dwie* świece, *dwa* klucze), a forma rzeczownika zależy od liczby (*dwie woskowe świece*, ale *osiem woskowych świec*). Rozwiązaniem jest **`list_together` w postaci procedury**. Biblioteka grupuje obiekty o tej samej wartości `list_together` i przed wypisaniem grupy wywołuje procedurę z `inventory_stage == 1`. Jeśli procedura zwróci prawdę, znaczy to, że sama wypisała całą grupę.
+Polski liczebnik zgadza się z rodzajem (*dwie* świece, *dwa* klucze), a forma rzeczownika zależy od liczby (*dwie woskowe świece*, ale *osiem woskowych świec*). Przy identycznych obiektach wystarcza `plural` zapisane z „/” (podręcznik, rozdział 5): `plural "woskow/e świec/e"`. Grupy złożonej z różnych obiektów ani opisu w rodzaju „osiem gwiazdek (trzy złote, …)” to nie załatwi. Rozwiązaniem jest wtedy **`list_together` w postaci procedury**. Biblioteka grupuje obiekty o tej samej wartości `list_together` i przed wypisaniem grupy wywołuje procedurę z `inventory_stage == 1`. Jeśli procedura zwróci prawdę, znaczy to, że sama wypisała całą grupę.
 
 Monety w „Równowadze” są z trzech metali i mogą leżeć razem. Procedura `ListaMonet` liczy je według metalu i wypisuje we właściwym przypadku:
 
@@ -1489,7 +1489,7 @@ Przy tłumaczeniu gier przykładowych powtarzały się te same problemy. Większ
 - **Form z odmiany nie ma w słowniku.** Parser je rozpoznaje, ale w tablicy `parse` mają wartość `PL_NIEZNANE`. Kod, który porównuje słowa ze stałymi słownikowymi (`switch(NextWord())`, `BeforeParsing`, `Ask` z listą słów), musi wymienić formy jawnie albo użyć `Refers` lub `SlowoW`.
 - **Słowo, które jest też przyimkiem.** „W”, „na”, „do” czy „z” w nazwie przedmiotu mogą zostać wzięte za przyimek polecenia (mucha w bursztynie, rozdział 8). Krótkie nieodmienne słowo z nazwy biblioteka uznaje za jej część tylko wtedy, gdy następne słowo również do nazwy pasuje.
 - **Listy wypisywane przez grę są w mianowniku.** `WriteListFrom` i `Locale` z własnym tekstem trzeba w razie potrzeby otoczyć wywołaniami `ListaWPrzypadku(…, PRZYP_BIE)` i `ListaWPrzypadku(0)`.
-- **Liczebniki.** Wszędzie tam, gdzie oryginał pisze „liczba + liczba mnoga”, po polsku potrzebne jest `Liczebnik(n, "moneta", "monety", "monet")`, a w rodzaju żeńskim także „dwie” zamiast „dwa”.
+- **Liczebniki.** Wszędzie tam, gdzie oryginał pisze „liczba + liczba mnoga”, po polsku potrzebne jest `Liczebnik(n, "moneta", "monety", "monet")`, a w rodzaju żeńskim także „dwie” zamiast „dwa”. Listy identycznych obiektów załatwia `plural` zapisane z „/”.
 - **Napisy od gracza tracą ogonki.** W słowach spoza słownika biblioteka zamienia polskie litery na litery bez ogonków, zanim gra je zobaczy. Tekst w cudzysłowie jest z tej zamiany wyłączony.
 - **`BeforeParsing` zwraca fałsz.** Jeśli zwróci prawdę (także przez gołe `return;`), biblioteka pomija swoje rozszerzenia, a wśród nich rozpoznawanie słów wpisanych bez ogonków. Gra, która w `BeforeParsing` porównuje słowa ze słownikiem, powinna na początku wywołać `PL_NieznaneSlowa()`, żeby widzieć `'biały'` także wtedy, gdy gracz napisał „bialy”.
 - **Słowo w słowniku maszyny Z ma najwyżej 9 z-znaków.** Dłuższe słowa są obcinane, więc „podpowiedź” i „podpowiedz” to dla parsera to samo słowo. Każda polska litera zajmuje w słowniku dwa z-znaki.
