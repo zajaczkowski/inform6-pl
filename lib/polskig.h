@@ -991,6 +991,13 @@ Global pl_nazwa_uni_len;
     pl_wpis_rodzic = 0;
 ];
 
+! "upuść krzesełko", gdy siedzi się na nim: biblioteka próbowałaby przenieść
+! je samo do siebie.
+[ DropSub;
+    if (IndirectlyContains(noun, actor)) return L__M(##Take, 4, noun);
+    PL_DropSubOryg();
+];
+
 [ Identical o1 o2;                                     ! zob. odmiana.h
     if (~~PL_Identical(o1, o2)) rfalse;
     return PL_IdenticalOryg(o1, o2);

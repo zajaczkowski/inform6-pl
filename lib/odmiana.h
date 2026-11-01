@@ -545,7 +545,7 @@ Global pl_wpis_rodzic;
 ! Czy słowo wnum to jakaś forma któregoś słowa z nazwy wczytanej przez
 ! PL_Odmienna(o), albo słowo z ręcznej formy desc_*?  Słowa nieodmienne
 ! ("wełny", "nad kominkiem") pasują w niezmienionej postaci.
-[ PL_Pasuje o wnum  adr len i j n idx c r anim p;
+[ PL_Pasuje o wnum kier  adr len i j n idx c r anim p s e;
     adr = WordAddress(wnum); len = WordLength(wnum);
     r = PL_Rodzaj(o); anim = (o has animate) + 2*(o has female);   ! bity: 1 żywotny, 2 żeński
     n = PL_Glowa();
@@ -575,16 +575,23 @@ Global pl_wpis_rodzic;
             idx++;
         }
         else {
-            pl_por_len = j-i;
+            s = i; e = j;       ! bez cudzysłowów: "Grotołaza Dzisiaj"
+            if (pl_zn-->s == '"') s++;
+            if (e > s && pl_zn-->(e-1) == '"') e--;
+            pl_por_len = e-s;
             if (pl_por_len > PL_SL_MAX) pl_por_len = PL_SL_MAX;
-            for (p=0 : p<pl_por_len : p++) pl_por-->p = pl_zn-->(i+p);
+            for (p=0 : p<pl_por_len : p++) pl_por-->p = pl_zn-->(s+p);
             ! Krótkie słowo nieodmienne ("do", "nad", "z") pasuje tylko wtedy,
-            ! gdy następne wpisane słowo też należy do nazwy: "piłeczkę do
+            ! gdy sąsiednie wpisane słowo też należy do nazwy: "piłeczkę do
             ! żonglowania" tak, ale w "włóż piłeczkę do pudełka" "do" to
-            ! przyimek polecenia.
+            ! przyimek polecenia.  Ostatnie słowo nazwy ("zbiór do gry", "krzesło
+            ! Ludwika XV") może oprzeć się na poprzednim.  kier: 1 szukaj tylko
+            ! w prawo, 2 tylko w lewo.
             if (PL_Porownaj(adr, len)) {
                 if (j-i > 3) rtrue;
-                if (wnum < NumberWords() && PL_Pasuje(o, wnum+1)) rtrue;
+                if (kier ~= 2 && wnum < NumberWords() && PL_Pasuje(o, wnum+1, 1)) rtrue;
+                if (kier == 1 && j >= pl_zn_len) rtrue;
+                if ((kier == 2 || j >= pl_zn_len) && wnum > 1 && PL_Pasuje(o, wnum-1, 2)) rtrue;
             }
         }
         i = j;
@@ -663,6 +670,8 @@ Replace MatchWord PL_MatchWordOryg;
 Replace ImplicitUnlock PL_ImplicitUnlockOryg;
 ! Liczebniki na listach (polskig.h): "dwie monety", "pięć złotych monet".
 Replace EnglishNumber PL_EnglishNumberOryg;
+! Upuszczanie rzeczy, na której się stoi (polskig.h).
+Replace DropSub PL_DropSubOryg;
 Replace PrintOrRun PL_PrintOrRunOryg;
 Replace WriteBeforeEntry PL_WriteBeforeEntryOryg;
 Replace WriteAfterEntry PL_WriteAfterEntryOryg;

@@ -467,6 +467,13 @@ Include "odmiana";
 ];
 
 [ NazwaWPrzypadku o c  old;
+    if (o == selfobj && player ~= selfobj) {    ! gracz w innym ciele ("Guziec")
+        switch (c) {
+          PRZYP_DOP:          print "twojego dawnego ja"; return;
+          PRZYP_CEL:          print "twojemu dawnemu ja"; return;
+          PRZYP_NAR, PRZYP_MIE: print "twoim dawnym ja"; return;
+        }
+    }
     if (o == player) { GraczWPrzypadku(c); return; }
     old = short_name_case; short_name_case = c;
     print (the) o;
@@ -958,6 +965,8 @@ Global pl_bez_przyimka;     ! pomija końcowy przyimek w LanguageCommand
 [ LanguageCommand from  i k spacing_flag przyp ostatni nr;
     if (from == 0) {
         i = verb_word;
+        ! Sam kierunek ("w lewo", "północ kota"): słowo nie jest czasownikiem.
+        if ((i->#dict_par1) & DICT_VERB == 0) { print "pójść w tę stronę"; return; }
         if (LanguageVerb(i) == 0 && PrintVerb(i) == false && LibraryExtensions.RunWhile(ext_printverb, false, i) == 0)
             print (address) i;
         from++; spacing_flag = true;
@@ -1701,7 +1710,7 @@ Array pl_wielkosc --> 1;
   Look: switch (n) {
         1:  print " (na ", (mie) x1, ")";
         2:  print " (", (pl_w) x1, " ", (mie) x1, ")";
-        3:  print " (jako ", (mian) x1, ")";
+        3:  short_name_case = PRZYP_MIAN; print " (jako ", (name) x1, ")";
         4:  print "^Na ", (mie) x1;
             PL_ListaZCzasownikiem(child(x1),
               ENGLISH_BIT+RECURSE_BIT+PARTINV_BIT+TERSE_BIT+CONCEAL_BIT+ISARE_BIT);

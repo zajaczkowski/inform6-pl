@@ -26,6 +26,10 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
   z ogonkami działa już jako polecenie, nie jako odpowiedź; „zapytaj kota”
   i „powiedz kotu” dopytują o treść; „Gdzie chcesz włożyć te rzeczy?”.
 - Odmiana nazw w grach: rój, plan, reflektor, przełącznik, kogut, rudzik, bizon, wąż.
+- Krótkie ostatnie słowa nazw rozumiane w poleceniach: „zbiór do gry”, „krzesło
+  Ludwika XV”, „strzałka w dół”, „kwadrat dwa na dwa”.
+- „upuść krzesełko”, gdy się na nim siedzi: komunikat zamiast błędu programu.
+- „w lewo”, „północ kota”: „chcesz pójść w tę stronę”; „twojego dawnego ja”.
 - Glulx: „połóż się”, „potem” i „następnie” działają tak samo jak w maszynie Z.
 
 - Liczebniki na listach: właściwość `plural` można zapisać z „/” (`plural
