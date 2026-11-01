@@ -62,7 +62,7 @@ Object -> kasia "Kasi/a"
   with orders [; Go: "Kasia słucha."; ],
   has  animate female proper;
 
-Object -> mlotek "ciężk/i młot/e=/k+e";
+Object -> mlotek "ciężk/i młot/e/k/";
 
 Object -> klucz1 "żelazn/y klucz/";
 Object -> klucz2 "miedzian/y klucz/";

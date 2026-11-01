@@ -1283,7 +1283,7 @@ BronzeCoin -> -> bronze_coin;
 GoldCoin -> ->;
 GoldCoin -> ->;
 
-Scroll -> -> crumpled_scroll "pognieciony zw/ó=o/j/+u";
+Scroll -> -> crumpled_scroll "pogniecion/y zw/ó=o/j/+u";
 Spell  -> -> -> urbzig_spell
   with name 'urbzig',
        purpose "zmienia groźny przedmiot w nieszkodliwy",

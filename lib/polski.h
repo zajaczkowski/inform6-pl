@@ -1039,6 +1039,14 @@ Global pl_bez_przyimka;     ! pomija końcowy przyimek w LanguageCommand
         if (k == 0 && verb_word == 'idź' or 'pójdź' or 'biegnij' or 'pobiegnij' or 'płyń' or 'popłyń')
             print "Dokąd";
         else {
+            if (k > 0 && i == 0 or 1 && ~~PL_Dawanie(verb_word)) {
+                ! "włóż klucz do": przyimka jeszcze nie ma we wzorcu
+                print "Gdzie chcesz ";
+                pl_bez_przyimka = true;
+                PrintCommand();
+                pl_bez_przyimka = false;
+                "?";
+            }
             p = PRZYP_NAR;
             if (k == 0) p = PrzypadekCzasownika(verb_word);
             if (PL_Dawanie(verb_word)) {
@@ -1317,10 +1325,17 @@ Global pl_pocz_przyp;
 [ NaW o; if (o has supporter) print "na"; else pl_w(o); ];
 
 ! Podmiot zdania: gracz lub inna postać (rozkazy).
-! Kto(actor, "Bierzesz", "bierze") -> "Bierzesz" albo "Kowal bierze".
-[ Kto a ty on;
-    if (a == player || a == 0) print (string) ty;
-    else print (CMian) a, " ", (string) on;
+! Kto(actor, "Bierzesz", "bierze", "biorą") -> "Bierzesz", "Kowal bierze" albo
+! "Rybacy biorą".  KtoM to samo w środku zdania: "kowal bierze".
+[ Kto a ty on oni;
+    if (a == player || a == 0) { print (string) ty; return; }
+    print (CMian) a, " ";
+    if (oni && a has pluralname) print (string) oni; else print (string) on;
+];
+[ KtoM a ty on oni;
+    if (a == player || a == 0) { print (string) ty; return; }
+    print (mian) a, " ";
+    if (oni && a has pluralname) print (string) oni; else print (string) on;
 ];
 
 [ nop x; x = x; ];      ! print rule to absorb unwanted return value
@@ -1380,7 +1395,7 @@ Global pl_lista_od;
 ];
 
 [ DecideAgainst;
-    Kto(actor, "Rezygnujesz", "rezygnuje");
+    Kto(actor, "Rezygnujesz", "rezygnuje", "rezygnują");
     " z tego pomysłu.";
 ];
 
@@ -1457,7 +1472,7 @@ Array pl_wielkosc --> 1;
   Close: switch (n) {
         1:  "Tego nie da się zamknąć.";
         2:  print_ret (CMian) x1, " ", (JestSa) x1, " już ", (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), ".";
-        3:  Kto(actor, "Zamykasz", "zamyka"); " ", (bie) x1, ".";
+        3:  Kto(actor, "Zamykasz", "zamyka", "zamykają"); " ", (bie) x1, ".";
         4:  "(najpierw zamykasz ", (bie) x1, ")";
     }
   CommandsOff: switch (n) {
@@ -1483,7 +1498,7 @@ Array pl_wielkosc --> 1;
         5: "[Odtwarzanie poleceń zakończone.]";
         #Endif; ! TARGET_
     }
-  Consult:  Kto(actor, "Nie znajdujesz", "nie znajduje");
+  Consult:  Kto(actor, "Nie znajdujesz", "nie znajduje", "nie znajdują");
             " niczego ciekawego w ", (mie) x1, ".";
   Cut: switch (n) {
         1:  "Przecięcie ", (dop) x1, " niewiele by dało.";
@@ -1492,7 +1507,7 @@ Array pl_wielkosc --> 1;
   Dig:      "Kopanie nic tu nie da.";
   Disrobe: switch (n) {
         1:  "Nie masz ", (JegoJejIch) x1, " na sobie.";
-        2:  Kto(actor, "Zdejmujesz", "zdejmuje"); " ", (bie) x1, ".";
+        2:  Kto(actor, "Zdejmujesz", "zdejmuje", "zdejmują"); " ", (bie) x1, ".";
         3:  "(najpierw zdejmujesz ", (bie) x1, ")";
         4:  "Najpierw musisz zdjąć ", (bie) x1, ".";
     }
@@ -1508,7 +1523,7 @@ Array pl_wielkosc --> 1;
     }
   Eat: switch (n) {
         1:  "Tego nie da się zjeść.";
-        2:  Kto(actor, "Zjadasz", "zjada"); print " ", (bie) x1;
+        2:  Kto(actor, "Zjadasz", "zjada", "zjadają"); print " ", (bie) x1;
             if (actor ~= player) ".";
             print ". "; PL_PrzymZ(x1, "Smaczn", "Smaczni"); ".";
     }
@@ -1530,7 +1545,7 @@ Array pl_wielkosc --> 1;
         3:  "Nie możesz wejść do zamknięt", (nop) Forma(x1, "ego", "ej", "ego", "ych"),
             " ", (dop) x1, ".";
         4:  "Możesz wejść tylko do czegoś, co stoi samodzielnie.";
-        5:  Kto(actor, "Wchodzisz", "wchodzi");
+        5:  Kto(actor, "Wchodzisz", "wchodzi", "wchodzą");
             if (x1 has supporter) " na ", (bie) x1, ".";
             " do ", (dop) x1, ".";
         6:  if (x1 has supporter) "(schodzisz ", (pl_z) x1, " ", (dop) x1, ")";
@@ -1550,14 +1565,18 @@ Array pl_wielkosc --> 1;
   Exit: switch (n) {
         1:  "Nie masz z czego wyjść.";
         2:  "Nie możesz wyjść, bo ", (mian) x1, " ", (JestSa) x1, " ", (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), ".";
-        3:  if (x1 has supporter) Kto(actor, "Schodzisz", "schodzi");
-            else Kto(actor, "Wychodzisz", "wychodzi");
+        3:  if (x1 has supporter) Kto(actor, "Schodzisz", "schodzi", "schodzą");
+            else Kto(actor, "Wychodzisz", "wychodzi", "wychodzą");
             " ", (pl_z) x1, " ", (dop) x1, ".";
         4:  "Przecież nie jesteś ", (NaW) x1, " ", (mie) x1, ".";
         5:  if (x1 has supporter) "(najpierw schodzisz ", (pl_z) x1, " ", (dop) x1, ")";
             "(najpierw wychodzisz ", (pl_z) x1, " ", (dop) x1, ")";
-        6:  Kto(actor, "Wstajesz", "wstaje"); ".";
+        6:  Kto(actor, "Wstajesz", "wstaje", "wstają"); ".";
     }
+  PLAskWhat:  "O co chcesz zapytać ", (bie) x1, "? Napisz na przykład: zapytaj ", (bie) x1,
+              " o klucz.";
+  PLTellWhat: "Co chcesz powiedzieć ", (cel) x1, "? Napisz na przykład: powiedz ", (cel) x1,
+              " tak.";
   PLGreet:    "Witaj.";
   PLNoNeed:   "Nie ma takiej potrzeby.";
   PLThanks:   "Nie ma za co.";
@@ -1585,7 +1604,7 @@ Array pl_wielkosc --> 1;
         2:  "Przez chwilę żonglujesz ", (nar) x1, ", ale niewiele z tego wynika.";
         3:  print_ret (CMian) x1, " nie ", (nop) PL(x1, "wydaje", "wydają"),
                 " się tym zainteresowan", (nop) Forma(x1, "y", "a", "e", "e", "i"), ".";
-        4:  Kto(actor, "Oddajesz", "oddaje"); " ", (bie) x1, ".";
+        4:  Kto(actor, "Oddajesz", "oddaje", "oddają"); " ", (bie) x1, ".";
     }
   Go: switch (n) {
         1:  print "Najpierw musisz ";
@@ -1596,7 +1615,7 @@ Array pl_wielkosc --> 1;
         4:  "Nie dasz rady zejść po ", (mie) x1, ".";
         5:  "Nie możesz, bo na drodze ", (nop) PL(x1, "stoi", "stoją"), " ", (mian) x1, ".";
         6:  "Nie możesz, bo ", (mian) x1, " nigdzie nie ", (nop) PL(x1, "prowadzi", "prowadzą"), ".";
-        7:  Kto(actor, "Odchodzisz", "odchodzi"); ".";
+        7:  Kto(actor, "Odchodzisz", "odchodzi", "odchodzą"); ".";
     }
   Insert: switch (n) {
         1:  if (x1 == player) "Siebie nie da się nigdzie włożyć.";
@@ -1609,7 +1628,7 @@ Array pl_wielkosc --> 1;
         6:  "(najpierw zdejmujesz ", (GoJaJe) x1, ")";
         7:  "W ", (mie) x1, " nie ma już miejsca.";
         8:  "Zrobione.";
-        9:  Kto(actor, "Wkładasz", "wkłada"); " ", (bie) x1, " do ", (dop) x2, ".";
+        9:  Kto(actor, "Wkładasz", "wkłada", "wkładają"); " ", (bie) x1, " do ", (dop) x2, ".";
     }
   Inv: switch (n) {
         1:  "Nie masz nic przy sobie.";
@@ -1618,7 +1637,7 @@ Array pl_wielkosc --> 1;
         3:  print ":^";
         4:  ListaWPrzypadku(0); ".";
     }
-  Jump:     Kto(actor, "Podskakujesz", "podskakuje"); " w miejscu, ale nic z tego nie wynika.";
+  Jump:     Kto(actor, "Podskakujesz", "podskakuje", "podskakują"); " w miejscu, ale nic z tego nie wynika.";
   JumpIn: switch (n) {
         1:  "Wskakiwanie do ", (dop) x1, " nic tu nie da.";
         2:  DecideAgainst();
@@ -1632,7 +1651,7 @@ Array pl_wielkosc --> 1;
         2:  DecideAgainst();
     }
   Kiss:     "Lepiej skup się na grze.";
-  Listen:   Kto(actor, "Nie słyszysz", "nie słyszy"); " niczego niezwykłego.";
+  Listen:   Kto(actor, "Nie słyszysz", "nie słyszy", "nie słyszą"); " niczego niezwykłego.";
   ListMiscellany: switch (n) {
         1:  print " (świeci)";
         2:  print " (", (nop) PL_PrzymZL(x1, "zamknięt", "zamknięci"), ")";
@@ -1674,7 +1693,7 @@ Array pl_wielkosc --> 1;
         2:  print_ret (CMian) x1, " ", (JestSa) x1, " już ", (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), " na klucz.";
         3:  "Najpierw musisz zamknąć ", (bie) x1, ".";
         4:  print_ret (CMian) x1, " nie ", (nop) PL(x1, "pasuje", "pasują"), " do zamka.";
-        5:  Kto(actor, "Zamykasz", "zamyka"); print " ", (bie) x1;   ! "mosiężnym kluczem", "łańcuchem"
+        5:  Kto(actor, "Zamykasz", "zamyka", "zamykają"); print " ", (bie) x1;   ! "mosiężnym kluczem", "łańcuchem"
             if (second) print " ", (nar) second; else print " na klucz";
             ".";
         6:  "Nie masz klucza do ", (dop) x1, ".";   ! "zamknij X na klucz" bez klucza
@@ -1682,7 +1701,7 @@ Array pl_wielkosc --> 1;
   Look: switch (n) {
         1:  print " (na ", (mie) x1, ")";
         2:  print " (", (pl_w) x1, " ", (mie) x1, ")";
-        3:  print " (jako ", (name) x1, ")";
+        3:  print " (jako ", (mian) x1, ")";
         4:  print "^Na ", (mie) x1;
             PL_ListaZCzasownikiem(child(x1),
               ENGLISH_BIT+RECURSE_BIT+PARTINV_BIT+TERSE_BIT+CONCEAL_BIT+ISARE_BIT);
@@ -1693,9 +1712,9 @@ Array pl_wielkosc --> 1;
                 if (x1 has supporter) print "Na ";
                 else { if (PL_We(x1, PRZYP_MIE)) print "We "; else print "W "; }
                 print (mie) x1, " ";
-                Kto(actor, "widzisz", "widzi");
+                KtoM(actor, "widzisz", "widzi", "widzą");
             }
-            else { Kto(actor, "Widzisz", "widzi"); print " tutaj"; }
+            else { Kto(actor, "Widzisz", "widzi", "widzą"); print " tutaj"; }
             if (n == 5) print " także";
             print " ";
             ListaWPrzypadku(x1, PRZYP_BIE);
@@ -1703,11 +1722,11 @@ Array pl_wielkosc --> 1;
               ENGLISH_BIT+RECURSE_BIT+PARTINV_BIT+TERSE_BIT+CONCEAL_BIT+WORKFLAG_BIT);
             ListaWPrzypadku(0);
             ".";
-        7:  Kto(actor, "Nie dostrzegasz", "nie dostrzega"); " niczego niezwykłego w tym kierunku.";
+        7:  Kto(actor, "Nie dostrzegasz", "nie dostrzega", "nie dostrzegają"); " niczego niezwykłego w tym kierunku.";
     }
   LookUnder: switch (n) {
         1:  "Przecież jest ciemno.";
-        2:  Kto(actor, "Nie znajdujesz", "nie znajduje"); " niczego ciekawego.";
+        2:  Kto(actor, "Nie znajdujesz", "nie znajduje", "nie znajdują"); " niczego ciekawego.";
     }
   Mild:     "No właśnie.";
   Miscellany: switch (n) {
@@ -1755,7 +1774,7 @@ Array pl_wielkosc --> 1;
         27: "Nie zrozumiałem tego polecenia.";
         28: print "Zrozumiałem tylko tyle, że chcesz ";
         29: "Nie zrozumiałem tej liczby.";
-        30: Kto(actor, "Nie widzisz", "nie widzi"); " niczego takiego.";
+        30: Kto(actor, "Nie widzisz", "nie widzi", "nie widzą"); " niczego takiego.";
         31: "Chyba czegoś zabrakło w tym poleceniu.";
         32: "Nie trzymasz tego!";
         33: "Tego czasownika nie można użyć z kilkoma przedmiotami naraz.";
@@ -1798,7 +1817,7 @@ Array pl_wielkosc --> 1;
             if (x2 has container) print "wyjmujesz "; else print "zdejmujesz ";
             "", (bie) x1, " ", (pl_z) x2, " ", (dop) x2, ")";
         59: "Musisz wyrazić się dokładniej.";
-        60: print (CMian) x1, " zauważa, że ";
+        60: print (CMian) x1, " ", (nop) PL(x1, "zauważa", "zauważają"), ", że ";
     }
   No,Yes:   "To było pytanie retoryczne.";
   NotifyOff:
@@ -1822,11 +1841,11 @@ Array pl_wielkosc --> 1;
         2:  print_ret (CMian) x1, " ", (JestSa) x1, " ",
                 (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), " na klucz.";
         3:  print_ret (CMian) x1, " ", (JestSa) x1, " już ", (nop) PL_PrzymZ(x1, "otwart", "otwarci"), ".";
-        4:  Kto(actor, "Otwierasz", "otwiera"); print " ", (bie) x1, ". W środku";
+        4:  Kto(actor, "Otwierasz", "otwiera", "otwierają"); print " ", (bie) x1, ". W środku";
             if (PL_ListaZCzasownikiem(child(x1), ENGLISH_BIT+TERSE_BIT+CONCEAL_BIT+ISARE_BIT) == 0)
                 " nic nie ma.";
             ".";
-        5:  Kto(actor, "Otwierasz", "otwiera"); " ", (bie) x1, ".";
+        5:  Kto(actor, "Otwierasz", "otwiera", "otwierają"); " ", (bie) x1, ".";
         6:  "(najpierw otwierasz ", (bie) x1, ")";
     }
   Order:    print_ret (CMian) x1, " ", (nop) PL(x1, "ma", "mają"), " ciekawsze rzeczy do roboty.";
@@ -1870,7 +1889,7 @@ Array pl_wielkosc --> 1;
         5:  "(najpierw zdejmujesz ", (GoJaJe) x1, ")";
         6:  "Na ", (mie) x1, " nie ma już miejsca.";
         7:  "Zrobione.";
-        8:  Kto(actor, "Kładziesz", "kładzie"); " ", (bie) x1, " na ", (mie) x2, ".";
+        8:  Kto(actor, "Kładziesz", "kładzie", "kładą"); " ", (bie) x1, " na ", (mie) x2, ".";
     }
   Quit: switch (n) {
         1:  print "Odpowiedz ~tak~ lub ~nie~.";
@@ -1955,7 +1974,7 @@ Array pl_wielkosc --> 1;
         3:  print "Na ", (mie) x1;
             PL_ListaZCzasownikiem(child(x1), ENGLISH_BIT+TERSE_BIT+CONCEAL_BIT+ISARE_BIT);
             ".";
-        4:  Kto(actor, "Nie znajdujesz", "nie znajduje"); " niczego ciekawego.";
+        4:  Kto(actor, "Nie znajdujesz", "nie znajduje", "nie znajdują"); " niczego ciekawego.";
         5:  "Nie widać, co jest w środku, bo ", (mian) x1, " ", (JestSa) x1,
             " ", (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), ".";
         6:  print_ret (CMian) x1, " ", (JestSa) x1, " ", (nop) PL_PrzymZ(x1, "pust", "puści"), ".";
@@ -1972,7 +1991,7 @@ Array pl_wielkosc --> 1;
   Sing:     "Fałszujesz niemiłosiernie.";
   Sleep:    "Wcale nie chce ci się spać.";
   Smell: switch (n) {
-        1:  Kto(actor, "Nie czujesz", "nie czuje"); " żadnego niezwykłego zapachu.";
+        1:  Kto(actor, "Nie czujesz", "nie czuje", "nie czują"); " żadnego niezwykłego zapachu.";
         2:  DecideAgainst();
     }
   Sorry:    "Nie ma za co przepraszać.";
@@ -1986,12 +2005,12 @@ Array pl_wielkosc --> 1;
   SwitchOff: switch (n) {
         1:  "Tego nie da się wyłączyć.";
         2:  print_ret (CMian) x1, " ", (JestSa) x1, " już ", (nop) PL_PrzymZ(x1, "wyłączon", "wyłączeni"), ".";
-        3:  Kto(actor, "Wyłączasz", "wyłącza"); " ", (bie) x1, ".";
+        3:  Kto(actor, "Wyłączasz", "wyłącza", "wyłączają"); " ", (bie) x1, ".";
     }
   SwitchOn: switch (n) {
         1:  "Tego nie da się włączyć.";
         2:  print_ret (CMian) x1, " ", (JestSa) x1, " już ", (nop) PL_PrzymZ(x1, "włączon", "włączeni"), ".";
-        3:  Kto(actor, "Włączasz", "włącza"); " ", (bie) x1, ".";
+        3:  Kto(actor, "Włączasz", "włącza", "włączają"); " ", (bie) x1, ".";
     }
 
   Take: switch (n) {
@@ -2013,7 +2032,7 @@ Array pl_wielkosc --> 1;
         13: "(wkładasz ", (bie) x1, " do ", (dop) x2, ", żeby zrobić miejsce)";
     }
   Taste: switch (n) {
-        1:  Kto(actor, "Nie czujesz", "nie czuje"); " niczego niezwykłego w smaku.";
+        1:  Kto(actor, "Nie czujesz", "nie czuje", "nie czują"); " niczego niezwykłego w smaku.";
         2:  DecideAgainst();
     }
   Tell: switch (n) {
@@ -2031,7 +2050,7 @@ Array pl_wielkosc --> 1;
     }
   Touch: switch (n) {
         1:  DecideAgainst();
-        2:  Kto(actor, "Nie czujesz", "nie czuje"); " niczego niezwykłego.";
+        2:  Kto(actor, "Nie czujesz", "nie czuje", "nie czują"); " niczego niezwykłego.";
         3:  "To naprawdę nic by nie dało.";
     }
   Transfer: switch (n) {
@@ -2043,7 +2062,7 @@ Array pl_wielkosc --> 1;
         1:  "Tego nie da się otworzyć kluczem.";
         2:  print_ret (CMian) x1, " nie ", (JestSa) x1, " teraz ", (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), " na klucz.";
         3:  print_ret (CMian) x1, " nie ", (nop) PL(x1, "pasuje", "pasują"), " do zamka.";
-        4:  Kto(actor, "Otwierasz", "otwiera"); print " zamek ", (dop) x1;
+        4:  Kto(actor, "Otwierasz", "otwiera", "otwierają"); print " zamek ", (dop) x1;
             if (second) print " ", (nar) second;
             ".";
         5:  print "(najpierw otwierasz zamek";      ! x2: klucz
@@ -2066,7 +2085,7 @@ Array pl_wielkosc --> 1;
         3:  DecideAgainst();
     }
   WaveHands:
-        Kto(actor, "Machasz", "macha");
+        Kto(actor, "Machasz", "macha", "machają");
         switch (n) {
         1: ! nothing
         2: print " do ", (dop) x1;
@@ -2076,7 +2095,7 @@ Array pl_wielkosc --> 1;
         1:  "Nie da się ", (JegoJejIch) x1, " założyć.";
         2:  "Nie trzymasz ", (JegoJejIch) x1, ".";
         3:  "Masz ", (GoJaJe) x1, " już na sobie.";
-        4:  Kto(actor, "Zakładasz", "zakłada"); " ", (bie) x1, ".";
+        4:  Kto(actor, "Zakładasz", "zakłada", "zakładają"); " ", (bie) x1, ".";
         5:  print "Najpierw musisz ";
             if (x2 has container) print "wyjąć "; else print "zdjąć ";
             print (bie) x1, " ", (pl_z) x2, " ", (dop) x2;

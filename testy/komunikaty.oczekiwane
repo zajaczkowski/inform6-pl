@@ -238,6 +238,20 @@ Na wynik składają się następujące osiągnięcia:
 znalezienie różnych przedmiotów
 odwiedzenie różnych miejsc
 łącznie (na 0 możliwych)
+O co chcesz zapytać stalowy miecz? Napisz na przykład: zapytaj stalowy miecz o klucz.
+O co chcesz zapytać krótką księgę? Napisz na przykład: zapytaj krótką księgę o klucz.
+O co chcesz zapytać ciepłe mleko? Napisz na przykład: zapytaj ciepłe mleko o klucz.
+O co chcesz zapytać drewniane drzwi? Napisz na przykład: zapytaj drewniane drzwi o klucz.
+O co chcesz zapytać starego kapłana? Napisz na przykład: zapytaj starego kapłana o klucz.
+O co chcesz zapytać młodą kucharkę? Napisz na przykład: zapytaj młodą kucharkę o klucz.
+O co chcesz zapytać dzielnych rycerzy? Napisz na przykład: zapytaj dzielnych rycerzy o klucz.
+Co chcesz powiedzieć stalowemu mieczowi? Napisz na przykład: powiedz stalowemu mieczowi tak.
+Co chcesz powiedzieć krótkiej księdze? Napisz na przykład: powiedz krótkiej księdze tak.
+Co chcesz powiedzieć ciepłemu mleku? Napisz na przykład: powiedz ciepłemu mleku tak.
+Co chcesz powiedzieć drewnianym drzwiom? Napisz na przykład: powiedz drewnianym drzwiom tak.
+Co chcesz powiedzieć staremu kapłanowi? Napisz na przykład: powiedz staremu kapłanowi tak.
+Co chcesz powiedzieć młodej kucharce? Napisz na przykład: powiedz młodej kucharce tak.
+Co chcesz powiedzieć dzielnym rycerzom? Napisz na przykład: powiedz dzielnym rycerzom tak.
 Witaj.
 Nie ma takiej potrzeby.
 Nie ma za co.
@@ -728,6 +742,74 @@ Otwierasz zamek młodej kucharki krótką księgą.
 Otwierasz zamek dzielnych rycerzy krótką księgą.
 (najpierw otwierasz zamek krótką księgą)
 Musisz podać, w którą stronę chcesz iść.
+(świeci)
+(zamknięty)
+(zamknięta)
+(zamknięte)
+(zamknięci)
+(zamknięty, świeci)
+(zamknięta, świeci)
+(zamknięte, świeci)
+(zamknięci, świeci)
+(pusty)
+(pusta)
+(puste)
+(puści)
+(pusty, świeci)
+(pusta, świeci)
+(puste, świeci)
+(puści, świeci)
+(zamknięty i pusty)
+(zamknięta i pusta)
+(zamknięte i puste)
+(zamknięci i puści)
+(zamknięty, pusty, świeci)
+(zamknięta, pusta, świeci)
+(zamknięte, puste, świeci)
+(zamknięci, puści, świeci)
+(świeci, masz go na sobie
+(świeci, masz ją na sobie
+(świeci, masz je na sobie
+(świeci, masz ich na sobie
+(świeci
+(masz go na sobie
+(masz ją na sobie
+(masz je na sobie
+(masz ich na sobie
+(
+otwarty
+otwarta
+otwarte
+otwarci
+otwarty, ale pusty
+otwarta, ale pusta
+otwarte, ale puste
+otwarci, ale puści
+zamknięty
+zamknięta
+zamknięte
+zamknięci
+zamknięty na klucz
+zamknięta na klucz
+zamknięte na klucz
+zamknięci na klucz
+i pusty
+i pusta
+i puste
+i puści
+, zawiera
+(na którym
+(na której
+(na których
+, na którym
+, na której
+, na których
+(w którym
+(w której
+(w których
+, w którym
+, w której
+, w których
 Mija trochę czasu.
 Niestety, to nie jest sen.
 Przecież go nie trzymasz.
@@ -765,4 +847,454 @@ Zakładasz drewniane drzwi.
 Zakładasz starego kapłana.
 Zakładasz młodą kucharkę.
 Zakładasz dzielnych rycerzy.
+Miałaś w rękach
+Nie miałaś jeszcze niczego w rękach.
+Nie odwiedziłaś jeszcze żadnego miejsca.
+Przez chwilę mówisz sama do siebie.
+Stary kapłan rezygnuje z tego pomysłu.
+Stary kapłan zamyka stalowy miecz.
+Stary kapłan zamyka krótką księgę.
+Stary kapłan zamyka ciepłe mleko.
+Stary kapłan zamyka drewniane drzwi.
+Stary kapłan zamyka starego kapłana.
+Stary kapłan zamyka młodą kucharkę.
+Stary kapłan zamyka dzielnych rycerzy.
+Stary kapłan nie znajduje niczego ciekawego w stalowym mieczu.
+Stary kapłan nie znajduje niczego ciekawego w krótkiej księdze.
+Stary kapłan nie znajduje niczego ciekawego w ciepłym mleku.
+Stary kapłan nie znajduje niczego ciekawego w drewnianych drzwiach.
+Stary kapłan nie znajduje niczego ciekawego w starym kapłanie.
+Stary kapłan nie znajduje niczego ciekawego w młodej kucharce.
+Stary kapłan nie znajduje niczego ciekawego w dzielnych rycerzach.
+Stary kapłan zdejmuje stalowy miecz.
+Stary kapłan zdejmuje krótką księgę.
+Stary kapłan zdejmuje ciepłe mleko.
+Stary kapłan zdejmuje drewniane drzwi.
+Stary kapłan zdejmuje starego kapłana.
+Stary kapłan zdejmuje młodą kucharkę.
+Stary kapłan zdejmuje dzielnych rycerzy.
+Stary kapłan zjada stalowy miecz.
+Stary kapłan zjada krótką księgę.
+Stary kapłan zjada ciepłe mleko.
+Stary kapłan zjada drewniane drzwi.
+Stary kapłan zjada starego kapłana.
+Stary kapłan zjada młodą kucharkę.
+Stary kapłan zjada dzielnych rycerzy.
+Przecież już jest w stalowym mieczu.
+Przecież już jest w krótkiej księdze.
+Przecież już jest w ciepłym mleku.
+Przecież już jest w drewnianych drzwiach.
+Przecież już jest w starym kapłanie.
+Przecież już jest w młodej kucharce.
+Przecież już jest w dzielnych rycerzach.
+Stary kapłan wchodzi do stalowego miecza.
+Stary kapłan wchodzi do krótkiej księgi.
+Stary kapłan wchodzi do ciepłego mleka.
+Stary kapłan wchodzi do drewnianych drzwi.
+Stary kapłan wchodzi do starego kapłana.
+Stary kapłan wchodzi do młodej kucharki.
+Stary kapłan wchodzi do dzielnych rycerzy.
+Stary kapłan wychodzi ze stalowego miecza.
+Stary kapłan wychodzi z krótkiej księgi.
+Stary kapłan wychodzi z ciepłego mleka.
+Stary kapłan wychodzi z drewnianych drzwi.
+Stary kapłan wychodzi ze starego kapłana.
+Stary kapłan wychodzi z młodej kucharki.
+Stary kapłan wychodzi z dzielnych rycerzy.
+Stary kapłan wstaje.
+Stary kapłan oddaje stalowy miecz.
+Stary kapłan oddaje krótką księgę.
+Stary kapłan oddaje ciepłe mleko.
+Stary kapłan oddaje drewniane drzwi.
+Stary kapłan oddaje starego kapłana.
+Stary kapłan oddaje młodą kucharkę.
+Stary kapłan oddaje dzielnych rycerzy.
+Stary kapłan odchodzi.
+Stary kapłan wkłada stalowy miecz do krótkiej księgi.
+Stary kapłan wkłada krótką księgę do krótkiej księgi.
+Stary kapłan wkłada ciepłe mleko do krótkiej księgi.
+Stary kapłan wkłada drewniane drzwi do krótkiej księgi.
+Stary kapłan wkłada starego kapłana do krótkiej księgi.
+Stary kapłan wkłada młodą kucharkę do krótkiej księgi.
+Stary kapłan wkłada dzielnych rycerzy do krótkiej księgi.
+Stary kapłan podskakuje w miejscu, ale nic z tego nie wynika.
+Stary kapłan nie słyszy niczego niezwykłego.
+Stary kapłan zamyka stalowy miecz krótką księgą.
+Stary kapłan zamyka krótką księgę krótką księgą.
+Stary kapłan zamyka ciepłe mleko krótką księgą.
+Stary kapłan zamyka drewniane drzwi krótką księgą.
+Stary kapłan zamyka starego kapłana krótką księgą.
+Stary kapłan zamyka młodą kucharkę krótką księgą.
+Stary kapłan zamyka dzielnych rycerzy krótką księgą.
+W stalowym mieczu stary kapłan widzi także .
+W krótkiej księdze stary kapłan widzi także .
+W ciepłym mleku stary kapłan widzi także .
+W drewnianych drzwiach stary kapłan widzi także .
+W starym kapłanie stary kapłan widzi także .
+W młodej kucharce stary kapłan widzi także .
+W dzielnych rycerzach stary kapłan widzi także .
+W stalowym mieczu stary kapłan widzi .
+W krótkiej księdze stary kapłan widzi .
+W ciepłym mleku stary kapłan widzi .
+W drewnianych drzwiach stary kapłan widzi .
+W starym kapłanie stary kapłan widzi .
+W młodej kucharce stary kapłan widzi .
+W dzielnych rycerzach stary kapłan widzi .
+Stary kapłan nie dostrzega niczego niezwykłego w tym kierunku.
+Stary kapłan nie znajduje niczego ciekawego.
+Stary kapłan otwiera stalowy miecz. W środku nic nie ma.
+Stary kapłan otwiera krótką księgę. W środku nic nie ma.
+Stary kapłan otwiera ciepłe mleko. W środku nic nie ma.
+Stary kapłan otwiera drewniane drzwi. W środku nic nie ma.
+Stary kapłan otwiera starego kapłana. W środku nic nie ma.
+Stary kapłan otwiera młodą kucharkę. W środku nic nie ma.
+Stary kapłan otwiera dzielnych rycerzy. W środku nic nie ma.
+Stary kapłan otwiera stalowy miecz.
+Stary kapłan otwiera krótką księgę.
+Stary kapłan otwiera ciepłe mleko.
+Stary kapłan otwiera drewniane drzwi.
+Stary kapłan otwiera starego kapłana.
+Stary kapłan otwiera młodą kucharkę.
+Stary kapłan otwiera dzielnych rycerzy.
+Stary kapłan kładzie stalowy miecz na krótkiej księdze.
+Stary kapłan kładzie krótką księgę na krótkiej księdze.
+Stary kapłan kładzie ciepłe mleko na krótkiej księdze.
+Stary kapłan kładzie drewniane drzwi na krótkiej księdze.
+Stary kapłan kładzie starego kapłana na krótkiej księdze.
+Stary kapłan kładzie młodą kucharkę na krótkiej księdze.
+Stary kapłan kładzie dzielnych rycerzy na krótkiej księdze.
+Stary kapłan nie czuje żadnego niezwykłego zapachu.
+Stary kapłan wyłącza stalowy miecz.
+Stary kapłan wyłącza krótką księgę.
+Stary kapłan wyłącza ciepłe mleko.
+Stary kapłan wyłącza drewniane drzwi.
+Stary kapłan wyłącza starego kapłana.
+Stary kapłan wyłącza młodą kucharkę.
+Stary kapłan wyłącza dzielnych rycerzy.
+Stary kapłan włącza stalowy miecz.
+Stary kapłan włącza krótką księgę.
+Stary kapłan włącza ciepłe mleko.
+Stary kapłan włącza drewniane drzwi.
+Stary kapłan włącza starego kapłana.
+Stary kapłan włącza młodą kucharkę.
+Stary kapłan włącza dzielnych rycerzy.
+Stary kapłan nie czuje niczego niezwykłego w smaku.
+Stary kapłan nie czuje niczego niezwykłego.
+Stary kapłan otwiera zamek stalowego miecza krótką księgą.
+Stary kapłan otwiera zamek krótkiej księgi krótką księgą.
+Stary kapłan otwiera zamek ciepłego mleka krótką księgą.
+Stary kapłan otwiera zamek drewnianych drzwi krótką księgą.
+Stary kapłan otwiera zamek starego kapłana krótką księgą.
+Stary kapłan otwiera zamek młodej kucharki krótką księgą.
+Stary kapłan otwiera zamek dzielnych rycerzy krótką księgą.
+Stary kapłan macha rękami, czując się trochę głupio.
+Stary kapłan macha do stalowego miecza rękami, czując się trochę głupio.
+Stary kapłan macha do krótkiej księgi rękami, czując się trochę głupio.
+Stary kapłan macha do ciepłego mleka rękami, czując się trochę głupio.
+Stary kapłan macha do drewnianych drzwi rękami, czując się trochę głupio.
+Stary kapłan macha do starego kapłana rękami, czując się trochę głupio.
+Stary kapłan macha do młodej kucharki rękami, czując się trochę głupio.
+Stary kapłan macha do dzielnych rycerzy rękami, czując się trochę głupio.
+Stary kapłan zakłada stalowy miecz.
+Stary kapłan zakłada krótką księgę.
+Stary kapłan zakłada ciepłe mleko.
+Stary kapłan zakłada drewniane drzwi.
+Stary kapłan zakłada starego kapłana.
+Stary kapłan zakłada młodą kucharkę.
+Stary kapłan zakłada dzielnych rycerzy.
+Młoda kucharka rezygnuje z tego pomysłu.
+Młoda kucharka zamyka stalowy miecz.
+Młoda kucharka zamyka krótką księgę.
+Młoda kucharka zamyka ciepłe mleko.
+Młoda kucharka zamyka drewniane drzwi.
+Młoda kucharka zamyka starego kapłana.
+Młoda kucharka zamyka młodą kucharkę.
+Młoda kucharka zamyka dzielnych rycerzy.
+Młoda kucharka nie znajduje niczego ciekawego w stalowym mieczu.
+Młoda kucharka nie znajduje niczego ciekawego w krótkiej księdze.
+Młoda kucharka nie znajduje niczego ciekawego w ciepłym mleku.
+Młoda kucharka nie znajduje niczego ciekawego w drewnianych drzwiach.
+Młoda kucharka nie znajduje niczego ciekawego w starym kapłanie.
+Młoda kucharka nie znajduje niczego ciekawego w młodej kucharce.
+Młoda kucharka nie znajduje niczego ciekawego w dzielnych rycerzach.
+Młoda kucharka zdejmuje stalowy miecz.
+Młoda kucharka zdejmuje krótką księgę.
+Młoda kucharka zdejmuje ciepłe mleko.
+Młoda kucharka zdejmuje drewniane drzwi.
+Młoda kucharka zdejmuje starego kapłana.
+Młoda kucharka zdejmuje młodą kucharkę.
+Młoda kucharka zdejmuje dzielnych rycerzy.
+Młoda kucharka zjada stalowy miecz.
+Młoda kucharka zjada krótką księgę.
+Młoda kucharka zjada ciepłe mleko.
+Młoda kucharka zjada drewniane drzwi.
+Młoda kucharka zjada starego kapłana.
+Młoda kucharka zjada młodą kucharkę.
+Młoda kucharka zjada dzielnych rycerzy.
+Młoda kucharka wchodzi do stalowego miecza.
+Młoda kucharka wchodzi do krótkiej księgi.
+Młoda kucharka wchodzi do ciepłego mleka.
+Młoda kucharka wchodzi do drewnianych drzwi.
+Młoda kucharka wchodzi do starego kapłana.
+Młoda kucharka wchodzi do młodej kucharki.
+Młoda kucharka wchodzi do dzielnych rycerzy.
+Młoda kucharka wychodzi ze stalowego miecza.
+Młoda kucharka wychodzi z krótkiej księgi.
+Młoda kucharka wychodzi z ciepłego mleka.
+Młoda kucharka wychodzi z drewnianych drzwi.
+Młoda kucharka wychodzi ze starego kapłana.
+Młoda kucharka wychodzi z młodej kucharki.
+Młoda kucharka wychodzi z dzielnych rycerzy.
+Młoda kucharka wstaje.
+Młoda kucharka oddaje stalowy miecz.
+Młoda kucharka oddaje krótką księgę.
+Młoda kucharka oddaje ciepłe mleko.
+Młoda kucharka oddaje drewniane drzwi.
+Młoda kucharka oddaje starego kapłana.
+Młoda kucharka oddaje młodą kucharkę.
+Młoda kucharka oddaje dzielnych rycerzy.
+Młoda kucharka odchodzi.
+Młoda kucharka wkłada stalowy miecz do krótkiej księgi.
+Młoda kucharka wkłada krótką księgę do krótkiej księgi.
+Młoda kucharka wkłada ciepłe mleko do krótkiej księgi.
+Młoda kucharka wkłada drewniane drzwi do krótkiej księgi.
+Młoda kucharka wkłada starego kapłana do krótkiej księgi.
+Młoda kucharka wkłada młodą kucharkę do krótkiej księgi.
+Młoda kucharka wkłada dzielnych rycerzy do krótkiej księgi.
+Młoda kucharka podskakuje w miejscu, ale nic z tego nie wynika.
+Młoda kucharka nie słyszy niczego niezwykłego.
+Młoda kucharka zamyka stalowy miecz krótką księgą.
+Młoda kucharka zamyka krótką księgę krótką księgą.
+Młoda kucharka zamyka ciepłe mleko krótką księgą.
+Młoda kucharka zamyka drewniane drzwi krótką księgą.
+Młoda kucharka zamyka starego kapłana krótką księgą.
+Młoda kucharka zamyka młodą kucharkę krótką księgą.
+Młoda kucharka zamyka dzielnych rycerzy krótką księgą.
+W stalowym mieczu młoda kucharka widzi także .
+W krótkiej księdze młoda kucharka widzi także .
+W ciepłym mleku młoda kucharka widzi także .
+W drewnianych drzwiach młoda kucharka widzi także .
+W starym kapłanie młoda kucharka widzi także .
+W młodej kucharce młoda kucharka widzi także .
+W dzielnych rycerzach młoda kucharka widzi także .
+W stalowym mieczu młoda kucharka widzi .
+W krótkiej księdze młoda kucharka widzi .
+W ciepłym mleku młoda kucharka widzi .
+W drewnianych drzwiach młoda kucharka widzi .
+W starym kapłanie młoda kucharka widzi .
+W młodej kucharce młoda kucharka widzi .
+W dzielnych rycerzach młoda kucharka widzi .
+Młoda kucharka nie dostrzega niczego niezwykłego w tym kierunku.
+Młoda kucharka nie znajduje niczego ciekawego.
+Młoda kucharka otwiera stalowy miecz. W środku nic nie ma.
+Młoda kucharka otwiera krótką księgę. W środku nic nie ma.
+Młoda kucharka otwiera ciepłe mleko. W środku nic nie ma.
+Młoda kucharka otwiera drewniane drzwi. W środku nic nie ma.
+Młoda kucharka otwiera starego kapłana. W środku nic nie ma.
+Młoda kucharka otwiera młodą kucharkę. W środku nic nie ma.
+Młoda kucharka otwiera dzielnych rycerzy. W środku nic nie ma.
+Młoda kucharka otwiera stalowy miecz.
+Młoda kucharka otwiera krótką księgę.
+Młoda kucharka otwiera ciepłe mleko.
+Młoda kucharka otwiera drewniane drzwi.
+Młoda kucharka otwiera starego kapłana.
+Młoda kucharka otwiera młodą kucharkę.
+Młoda kucharka otwiera dzielnych rycerzy.
+Młoda kucharka kładzie stalowy miecz na krótkiej księdze.
+Młoda kucharka kładzie krótką księgę na krótkiej księdze.
+Młoda kucharka kładzie ciepłe mleko na krótkiej księdze.
+Młoda kucharka kładzie drewniane drzwi na krótkiej księdze.
+Młoda kucharka kładzie starego kapłana na krótkiej księdze.
+Młoda kucharka kładzie młodą kucharkę na krótkiej księdze.
+Młoda kucharka kładzie dzielnych rycerzy na krótkiej księdze.
+Młoda kucharka nie czuje żadnego niezwykłego zapachu.
+Młoda kucharka wyłącza stalowy miecz.
+Młoda kucharka wyłącza krótką księgę.
+Młoda kucharka wyłącza ciepłe mleko.
+Młoda kucharka wyłącza drewniane drzwi.
+Młoda kucharka wyłącza starego kapłana.
+Młoda kucharka wyłącza młodą kucharkę.
+Młoda kucharka wyłącza dzielnych rycerzy.
+Młoda kucharka włącza stalowy miecz.
+Młoda kucharka włącza krótką księgę.
+Młoda kucharka włącza ciepłe mleko.
+Młoda kucharka włącza drewniane drzwi.
+Młoda kucharka włącza starego kapłana.
+Młoda kucharka włącza młodą kucharkę.
+Młoda kucharka włącza dzielnych rycerzy.
+Młoda kucharka nie czuje niczego niezwykłego w smaku.
+Młoda kucharka nie czuje niczego niezwykłego.
+Młoda kucharka otwiera zamek stalowego miecza krótką księgą.
+Młoda kucharka otwiera zamek krótkiej księgi krótką księgą.
+Młoda kucharka otwiera zamek ciepłego mleka krótką księgą.
+Młoda kucharka otwiera zamek drewnianych drzwi krótką księgą.
+Młoda kucharka otwiera zamek starego kapłana krótką księgą.
+Młoda kucharka otwiera zamek młodej kucharki krótką księgą.
+Młoda kucharka otwiera zamek dzielnych rycerzy krótką księgą.
+Młoda kucharka macha rękami, czując się trochę głupio.
+Młoda kucharka macha do stalowego miecza rękami, czując się trochę głupio.
+Młoda kucharka macha do krótkiej księgi rękami, czując się trochę głupio.
+Młoda kucharka macha do ciepłego mleka rękami, czując się trochę głupio.
+Młoda kucharka macha do drewnianych drzwi rękami, czując się trochę głupio.
+Młoda kucharka macha do starego kapłana rękami, czując się trochę głupio.
+Młoda kucharka macha do młodej kucharki rękami, czując się trochę głupio.
+Młoda kucharka macha do dzielnych rycerzy rękami, czując się trochę głupio.
+Młoda kucharka zakłada stalowy miecz.
+Młoda kucharka zakłada krótką księgę.
+Młoda kucharka zakłada ciepłe mleko.
+Młoda kucharka zakłada drewniane drzwi.
+Młoda kucharka zakłada starego kapłana.
+Młoda kucharka zakłada młodą kucharkę.
+Młoda kucharka zakłada dzielnych rycerzy.
+Dzielni rycerze rezygnują z tego pomysłu.
+Dzielni rycerze zamykają stalowy miecz.
+Dzielni rycerze zamykają krótką księgę.
+Dzielni rycerze zamykają ciepłe mleko.
+Dzielni rycerze zamykają drewniane drzwi.
+Dzielni rycerze zamykają starego kapłana.
+Dzielni rycerze zamykają młodą kucharkę.
+Dzielni rycerze zamykają dzielnych rycerzy.
+Dzielni rycerze nie znajdują niczego ciekawego w stalowym mieczu.
+Dzielni rycerze nie znajdują niczego ciekawego w krótkiej księdze.
+Dzielni rycerze nie znajdują niczego ciekawego w ciepłym mleku.
+Dzielni rycerze nie znajdują niczego ciekawego w drewnianych drzwiach.
+Dzielni rycerze nie znajdują niczego ciekawego w starym kapłanie.
+Dzielni rycerze nie znajdują niczego ciekawego w młodej kucharce.
+Dzielni rycerze nie znajdują niczego ciekawego w dzielnych rycerzach.
+Dzielni rycerze zdejmują stalowy miecz.
+Dzielni rycerze zdejmują krótką księgę.
+Dzielni rycerze zdejmują ciepłe mleko.
+Dzielni rycerze zdejmują drewniane drzwi.
+Dzielni rycerze zdejmują starego kapłana.
+Dzielni rycerze zdejmują młodą kucharkę.
+Dzielni rycerze zdejmują dzielnych rycerzy.
+Dzielni rycerze zjadają stalowy miecz.
+Dzielni rycerze zjadają krótką księgę.
+Dzielni rycerze zjadają ciepłe mleko.
+Dzielni rycerze zjadają drewniane drzwi.
+Dzielni rycerze zjadają starego kapłana.
+Dzielni rycerze zjadają młodą kucharkę.
+Dzielni rycerze zjadają dzielnych rycerzy.
+Przecież już są w stalowym mieczu.
+Przecież już są w krótkiej księdze.
+Przecież już są w ciepłym mleku.
+Przecież już są w drewnianych drzwiach.
+Przecież już są w starym kapłanie.
+Przecież już są w młodej kucharce.
+Przecież już są w dzielnych rycerzach.
+Dzielni rycerze wchodzą do stalowego miecza.
+Dzielni rycerze wchodzą do krótkiej księgi.
+Dzielni rycerze wchodzą do ciepłego mleka.
+Dzielni rycerze wchodzą do drewnianych drzwi.
+Dzielni rycerze wchodzą do starego kapłana.
+Dzielni rycerze wchodzą do młodej kucharki.
+Dzielni rycerze wchodzą do dzielnych rycerzy.
+Dzielni rycerze wychodzą ze stalowego miecza.
+Dzielni rycerze wychodzą z krótkiej księgi.
+Dzielni rycerze wychodzą z ciepłego mleka.
+Dzielni rycerze wychodzą z drewnianych drzwi.
+Dzielni rycerze wychodzą ze starego kapłana.
+Dzielni rycerze wychodzą z młodej kucharki.
+Dzielni rycerze wychodzą z dzielnych rycerzy.
+Dzielni rycerze wstają.
+Dzielni rycerze oddają stalowy miecz.
+Dzielni rycerze oddają krótką księgę.
+Dzielni rycerze oddają ciepłe mleko.
+Dzielni rycerze oddają drewniane drzwi.
+Dzielni rycerze oddają starego kapłana.
+Dzielni rycerze oddają młodą kucharkę.
+Dzielni rycerze oddają dzielnych rycerzy.
+Dzielni rycerze odchodzą.
+Dzielni rycerze wkładają stalowy miecz do krótkiej księgi.
+Dzielni rycerze wkładają krótką księgę do krótkiej księgi.
+Dzielni rycerze wkładają ciepłe mleko do krótkiej księgi.
+Dzielni rycerze wkładają drewniane drzwi do krótkiej księgi.
+Dzielni rycerze wkładają starego kapłana do krótkiej księgi.
+Dzielni rycerze wkładają młodą kucharkę do krótkiej księgi.
+Dzielni rycerze wkładają dzielnych rycerzy do krótkiej księgi.
+Dzielni rycerze podskakują w miejscu, ale nic z tego nie wynika.
+Dzielni rycerze nie słyszą niczego niezwykłego.
+Dzielni rycerze zamykają stalowy miecz krótką księgą.
+Dzielni rycerze zamykają krótką księgę krótką księgą.
+Dzielni rycerze zamykają ciepłe mleko krótką księgą.
+Dzielni rycerze zamykają drewniane drzwi krótką księgą.
+Dzielni rycerze zamykają starego kapłana krótką księgą.
+Dzielni rycerze zamykają młodą kucharkę krótką księgą.
+Dzielni rycerze zamykają dzielnych rycerzy krótką księgą.
+W stalowym mieczu dzielni rycerze widzą także .
+W krótkiej księdze dzielni rycerze widzą także .
+W ciepłym mleku dzielni rycerze widzą także .
+W drewnianych drzwiach dzielni rycerze widzą także .
+W starym kapłanie dzielni rycerze widzą także .
+W młodej kucharce dzielni rycerze widzą także .
+W dzielnych rycerzach dzielni rycerze widzą także .
+W stalowym mieczu dzielni rycerze widzą .
+W krótkiej księdze dzielni rycerze widzą .
+W ciepłym mleku dzielni rycerze widzą .
+W drewnianych drzwiach dzielni rycerze widzą .
+W starym kapłanie dzielni rycerze widzą .
+W młodej kucharce dzielni rycerze widzą .
+W dzielnych rycerzach dzielni rycerze widzą .
+Dzielni rycerze nie dostrzegają niczego niezwykłego w tym kierunku.
+Dzielni rycerze nie znajdują niczego ciekawego.
+Dzielni rycerze otwierają stalowy miecz. W środku nic nie ma.
+Dzielni rycerze otwierają krótką księgę. W środku nic nie ma.
+Dzielni rycerze otwierają ciepłe mleko. W środku nic nie ma.
+Dzielni rycerze otwierają drewniane drzwi. W środku nic nie ma.
+Dzielni rycerze otwierają starego kapłana. W środku nic nie ma.
+Dzielni rycerze otwierają młodą kucharkę. W środku nic nie ma.
+Dzielni rycerze otwierają dzielnych rycerzy. W środku nic nie ma.
+Dzielni rycerze otwierają stalowy miecz.
+Dzielni rycerze otwierają krótką księgę.
+Dzielni rycerze otwierają ciepłe mleko.
+Dzielni rycerze otwierają drewniane drzwi.
+Dzielni rycerze otwierają starego kapłana.
+Dzielni rycerze otwierają młodą kucharkę.
+Dzielni rycerze otwierają dzielnych rycerzy.
+Dzielni rycerze kładą stalowy miecz na krótkiej księdze.
+Dzielni rycerze kładą krótką księgę na krótkiej księdze.
+Dzielni rycerze kładą ciepłe mleko na krótkiej księdze.
+Dzielni rycerze kładą drewniane drzwi na krótkiej księdze.
+Dzielni rycerze kładą starego kapłana na krótkiej księdze.
+Dzielni rycerze kładą młodą kucharkę na krótkiej księdze.
+Dzielni rycerze kładą dzielnych rycerzy na krótkiej księdze.
+Dzielni rycerze nie czują żadnego niezwykłego zapachu.
+Dzielni rycerze wyłączają stalowy miecz.
+Dzielni rycerze wyłączają krótką księgę.
+Dzielni rycerze wyłączają ciepłe mleko.
+Dzielni rycerze wyłączają drewniane drzwi.
+Dzielni rycerze wyłączają starego kapłana.
+Dzielni rycerze wyłączają młodą kucharkę.
+Dzielni rycerze wyłączają dzielnych rycerzy.
+Dzielni rycerze włączają stalowy miecz.
+Dzielni rycerze włączają krótką księgę.
+Dzielni rycerze włączają ciepłe mleko.
+Dzielni rycerze włączają drewniane drzwi.
+Dzielni rycerze włączają starego kapłana.
+Dzielni rycerze włączają młodą kucharkę.
+Dzielni rycerze włączają dzielnych rycerzy.
+Dzielni rycerze nie czują niczego niezwykłego w smaku.
+Dzielni rycerze nie czują niczego niezwykłego.
+Dzielni rycerze otwierają zamek stalowego miecza krótką księgą.
+Dzielni rycerze otwierają zamek krótkiej księgi krótką księgą.
+Dzielni rycerze otwierają zamek ciepłego mleka krótką księgą.
+Dzielni rycerze otwierają zamek drewnianych drzwi krótką księgą.
+Dzielni rycerze otwierają zamek starego kapłana krótką księgą.
+Dzielni rycerze otwierają zamek młodej kucharki krótką księgą.
+Dzielni rycerze otwierają zamek dzielnych rycerzy krótką księgą.
+Dzielni rycerze machają rękami, czując się trochę głupio.
+Dzielni rycerze machają do stalowego miecza rękami, czując się trochę głupio.
+Dzielni rycerze machają do krótkiej księgi rękami, czując się trochę głupio.
+Dzielni rycerze machają do ciepłego mleka rękami, czując się trochę głupio.
+Dzielni rycerze machają do drewnianych drzwi rękami, czując się trochę głupio.
+Dzielni rycerze machają do starego kapłana rękami, czując się trochę głupio.
+Dzielni rycerze machają do młodej kucharki rękami, czując się trochę głupio.
+Dzielni rycerze machają do dzielnych rycerzy rękami, czując się trochę głupio.
+Dzielni rycerze zakładają stalowy miecz.
+Dzielni rycerze zakładają krótką księgę.
+Dzielni rycerze zakładają ciepłe mleko.
+Dzielni rycerze zakładają drewniane drzwi.
+Dzielni rycerze zakładają starego kapłana.
+Dzielni rycerze zakładają młodą kucharkę.
+Dzielni rycerze zakładają dzielnych rycerzy.
 Koniec

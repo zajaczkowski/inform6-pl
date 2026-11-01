@@ -2,7 +2,7 @@
 !% +language_name=polski
 ! ==============================================================================
 !   Test komunikatów: drukuje każdy komunikat biblioteki dla obiektu każdego
-!   rodzaju.  Wynik jest porównywany z plikiem komunikaty.oczekiwane (zob.
+!   rodzaju i dla każdego wykonawcy.  Wynik jest porównywany z plikiem komunikaty.oczekiwane (zob.
 !   test.sh), więc każda zmiana brzmienia musi być świadoma.
 ! ==============================================================================
 
@@ -31,26 +31,39 @@ Array proby table o_m o_f o_n o_p o_a o_k o_r;
 Array akcje table
     ##Answer ##Ask ##Attack ##Blow ##Burn ##Buy ##Climb ##Close
     ##Consult ##Cut ##Dig ##Disrobe ##Drink ##Drop
-    ##Eat ##EmptyT ##Enter ##Examine ##Exit ##Fill ##PLFind ##FullScore ##PLGreet ##PLNoNeed ##PLThanks ##PLUse ##GetOff ##Give
+    ##Eat ##EmptyT ##Enter ##Examine ##Exit ##Fill ##PLFind ##FullScore ##PLAskWhat ##PLTellWhat ##PLGreet ##PLNoNeed ##PLThanks ##PLUse ##GetOff ##Give
     ##Go ##Insert ##Inv ##Jump ##JumpIn ##JumpOn ##JumpOver ##Kiss ##Listen
     ##Lock ##Look ##LookUnder ##Mild ##No ##NotifyOff ##NotifyOn ##Objects
     ##Open ##Order ##Places ##Pray ##Pull ##Push ##PushDir ##PutOn ##Remove
     ##Rub ##Search ##Set ##SetTo ##Show ##Sing ##Sleep ##Smell ##Sorry
     ##Squeeze ##Strong ##Swim ##Swing ##SwitchOff ##SwitchOn ##Take ##Taste
     ##Tell ##Think ##ThrowAt ##Tie ##Touch ##Transfer ##Turn ##Unlock ##VagueGo
-    ##Wait ##Wake ##WakeOther ##Wave ##WaveHands ##Wear ##Yes;
+    ##ListMiscellany ##Wait ##Wake ##WakeOther ##Wave ##WaveHands ##Wear ##Yes;
 
-[ Initialise  a n p;
-    location = Pokoj;
-    second = o_f; noun = o_m; actor = player;
-    print "Początek^";
-    for (a=1 : a<=akcje-->0 : a++)
-        for (n=1 : n<=12 : n++)
+[ Rzut  a n p m;
+    for (a=1 : a<=akcje-->0 : a++) {
+        m = 12;
+        if (akcje-->a == ##ListMiscellany) m = 30;
+        for (n=1 : n<=m : n++)
             for (p=1 : p<=proby-->0 : p++) {
                 print a, ".", n, ".", p, ": ";
                 L__M(akcje-->a, n, proby-->p, o_f);
                 new_line;
             }
+    }
+];
+
+! Każdy komunikat dla gracza, graczki i postaci każdego rodzaju jako wykonawcy.
+[ Initialise;
+    location = Pokoj;
+    second = o_f; noun = o_m;
+    print "Początek^";
+    actor = player; Rzut();
+    give player female; Rzut(); give player ~female;
+    actor = o_a; Rzut();
+    actor = o_k; Rzut();
+    actor = o_r; Rzut();
+    actor = player;
     print "Koniec^";
     deadflag = 2;
 ];

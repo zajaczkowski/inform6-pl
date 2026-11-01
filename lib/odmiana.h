@@ -747,6 +747,19 @@ Array pl_podmienione -> 64;
     rfalse;
 ];
 
+Global pl_bufor;    ! inne niż buffer i parse (zero: te zwykłe)
+Global pl_parse;
+
+! Nowe polecenie zamiast odpowiedzi na pytanie gry ("Co masz na myśli: ...?"):
+! parser sprawdza wtedy pierwsze słowo sam, z pominięciem PL_NieznaneSlowa.
+[ LanguageIsVerb pb pp n  w;
+    pl_bufor = pb; pl_parse = pp;
+    w = PL_SlowoBezOgonkow(n);
+    pl_bufor = 0; pl_parse = 0;
+    if (w && (w->#dict_par1) & DICT_VERB) return w;
+    return 0;
+];
+
 Array pl_dslowo -> WORDSIZE + 40;      ! tekst słowa ze słownika
 [ PL_DrukSlowa w; print (address) w; ];
 
@@ -757,7 +770,7 @@ Array pl_dslowo -> WORDSIZE + 40;      ! tekst słowa ze słownika
 ! gdy nie ma słowa pasującego dokładnie; wygrywa wtedy najdłuższe ("polnocny" to
 ! obcięte 'północn', a nie 'północ').
 [ PL_SlowoBezOgonkow wnum  adr len dict ile dl e k j n c obciete pocz pdl;
-    adr = WordAddress(wnum); len = WordLength(wnum);
+    adr = WordAddress(wnum, pl_parse, pl_bufor); len = WordLength(wnum, pl_parse);
     if (len < 2) return 0;
     #Ifdef TARGET_ZCODE;
     dict = 0-->4; n = dict->0;

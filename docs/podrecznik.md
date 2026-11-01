@@ -451,7 +451,7 @@ Tak samo kapłan mówi „Odpowiedź musisz znaleźć sam” albo „sama”. Na
 | `MuJejIm(o)` | mu / jej / im | |
 | `NimNiejNich(o)` | nim / niej / nich | „na niej” |
 | `CTenTaTo(o)` | Ten / Ta / To / Te / Ci | początek zdania |
-| `Kto(aktor, "Bierzesz", "bierze")` | „Bierzesz” albo „Kowal bierze” | komunikaty wspólne dla gracza i postaci |
+| `Kto(aktor, "Bierzesz", "bierze", "biorą")` | „Bierzesz”, „Kowal bierze” albo „Rybacy biorą” | komunikaty wspólne dla gracza i postaci |
 | `Liczebnik(n, "punkt", "punkty", "punktów")` | forma zgodna z liczbą | „3 punkty”, „5 punktów” |
 
 ---

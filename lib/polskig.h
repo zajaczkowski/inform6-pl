@@ -427,6 +427,7 @@ Verb 'powąchaj' 'wąchaj' 'obwąchaj'
 Verb 'powiedz' 'mów'
     * creature 'o//' topic                      -> Tell
     * creature topic                            -> Answer reverse
+    * creature                                  -> PLTellWhat
     * topic 'do' creature                       -> Answer;
 
 Verb 'przekręć' 'obróć' 'zakręć' 'odkręć' 'dokręć' 'kręć'
@@ -505,6 +506,8 @@ Verb 'stań' 'usiądź' 'siądź' 'siadaj' 'kładź'
 [ PLNoNeedSub; L__M(##PLNoNeed); ];
 [ PLThanksSub; L__M(##PLThanks); ];
 [ PLUseSub;    L__M(##PLUse);    ];
+[ PLAskWhatSub;  L__M(##PLAskWhat, 1, noun);  ];
+[ PLTellWhatSub; L__M(##PLTellWhat, 1, noun); ];
 
 Verb 'cześć' 'witaj' 'żegnaj' *   -> PLGreet;
 Verb 'dziękuję' 'dzięki'              *   -> PLThanks;
@@ -615,7 +618,9 @@ Extend only 'ubierz' first
     *                                           -> PLNoNeed;
 
 Verb 'zapytaj' 'pytaj' 'spytaj'
-    * creature 'o//' topic                      -> Ask;
+    * creature 'o//' topic                      -> Ask
+    * creature 'o//'                            -> PLAskWhat
+    * creature                                  -> PLAskWhat;
 
 Verb 'zjedz' 'jedz' 'połknij' 'ugryź' 'przełknij'
     * held                                      -> Eat;

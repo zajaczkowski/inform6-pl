@@ -336,7 +336,7 @@ Object -> slime "pływając/a plam/a oleistego szlamu"
                   pełna.";
        ],
   has  static female;
-Object -> chiggers "rój/ meszek"
+Object -> chiggers "r/ó=o/j/+u meszek"
   with name 'meszki' 'meszek' 'roju' 'rojem',
        daemon
        [;  if (chigger_bites in player && mud notin player && random(100)<=10)

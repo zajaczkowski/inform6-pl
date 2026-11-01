@@ -158,15 +158,15 @@ Object szyfr_rozszerzenie "(szyfr)" LibraryExtensions
            UnlockWithCode:
                switch (lm_n) {
                  1: "Tego nie otwiera się kodem.";
-                 2: Kto(actor, "Wprowadzasz", "wprowadza");
+                 2: Kto(actor, "Wprowadzasz", "wprowadza", "wprowadzają");
                     " kod ", (SzyfrWpisany) 0, ", ale nic się nie dzieje.";
                  3: "(najpierw wprowadzasz kod ", (SzyfrWpisany) 0, ")";
-                 4: Kto(actor, "Wprowadzasz", "wprowadza");
+                 4: Kto(actor, "Wprowadzasz", "wprowadza", "wprowadzają");
                     " kod ", (SzyfrWpisany) 0, " i zamek ustępuje.";
                  5: "Gdzie chcesz wprowadzić ten kod?";
                }
            LockWithCode:
-               Kto(actor, "Zamykasz", "zamyka"); print " ", (bie) lm_o;
+               Kto(actor, "Zamykasz", "zamyka", "zamykają"); print " ", (bie) lm_o;
                ". Zamek zatrzaskuje się.";
            ! Przy zamkach szyfrowych bez "na klucz": "Sejf jest zamknięty. Bez
            ! kodu nie da się go otworzyć."

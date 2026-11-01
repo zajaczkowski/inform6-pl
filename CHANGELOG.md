@@ -19,6 +19,13 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
     „umyj się”, „ubierz się”, ukryj, złam, łam, zepsuj, mów, graj, budź, zamykaj,
     otwieraj, siadaj, wstawaj.  **Gra, która sama definiowała któryś z tych
     czasowników dyrektywą `Verb`, musi użyć `Extend ... replace`.**
+- Postacie w komunikatach: czasownik w liczbie mnogiej („Rybacy wchodzą”), „W pudle
+  kowal widzi…” małą literą, „(jako krótka księga)” w mianowniku.  `Kto` przyjmuje
+  czwarty argument z formą mnogą.
+- Odpowiedzi na pytania gry: nowe polecenie bez ogonków („wez lampe”) i na Glulxie
+  z ogonkami działa już jako polecenie, nie jako odpowiedź; „zapytaj kota”
+  i „powiedz kotu” dopytują o treść; „Gdzie chcesz włożyć te rzeczy?”.
+- Odmiana nazw w grach: rój, plan, reflektor, przełącznik, kogut, rudzik, bizon, wąż.
 - Glulx: „połóż się”, „potem” i „następnie” działają tak samo jak w maszynie Z.
 
 - Liczebniki na listach: właściwość `plural` można zapisać z „/” (`plural

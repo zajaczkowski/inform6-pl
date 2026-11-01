@@ -111,7 +111,7 @@ Object  Foyer "Hol"
         s_to Corridor12, w_to Room14,
         d_to basement, out_to balcony;
 
-Object -> "plan/ parteru"
+Object -> "plan/+u parteru"
   with name 'mapa' 'mapę' 'parter' 'parteru',
        initial "W jednej ze ścian wytłoczono plan parteru.",
        description
@@ -243,7 +243,7 @@ Object Room10a "Sala Kierunków"
                 return Room11; ],
   has  light;
 
-Object hyper "hiperwymiarow/y kierun/e/k/"
+Object hyper "hiperwymiarow/y kierun/e/k/+u"
   with name 'hiper' 'czwarty' 'czwartym' 'wymiar' 'wymiarze', door_dir in_to,
        daemon
        [;  if (location ~= Room10a) { remove self; StopDaemon(self); }
@@ -497,7 +497,7 @@ Object Room13 "Sala Przełączników"
        n_to Oak_Door, s_to PlankBridge,
   has  light;
 
-Object -> "reflektor/+u z Gotham City"
+Object -> "reflektor/ z Gotham City"
   with name 'gotham' 'city' 'szablon' 'szablonu',
        description "Jest na nim jakiś szablon.",
        when_on "Stary miejski reflektor rzuca na alabastrowy sufit muzeum
@@ -506,7 +506,7 @@ Object -> "reflektor/+u z Gotham City"
                 City."
   has  switchable static;
 
-Object -> "przełącznik/+u światła w piwnicy"
+Object -> "przełącznik/ światła w piwnicy"
   with name 'piwnica' 'piwnicy' 'światło' 'światła',
        after
        [;  SwitchOn: give basement light; "Klik!";
@@ -810,7 +810,7 @@ Object Second_Floor "Antresola"
        u_to Third_Floor,
   has  light;
 
-Object -> "plan/ antresoli"
+Object -> "plan/+u antresoli"
   with name 'mapa' 'mapę' 'antresola' 'antresoli' 'piętro' 'piętra',
        initial "W jednej ze ścian wytłoczono plan antresoli.",
        description
@@ -1172,7 +1172,7 @@ Object Third_Floor "Trzecie piętro"
        e_to Room24, w_to window_w, s_to Corridor22,
   has  light;
 
-Object -> "plan/ trzeciego piętra"
+Object -> "plan/+u trzeciego piętra"
   with name 'mapa' 'mapę' 'trzecie' 'trzeciego' 'piętro' 'piętra',
        initial "W jednej ze ścian wytłoczono plan trzeciego piętra.",
        description
@@ -1475,11 +1475,11 @@ GoldCoin -> "koz/a"    with desc_bie "kozę", has female;
 GoldCoin -> "jele/ń/"  with desc_dop "jelenia", desc_cel "jeleniowi",
                           desc_bie "jelenia", desc_nar "jeleniem",
                           desc_mie "jeleniu";
-GoldCoin -> "kogut/";
+GoldCoin -> "kogut/" with desc_bie "koguta";
 
-SilverCoin -> "rudzik/";
-SilverCoin -> "w/ą=ę/ż/";
-SilverCoin -> "bizon/";
+SilverCoin -> "rudzik/" with desc_bie "rudzika";
+SilverCoin -> "w/ą=ę/ż/" with desc_bie "węża";
+SilverCoin -> "bizon/" with desc_bie "bizona";
 
 Global cherub_warning_given;
 Class  Cherub
