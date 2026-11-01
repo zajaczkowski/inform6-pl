@@ -64,9 +64,9 @@ Object  Drawing_Room "Salon"
             if (player in mantelpiece &&
                 action ~= ##Examine or ##Enter or ##Go &&
                 action ~= ##ThrownAt or ##ThrowAt or ##Reflect)
-                if ((noun > 0 && noun notin mantelpiece &&
+                if ((metaclass(noun) == Object && noun notin mantelpiece &&
                     noun ~= mantelpiece or mirror && noun notin player) ||
-                    (second > 0 && second notin mantelpiece &&
+                    (metaclass(second) == Object && second notin mantelpiece &&
                     second ~= mantelpiece or mirror && second notin player))
                     "Stąd tego nie dosięgniesz!";
         ];
@@ -98,7 +98,7 @@ Object  chess_board "szachownic/a" Drawing_Room
             'planszą',
         initial "Na podłodze leży porzucona szachownica.",
         description "Została tu po partii, którą przed chwilą grałaś, ale
-            wszystkie figury zniknęły - kotki uparcie się nimi bawią.";
+            wszystkie figury zniknęły – kotki uparcie się nimi bawią.";
 
 Object  hearth "komin/e/k/" Drawing_Room
  has    scenery
@@ -243,7 +243,7 @@ Object  worsted "kłęb/e/k/ wełny" Drawing_Room
         before [;
          Untangle:
             give self ~general;
-            "Nikt nie zwija kłębków tak szybko jak ty - choć mówisz to
+            "Nikt nie zwija kłębków tak szybko jak ty – choć mówisz to
             o sobie sama! Wkrótce kłębek jest znów porządny i zgrabny.";
         ],
         after [;

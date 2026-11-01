@@ -176,7 +176,7 @@ Treasure -> "*ZŁOTA RYBKA*"
            if ((water_in_the_bottle notin bottle
                 || bottle notin player) && random(100)<=50)
            {   remove self; move dead_fish to player;
-               "^Za sucho.  Rybka zdycha.";
+               "^Za sucho. Rybka zdycha.";
            }
        ],
   has  female;
@@ -236,7 +236,7 @@ Object -> dragon "śpiąc/y smok/"
        [;  WakeOther: deadflag=1; "Smok się budzi!";
        ],
        life
-       [;  Order, Answer, Ask: "Ćśś!  Nie chcesz chyba obudzić smoka.";
+       [;  Order, Answer, Ask: "Ćśś! Nie chcesz chyba obudzić smoka.";
            Give:    "Smok jest zbyt zaspany, żeby to zauważyć.";
            ThrowAt: if (noun==axe)
                     {   move axe to location; "Smok się tym nie przejmuje."; }
@@ -244,7 +244,7 @@ Object -> dragon "śpiąc/y smok/"
        each_turn
        [;  if (mud in location && random(100)<=50)
            {   deadflag=1;
-               "Smok coś wyczuwa - budzi się - atakuje cię!";
+               "Smok coś wyczuwa – budzi się – atakuje cię!";
            }
        ],
   has  animate male;
@@ -253,10 +253,10 @@ Treasure eggs "*SMOCZE JAJA* (bardzo rzadkie)"
   with name 'smocze' 'smoczych' 'jaja' 'jaj' 'jajami' 'jajka' 'jajek' 'rzadkie',
        depositpoints 12,
   has  pluralname neuter;
-Object gore "dymiąca dziura - szczątki smoka i posoka"
+Object gore "dymiąca dziura – szczątki smoka i posoka"
   with name 'dziura' 'dziurę' 'dymiąca' 'szczątki' 'szczątków' 'smok' 'smoka'
             'posoka' 'posokę',
-       desc_bie "dymiącą dziurę - szczątki smoka i posokę",
+       desc_bie "dymiącą dziurę – szczątki smoka i posokę",
   has  static female;
 
 ScottRoom Hidden_Grove "Gaj"
@@ -286,7 +286,7 @@ Object -> cypress_tree "cyprys/+u"
                     print "DRZEWO LECI..";
                     if (keys in Tree_Top)
                     {   remove keys;
-                        ".  Coś spadło z wierzchołka i zniknęło!";
+                        ". Coś spadło z wierzchołka i zniknęło!";
                     }
                     ".";
        ],
@@ -332,7 +332,7 @@ Object -> slime "pływając/a plam/a oleistego szlamu"
        before
        [;  Take: brass_lantern.power=125; give brass_lantern general;
                  remove self; move brass_lantern to player;
-                 "Magiczny olej przyciąga magiczną lampę.  Lampa jest teraz
+                 "Magiczny olej przyciąga magiczną lampę. Lampa jest teraz
                   pełna.";
        ],
   has  static female;
@@ -365,12 +365,12 @@ Object -> chiggers "r/ó=o/j/+u meszek"
 Object chigger_bites "ukąszeni/a meszek"
   with name 'ukąszenie' 'ukąszeń' 'ugryzienia' 'ugryzień',
        desc_dop "ukąszeń meszek",
-       before [; "Ukąszenia są dokuczliwe.  Może jakieś lekarstwo by pomogło?"; ],
+       before [; "Ukąszenia są dokuczliwe. Może jakieś lekarstwo by pomogło?"; ],
   has  pluralname neuter;
 Object infected_bites "zaognion/e ukąszeni/a meszek"
   with name 'ukąszenie' 'ukąszeń' 'ugryzienia' 'ugryzień',
        desc_dop "zaognionych ukąszeń meszek",
-       before [; "Ukąszenia wyglądają przerażająco.  Zdobądź lekarstwo!"; ],
+       before [; "Ukąszenia wyglądają przerażająco. Zdobądź lekarstwo!"; ],
   has  pluralname neuter;
 
 Object tree_remains "pusty pień i resztki ściętego drzewa"
@@ -390,7 +390,7 @@ ScottRoom Tree_Top "Wierzchołek drzewa"
 
 Object -> "pajęczyn/a z napisem"
   with name 'pająk' 'pająka' 'sieć' 'napis',
-       description "~ZETNIJ JE!~",
+       description "„ZETNIJ JE!”",
        before
        [;  Take: deadflag=1; "Ugryzł cię pająk.";
        ],
@@ -403,7 +403,7 @@ ScottRoom Inside_Stump "Wnętrze pnia"
        n_to Dismal_Swamp,  s_to Dismal_Swamp,  e_to Dismal_Swamp,
        w_to Dismal_Swamp,  u_to Dismal_Swamp,  d_to Root_Chamber,
   has  light;
-Sign -> "ZOSTAW TU SKARBY - (powiedz 'WYNIK')";
+Sign -> "ZOSTAW TU SKARBY – (powiedz 'WYNIK')";
 Object -> bottle "butelk/a"
   with name 'butelka' 'butelkę' 'butelki' 'butelce' 'butelką' 'flaszka'
             'flaszkę' 'słoik' 'słoika',
@@ -464,28 +464,28 @@ Object -> brass_lantern "staroświeck/a lamp/a"
        before
        [; Examine: print "To błyszcząca mosiężna lampa";
                 if (self hasnt on)
-                    ".  Teraz jest zgaszona.";
+                    ". Teraz jest zgaszona.";
                 if (self.power < 30)
                     ", świecąca słabo.";
                 ", świecąca jasno.";
           Burn: <<SwitchOn self>>;
-          Rub:  if (self has on) "Nie!  Jest za gorąca.";
+          Rub:  if (self has on) "Nie! Jest za gorąca.";
                 if (self hasnt general) "Nic się nie dzieje.";
                 switch(++genie_gifts)
                 {   1: move ring to location;
-                       "Pojawia się świecący dżin - coś upuszcza - i znika.";
+                       "Pojawia się świecący dżin – coś upuszcza – i znika.";
                     2: move bracelet to location;
-                       "Pojawia się świecący dżin - coś upuszcza - i znika.";
+                       "Pojawia się świecący dżin – coś upuszcza – i znika.";
                     3: if (ring in Inside_Stump)
                            score=score-ring.depositpoints;
                        remove ring; move player to Misty_Room;
-                       "Pojawia się dżin - mówi ~ale z ciebie samolub~ - coś
-                        zabiera - i znika!";
+                       "Pojawia się dżin – mówi „ale z ciebie samolub” – coś
+                        zabiera – i znika!";
                     4: if (bracelet in Inside_Stump)
                            score=score-bracelet.depositpoints;
                        remove bracelet; move player to Misty_Room;
-                       "Pojawia się dżin - mówi ~ale z ciebie samolub~ - coś
-                        zabiera - i znika!";
+                       "Pojawia się dżin – mówi „ale z ciebie samolub” – coś
+                        zabiera – i znika!";
                     default: "Nic się nie dzieje.";
                 }
           SwitchOn: if (self.power <= 0) "Wyczerpała się.";
@@ -603,7 +603,7 @@ Object -> bees "wielk/ie afrykańsk/ie pszczoł/y"
            if (bear in location)
            {   move self to location;
                give bear ~general; deadflag=1;
-              "Pszczoły doprowadzają niedźwiedzia do szału.  Niedźwiedź
+              "Pszczoły doprowadzają niedźwiedzia do szału. Niedźwiedź
                atakuje cię!";
            }
           "Wypuszczasz pszczoły.";
@@ -690,7 +690,7 @@ Object -> "strzałk/a w dół"
   has  static female;
 
 ScottRoom Chasm_Bottom "Przepaść"
-  with description "Jesteś na dnie przepaści.  W górze 2 półki skalne.
+  with description "Jesteś na dnie przepaści. W górze 2 półki skalne.
                     Na jednej jest zamurowane okno.",
        u_to Maze6;
 Treasure -> net "*ZŁOTA SIEĆ*"
@@ -698,7 +698,7 @@ Treasure -> net "*ZŁOTA SIEĆ*"
        desc_bie "*ZŁOTĄ SIEĆ*", desc_nar "*ZŁOTĄ SIECIĄ*",
        desc_dop "*ZŁOTEJ SIECI*", desc_cel "*ZŁOTEJ SIECI*", desc_mie "*ZŁOTEJ SIECI*",
   has  female;
-Sign -> "MAGICZNE SŁOWO TO AWAY.  X LA -(reszta napisu odpadła)";
+Sign -> "MAGICZNE SŁOWO TO AWAY. X LA -(reszta napisu odpadła)";
 Object -> lava "lawa"
   with name 'strumień' 'strumienia' 'lawa' 'lawy' 'lawę' 'lawą' 'tama' 'tamę',
        short_name
@@ -710,11 +710,11 @@ Object -> lava "lawa"
        ],
        description
        [;  if (self hasnt general)
-             "Coś tam na pewno jest!  Może tam pójdziesz?";
+             "Coś tam na pewno jest! Może tam pójdziesz?";
            "Po prostu jeszcze więcej zatamowanej lawy.";
        ],
        before
-       [;  Enter, Push, Pull, Take: "NIE!  Jest za gorąca.";
+       [;  Enter, Push, Pull, Take: "NIE! Jest za gorąca.";
        ],
   has  static;
 Treasure firestone "*OGNISTY KAMIEŃ* (już zimny)"
@@ -726,7 +726,7 @@ ScottRoom Narrow_Ledge_1 "Półka skalna"
                     Po drugiej stronie przepaści jest sala tronowa.",
        before
        [;  Jump, JumpOver: if (firebricks in player)
-                 {   deadflag=1; "O nie!  Coś było za ciężkie!"; }
+                 {   deadflag=1; "O nie! Coś było za ciężkie!"; }
                  print "Przeskakujesz nad przepaścią...^";
                  PlayerTo(Narrow_Ledge_2); rtrue;
        ],
@@ -738,7 +738,7 @@ ScottRoom Royal_Chamber "Komnata królewska"
 Object -> bricked_window "zamurowan/e okn/o"
   with name 'cegły' 'cegieł' 'cegła' 'mur' 'muru'
   has  static neuter;
-Object holed_window "zamurowane okno z dziurą - za nim jest półka skalna"
+Object holed_window "zamurowane okno z dziurą – za nim jest półka skalna"
   with name 'okno' 'okna' 'oknem' 'oknie' 'zamurowane' 'dziura' 'dziurą' 'dziurę'
             'półka' 'półkę',
        desc_dop "zamurowanego okna z dziurą",
@@ -750,7 +750,7 @@ Object holed_window "zamurowane okno z dziurą - za nim jest półka skalna"
 Object firebricks "luźn/e cegł/y+ie szamotow/e!"
   with name 'cegły' 'cegieł' 'cegłami' 'ogniotrwałe' 'ogniotrwałych',
        after
-       [;  Take: "Wzięte.  (Ciężkie!)";
+       [;  Take: "Wzięte. (Ciężkie!)";
            Drop: if (location~=Chasm_Bottom) rfalse;
                  remove self; give lava general;
                  move firestone to location;
@@ -760,7 +760,7 @@ Object firebricks "luźn/e cegł/y+ie szamotow/e!"
 
 ScottRoom Narrow_Ledge_2 "Półka skalna"
   with description
-          "Jesteś na wąskiej półce przy sali tronowej - po drugiej stronie
+          "Jesteś na wąskiej półce przy sali tronowej – po drugiej stronie
            przepaści jest druga półka.",
        before
        [;  Sing:
@@ -788,13 +788,13 @@ Treasure -> mirror "*MAGICZNE LUSTRO*"
        after
        [;  Drop:
              if (rug in location)
-             {   print "Lustro ląduje miękko na dywanie - rozjaśnia się
+             {   print "Lustro ląduje miękko na dywanie – rozjaśnia się
                         i mówi:^";
                  self.side_up++;
                  if (self.side_up % 2 == 1)
-                   "*SMOK ŻĄDLI* i gaśnie.  Nie rozumiem - mam nadzieję, że
+                   "*SMOK ŻĄDLI* i gaśnie. Nie rozumiem – mam nadzieję, że
                     ty rozumiesz.";
-                 "Nie marnuj *MIODU*.  Lepiej kogoś rozwściecz.  Zatamuj
+                 "Nie marnuj *MIODU*. Lepiej kogoś rozwściecz. Zatamuj
                   lawę!";
              }
              remove self; move broken_glass to location;
@@ -825,7 +825,7 @@ Object -> bear "niedźwiedź"
            Attack, ThrowAt:
                if (self has general) <WakeOther self>;
                remove mirror; move broken_glass to location;
-               "O nie...  Niedźwiedź robi unik...  TRZASK!";
+               "O nie... Niedźwiedź robi unik... TRZASK!";
        ],
   has  animate male;
 Object broken_glass "potłuczon/e szkł/o"
@@ -850,7 +850,7 @@ Treasure -> "*ZŁOTA KORONA*"
 
 ScottRoom Real_Trouble "Kłopoty!"
   with description
-           "Chyba masz naprawdę poważne kłopoty.  Jest tu facet z widłami!^^
+           "Chyba masz naprawdę poważne kłopoty. Jest tu facet z widłami!^^
             Wszystkie skarby *PRZEPADŁY*.",
        initial
        [;  deadflag=3;
@@ -859,10 +859,10 @@ ScottRoom Real_Trouble "Kłopoty!"
 
 ScottRoom Memory_RAM "Paskudne miejsce"
   with description
-          "Jesteś w pamięci RAM komputera IBM PC.  Gdzieś źle skręciłeś!",
+          "Jesteś w pamięci RAM komputera IBM PC. Gdzieś źle skręciłeś!",
        e_to Large_Cavern,
   has  light;
-Sign -> "Dla Architektów - TSURRIS";
+Sign -> "Dla Architektów – TSURRIS";
 
 ScottRoom Misty_Room "Mglista sala"
   with description "Jesteś w dużej mglistej sali z dziwnymi literami nad
@@ -870,7 +870,7 @@ ScottRoom Misty_Room "Mglista sala"
        s_to Real_Trouble,  e_to Forest,  w_to Real_Trouble,
        u_to Up_Oak,  d_to Real_Trouble,
   has  light;
-Sign -> "OTCHŁAŃ.  ZNAJDŹ WŁAŚCIWE WYJŚCIE I ŻYJ ZNOWU!";
+Sign -> "OTCHŁAŃ. ZNAJDŹ WŁAŚCIWE WYJŚCIE I ŻYJ ZNOWU!";
 
 ! ------------------------------------------------------------------------------
 !   Szczypta kodu
@@ -882,7 +882,7 @@ Sign -> "OTCHŁAŃ.  ZNAJDŹ WŁAŚCIWE WYJŚCIE I ŻYJ ZNOWU!";
   StartDaemon(chiggers);
 
   "^^^^^Rozlega się grzmiący głos...^
-  Skarby mają w nazwie *.  Powiedz 'WYNIK'^
+  Skarby mają w nazwie *. Powiedz 'WYNIK'^
   Jeśli potrzebujesz podpowiedzi, spróbuj 'POMOC'.^";
 ];
 
@@ -896,8 +896,8 @@ Sign -> "OTCHŁAŃ.  ZNAJDŹ WŁAŚCIWE WYJŚCIE I ŻYJ ZNOWU!";
   if (score ~= 100) rfalse;
 
   deadflag=2;
-  "Gratulacje!  Znajdując i składając wszystkie 13 *SKARBÓW*, rozwiązał",
-  (nop) Gracz("eś", "aś"), " ~Krainę Przygód~ Scotta Adamsa i zostaje tylko
+  "Gratulacje! Znajdując i składając wszystkie 13 *SKARBÓW*, rozwiązał",
+  (nop) Gracz("eś", "aś"), " „Krainę Przygód” Scotta Adamsa i zostaje tylko
    powiedzieć, że...";
 ];
 
@@ -911,7 +911,7 @@ Sign -> "OTCHŁAŃ.  ZNAJDŹ WŁAŚCIWE WYJŚCIE I ŻYJ ZNOWU!";
 
 [ DarkToDark;
   if (dark_warning==0)
-  {   dark_warning=1; "Jest teraz zupełnie ciemno.  Jeśli pójdziesz dalej,
+  {   dark_warning=1; "Jest teraz zupełnie ciemno. Jeśli pójdziesz dalej,
                        pewnie wpadniesz do jamy.";
   }
   if (random(4) == 1)
@@ -972,19 +972,19 @@ Sign -> "OTCHŁAŃ.  ZNAJDŹ WŁAŚCIWE WYJŚCIE I ŻYJ ZNOWU!";
 
 [ HelpSub;
    print "Rozlega się grzmiący głos...^";
-   print "Spróbuj:  ROZEJRZYJ SIĘ, SKOCZ, PŁYŃ, WESPNIJ SIĘ, RZUĆ, ZNAJDŹ,
+   print "Spróbuj: ROZEJRZYJ SIĘ, SKOCZ, PŁYŃ, WESPNIJ SIĘ, RZUĆ, ZNAJDŹ,
           IDŹ, WEŹ, EKWIPUNEK, WYNIK.^";
    if (chigger_bites in player || infected_bites in player)
        "Na ukąszenia dobre jest lekarstwo.";
    if (location == Quicksand) "Tu mogą być potrzebne magiczne słowa.";
    if (location == Sunny_Meadow)
-       "Tylko 3 rzeczy obudzą smoka.  Jedna z nich jest niebezpieczna!";
+       "Tylko 3 rzeczy obudzą smoka. Jedna z nich jest niebezpieczna!";
    if (location == Hive)
        "Przeczytaj tabliczkę na łące!";
    if (location == Maze1 or Maze2 or Maze3
        || location == Maze4 or Maze5 or Maze6)
        "Tu mogą być potrzebne magiczne słowa.";
-   if (location == Royal_Chamber) "Wysadź to.  Spróbuj na bagnie.";
+   if (location == Royal_Chamber) "Wysadź to. Spróbuj na bagnie.";
 ];
 
 [ AwaySub;

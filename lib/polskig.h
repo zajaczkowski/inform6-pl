@@ -219,8 +219,8 @@ Verb meta 'glklist'
 [ ADirection; if (noun in Compass) rtrue; rfalse; ];
 [ Przelaczalny; return noun has switchable; ];
 [ RozmowaSub;
-    print "Żeby porozmawiać, zapytaj o coś (~zapytaj ", (bie) noun,
-          " o drogę~) albo powiedz coś (~powiedz ", (cel) noun, " cześć~).^";
+    print "Żeby porozmawiać, zapytaj o coś („zapytaj ", (bie) noun,
+          " o drogę”) albo powiedz coś („powiedz ", (cel) noun, " cześć”).^";
 ];
 ! Jak "powiedz X cześć": reguła life postaci dostaje Answer ze słowem 'cześć'
 ! w noun (nie przez <Answer ...>, bo słowo nie jest obiektem).
@@ -229,7 +229,7 @@ Verb meta 'glklist'
     if (RunLife(o, ##Answer) == 0) L__M(##Answer, 1, noun);
     noun = o; second = 0;
 ];
-[ NakarmSub; "Kogo chcesz nakarmić i czym? Na przykład: ~nakarm niedźwiedzia jedzeniem~."; ];
+[ NakarmSub; "Kogo chcesz nakarmić i czym? Na przykład: „nakarm niedźwiedzia jedzeniem”."; ];
 [ KrzykSub; "Krzyczysz na cały głos, ale nic z tego nie wynika."; ];
 [ PomocSub;
     "To gra tekstowa. Wpisujesz polecenia, a gra opisuje, co się dzieje.

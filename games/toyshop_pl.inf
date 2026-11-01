@@ -222,7 +222,7 @@ Object  -> grenade "paskudn/y granat/+u ręczn/y!"
   with  name 'paskudnie' 'wyglądający' 'wyglądającego',
         initial "Paskudny granat ręczny (innych nie ma) toczy się beztrosko
                  po podłodze.",
-        description "Niezalecany dla dzieci poniżej 90 roku życia.",
+        description "Niezalecany dla dzieci poniżej 90. roku życia.",
         before [;
             Pull: if (self has general) "Na to już za późno.";
                   StartTimer(self, 5); give self general;
@@ -285,8 +285,8 @@ Object  -> matchbook "pudełk/o zapałek"
             }
         ],
         description [;
-            print "Na okładce widnieje reklama ~Curses - Adventure of
-                   a Lunchtime~. ";
+            print "Na okładce widnieje reklama „Curses – Adventure of
+                   a Lunchtime”. ";
             switch (self.number) {
               0: "Pudełko jest puste.";
               1: "Została w nim jedna zapałka.";
@@ -384,7 +384,7 @@ Class   Candle
 Object  -> "szar/e blaszan/e pudełk/o"
   with  name 'puszka' 'puszki' 'puszkę' 'puszce',
         description
-            "Szare blaszane pudełko ze ~Świecami Majora~.",
+            "Szare blaszane pudełko ze „Świecami Majora”.",
   has   container openable neuter;
 
 Candle  -> ->;
@@ -666,26 +666,26 @@ Object  -> Chris "Krzysztof/"
                   'piłka', 'piłkę', 'piłce', 'piłeczka', 'piłeczkę',
                   'piłeczce', 'żonglowanie', 'żonglowaniu',
                   'fluorescencyjna', 'fluorescencyjną':
-                      "~To moje!~";
+                      "„To moje!”";
                   'balon', 'balonik', 'baloniku', 'balonie', 'hel':
                       "Krzysztof ziewa.";
                   'klocek', 'klocki', 'klockach', 'klocku', 'wieżę', 'wieży':
-                      "~Założę się, że zbuduję wyższą wieżę niż ty.~";
+                      "„Założę się, że zbuduję wyższą wieżę niż ty.”";
                   'zabawki', 'zabawkach', 'sklep', 'sklepie':
-                      "~Fajnie tu, prawda?~";
-                  default: "~Nie wiem.~";
+                      "„Fajnie tu, prawda?”";
+                  default: "„Nie wiem.”";
                 }
             Answer:
                 switch (noun) {
                   'cześć', 'hej', 'witaj', 'siema', 'dzień', 'hejka':
-                      "~Cześć~ - odpowiada wesoło Krzysztof.";
+                      "„Cześć” – odpowiada wesoło Krzysztof.";
                   default: "Krzysztof wydaje się zajęty czymś innym.";
                 }
             Attack:
                 remove self;
                 "Krzysztof rzuca się do ucieczki i bez trudu przemyka obok
                  ciebie!";
-            Kiss: "~Fuj, ale ckliwe.~";
+            Kiss: "„Fuj, ale ckliwe.”";
             Give:
                 if (noun == balloon) "Balonik zupełnie go nie interesuje.";
                 x = child(Chris);
@@ -697,10 +697,10 @@ Object  -> Chris "Krzysztof/"
                 print (bie) noun; move noun to Chris; ".";
         ],
         orders [;
-            Drop: if (noun in Chris) "~Nie! To moje!~";
+            Drop: if (noun in Chris) "„Nie! To moje!”";
             Take: "Krzysztofowi się nie chce.";
-            Give: if (second == player) "~Weź sobie własne!~";
-            Go: "~Ale mi się tu podoba!~";
+            Give: if (second == player) "„Weź sobie własne!”";
+            Go: "„Ale mi się tu podoba!”";
             PutOn: if (noun notin Chris) "Krzysztof zupełnie nie wie, o co chodzi.";
                    if (~~(noun ofclass Block && second ofclass Block))
                        "Krzysztof nie widzi w tym sensu.";
@@ -733,17 +733,17 @@ Object  "fluorescencyjn/a piłeczk/a do żonglowania" Chris
 Toyroom Office "Biuro"
   with  description
             "Małe, szare biuro z szeroką kamienną półką nad kominkiem. We
-             wschodniej ścianie są drzwi z napisem ~Wyjście~, a sklep
+             wschodniej ścianie są drzwi z napisem „Wyjście”, a sklep
              z zabawkami leży oczywiście na północy.",
         cant_go "Sala sklepu leży na północy.",
         n_to West_End,
         e_to [;
             if (score ~= MAX_SCORE)
-                "Rozlega się gong. ~Nie możesz opuścić sklepu z zabawkami,
-                 dopóki nie zrobisz sześciu ciekawych rzeczy!~";
+                "Rozlega się gong. „Nie możesz opuścić sklepu z zabawkami,
+                 dopóki nie zrobisz sześciu ciekawych rzeczy!”";
             deadflag = 2;
-            "Rozlega się gong. ~Gratulacje! Możesz już opuścić sklep
-             z zabawkami i zacząć pisać własną grę w Informie!~";
+            "Rozlega się gong. „Gratulacje! Możesz już opuścić sklep
+             z zabawkami i zacząć pisać własną grę w Informie!”";
         ];
 
 ! ------------------------------------------------------------------------------
@@ -824,7 +824,7 @@ Object  -> blackboard "tablic/a"
                     print "^Tablica w biurze jest czysto wytarta.^";
                     if (self hasnt general) {
                         give self general;
-                        "^[Żeby coś na niej napisać, spróbuj   > napisz ~tekst...~]";
+                        "^[Żeby coś na niej napisać, spróbuj   > napisz „tekst...”]";
                     }
                     rtrue;
                 }
@@ -878,7 +878,7 @@ Global from_char; Global to_char;
 [ Initialise;
     location = chair; move satchel to player;
 
-    print "^^^^~Co jest takiego wyjątkowego w tym Informie?~ - tyle
+    print "^^^^„Co jest takiego wyjątkowego w tym Informie?” – tyle
            pamiętasz z rozmowy z szalonym alchemikiem. Wielki błąd...^^";
 
     StartDaemon(balloon);
@@ -919,7 +919,7 @@ Global from_char; Global to_char;
          wyściełana podłoga staje w płomieniach.";
     }
     "Rozlega się gong i grobowy, nieco rozczarowany głos oznajmia:
-     ~W sklepie z zabawkami nie wolno bawić się ogniem.~";
+     „W sklepie z zabawkami nie wolno bawić się ogniem.”";
 ];
 
 ! Nowa akcja Burst (przebij), która po prostu przechodzi w Attack, oraz

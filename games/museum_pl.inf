@@ -12,8 +12,8 @@
 !   - nazwy obiektów są w notacji automatycznej odmiany (lib/odmiana.h),
 !     a procedury short_name dobierają przypadek same (PoPrzyp);
 !   - polecenia do maszyn i postaci są po polsku ("komputer, gdzie jest
-!     kapitan Picard", "zen, ustaw kurs na centauro", "charlotte, szymon
-!     mówi pomachaj");
+! kapitan Picard", "zen, ustaw kurs na centauro", "charlotte, szymon
+! mówi pomachaj");
 !   - własna linia statusu (DrawStatusLine) działa tylko w maszynie Z;
 !     w Glulx zostaje standardowa;
 !   - dostęp do tablicy parse idzie przez UstawSlowo/NumberWords, więc gra
@@ -98,9 +98,9 @@ Class Key
 Object  Foyer "Hol"
  has    light
  with   description
-           "Hol wspaniałego Muzeum Informu.  Szerokie schody prowadzą na górę,
+           "Hol wspaniałego Muzeum Informu. Szerokie schody prowadzą na górę,
             do rozdziałów V i VI, a na tym poziomie korytarze rozchodzą się
-            do rozdziału IV.  Prowadzą:^
+            do rozdziału IV. Prowadzą:^
             ^  na północ do Sali 10 (Sale Zmysłów i Kierunków),
             ^  na południe Korytarzem 12 (drzwi) do Sali 13 (przełączniki),
             ^  na @00 do Sali 11 (Cudowny Świat Pojemników)
@@ -118,19 +118,19 @@ Object -> "plan/+u parteru"
        [;  font off;
            print
           "^+------------------------------------------+
-           ^|                              (lustro)    |
+           ^|                              (lustro) |
            ^|   Sala          Sala 10  ---  Sala 10a   |
            ^|   ciężarów      zmysły        kierunki   |
            ^|      |            |                      |
            ^|   Sala 14 ---    Hol    ---   Sala 11    |
-           ^|  (zmiana     (jesteś tutaj)   pojemniki  |
-           ^|   postaci)        |                      |
+           ^|  (zmiana     (jesteś tutaj) pojemniki  |
+           ^|   postaci) |                      |
            ^|                   |                      |
            ^|   Sala 15 --- Korytarz 12                |
-           ^| (rękopisy)  (drzwi, kustosz)             |
-           ^|   (Biblia)        |                      |
+           ^| (rękopisy) (drzwi, kustosz) |
+           ^|   (Biblia) |                      |
            ^|           Sala Przełączników 13          |
-           ^|               (przepaść)                 |
+           ^|               (przepaść) |
            ^|                   |                      |
            ^|      Druga strona przepaści w Sali 13    |
            ^+------------------------------------------+^";
@@ -153,12 +153,12 @@ Object basement "Piwnica muzeum"
 
 Object Room10 "Sala Zmysłów"
   with description
-          "To Sala 10, na północ od holu.  Jeśli spróbujesz iść dalej na
-           północ, zamiast tego zostanie wypisany napis.  Do wyjścia na
+          "To Sala 10, na północ od holu. Jeśli spróbujesz iść dalej na
+           północ, zamiast tego zostanie wypisany napis. Do wyjścia na
            @00 przypisana jest procedura i prowadzi ono losowo albo do Sali
            Kierunków, albo z powrotem do holu.",
        s_to Foyer,
-       n_to "Ten napis to wartość ~n_to~ tego pomieszczenia.",
+       n_to "Ten napis to wartość „n_to” tego pomieszczenia.",
        e_to
        [;  if (random(2)==1) return Foyer; return Room10a; ],
   has  light;
@@ -175,9 +175,9 @@ Object -> "dźwigni/a PUŁAPKI"
        ],
        after
        [;  SwitchOn: move orange_cloud to location;
-              "Łup!  Nagle opada na ciebie pomarańczowa chmura.";
+              "Łup! Nagle opada na ciebie pomarańczowa chmura.";
            SwitchOff: remove orange_cloud;
-              "Klik!  Pomarańczowa chmura znika.";
+              "Klik! Pomarańczowa chmura znika.";
        ],
   has  switchable static female;
 
@@ -190,14 +190,14 @@ Object -> "złot/y zegar/e/k/"
 Object -> "gałązk/a lawendy"
   with name 'lawenda' 'lawendy' 'lawendę' 'lawendą',
        react_before
-       [;  Smell: if (noun==0 or self) "Lawendowe perfumy.  Ach!"; ],
+       [;  Smell: if (noun==0 or self) "Lawendowe perfumy. Ach!"; ],
   has  female;
 
 Object orange_cloud "pomarańczow/a chmur/a"
   with react_before
        [;  Look: "Nic nie widać przez otaczającą cię pomarańczową chmurę.";
            Go, Exit: "Krążysz w kółko, krztusząc się.";
-           Smell: if (noun==0 or self) "Cynamon?  Nie, gałka muszkatołowa.";
+           Smell: if (noun==0 or self) "Cynamon? Nie, gałka muszkatołowa.";
        ],
   has  scenery female;
 
@@ -226,8 +226,8 @@ Object Room10a "Sala Kierunków"
   with name 'lustro' 'lustra' 'lustrze',
        description
           "Przybudówka Sali 10: główne wyjście prowadzi z powrotem na @01,
-           a na północnej ścianie wisi dziwnie zamglone lustro.  Jest też
-           wyjście w czwartym, ~hiper~ wymiarze (widocznym tylko w dziwnej
+           a na północnej ścianie wisi dziwnie zamglone lustro. Jest też
+           wyjście w czwartym, „hiper” wymiarze (widocznym tylko w dziwnej
            geometrii tej sali).",
        initial
        [;  move hyper to compass; StartDaemon(hyper);
@@ -239,7 +239,7 @@ Object Room10a "Sala Kierunków"
            if (self has general) give self ~general; else give self general;
            <<Look>>;
        ],
-       in_to [; print "Niesamowite!  Przechodząc, skręcasz się jak korkociąg.^";
+       in_to [; print "Niesamowite! Przechodząc, skręcasz się jak korkociąg.^";
                 return Room11; ],
   has  light;
 
@@ -254,7 +254,7 @@ Object hyper "hiperwymiarow/y kierun/e/k/+u"
 
 Object Room11 "Cudowny Świat Pojemników"
   with description
-          "To Sala 11, na @00 od holu.  Zauważasz typowy element dekoracji,
+          "To Sala 11, na @00 od holu. Zauważasz typowy element dekoracji,
            który okazuje się podstawką: gzyms kominka.",
        w_to Foyer,
   has  light;
@@ -271,14 +271,14 @@ Object -> "brodaty psychiatra"
        [;  "Twoje zachowanie wyraźnie go fascynuje, ale nie próbuje się wtrącać.";
        ],
        react_after
-       [;  Insert: print "~Pacjent wkłada ", (bie) noun, " do ", (dop) second,
-                      ".  Interesujące.~^";
-           PutOn:  print "~Pacjent kładzie ", (bie) noun, " na ", (mie) second,
-                      ".  Interesujące.~^";
+       [;  Insert: print "„Pacjent wkłada ", (bie) noun, " do ", (dop) second,
+                      ". Interesujące.”^";
+           PutOn:  print "„Pacjent kładzie ", (bie) noun, " na ", (mie) second,
+                      ". Interesujące.”^";
        ],
        react_before
-       [;  Take, Remove: print "~Pacjentowi brakuje ", (dop) noun,
-               ".  Stłumiony kompleks Edypa?  Mhm.~^";
+       [;  Take, Remove: print "„Pacjentowi brakuje ", (dop) noun,
+               ". Stłumiony kompleks Edypa? Mhm.”^";
        ],
   has  animate male;
 
@@ -369,7 +369,7 @@ Object -> "torb/a z makramy"
        describe
        [;  print "^Z sufitu zwisa ciasno zawiązana torba z makramy";
            if (child(self)==0) ".";
-           print ".  W środku widać ";
+           print ". W środku widać ";
            ListaWPrzypadku(self, PRZYP_BIE);
            WriteListFrom(child(self), ENGLISH_BIT);
            ListaWPrzypadku(0);
@@ -388,7 +388,7 @@ Object -> -> "pozytywk/a"
 
 Object Corridor12 "Korytarz 12"
   with description
-          "Biegnie na południe od holu.  Boczne wyjście prowadzi na @01, do
+          "Biegnie na południe od holu. Boczne wyjście prowadzi na @01, do
            Sali 15, sali rękopisów.",
        n_to Foyer, s_to Oak_Door, w_to Room15,
   has  light;
@@ -423,7 +423,7 @@ Object -> "złowrog/i kustosz/"
        ],
        orders
        [;  if (self hasnt general) "Kustosz tylko chrapie.";
-          "Przykłada kościsty palec do ust.  ~Ćśś!~";
+          "Przykłada kościsty palec do ust. „Ćśś!”";
        ],
        life
        [;  WakeOther:
@@ -493,7 +493,7 @@ Object -> "czarna Biblia Tyndale'a"
 Object Room13 "Sala Przełączników"
   with description
           "To Sala 13, na południowym końcu długiego korytarza biegnącego na
-           północ.  Dalej na południe drogę zagradza przepaść.",
+           północ. Dalej na południe drogę zagradza przepaść.",
        n_to Oak_Door, s_to PlankBridge,
   has  light;
 
@@ -524,8 +524,8 @@ Object -> PlankBridge "chwiejn/a kładk/a"
        [;  if (children(player)~=0)
             {   deadflag=1;
                "Ostrożnie stąpasz po kładce, która ugina się pod twoim
-                ciężarem.  Ale twój skromny dobytek okazuje się kroplą, która
-                przepełnia czarę!  Rozlega się okropny trzask...";
+                ciężarem. Ale twój skromny dobytek okazuje się kroplą, która
+                przepełnia czarę! Rozlega się okropny trzask...";
             }
             print "Ostrożnie przechodzisz po kładce, wdzięczn",
                 (nop) Gracz("y", "a"), ", że nic nie niesiesz.^";
@@ -569,14 +569,14 @@ Object -> "krzesł/o w stylu Ludwika XV"
 
 Object -> car "mał/y czerwon/y samochodzik/"
   with name 'samochód' 'samochodu' 'samochodem' 'auto' 'auta' 'autem' 'kar1',
-       description "Na tyle duży, żeby usiąść w środku.  Wśród elementów
-                 sterowania wyróżnia się przełącznik zapłonu.  Numer
+       description "Na tyle duży, żeby usiąść w środku. Wśród elementów
+                 sterowania wyróżnia się przełącznik zapłonu. Numer
                  rejestracyjny to KAR 1.",
        when_on  "Stoi tu czerwony samochodzik z wciąż pracującym silnikiem.",
        when_off "Zaparkowano tu mały czerwony samochodzik.",
        before
        [; PushDir: AllowPushDir(); rtrue;
-          Go: if (car has on) "Brum!  Brum!";
+          Go: if (car has on) "Brum! Brum!";
               print "(Zapłon jest w tej chwili wyłączony.)^";
        ],
        after
@@ -599,7 +599,7 @@ Object -> -> "liścik/"
 
 Object -> "olbrzym/"
   with name 'gigant' 'giganta' 'olbrzymem',
-       initial "Jest tu olbrzym.  (A znasz starą legendę... popchnij
+       initial "Jest tu olbrzym. (A znasz starą legendę... popchnij
            olbrzyma, a staniesz się olbrzymem!)",
        before
        [;  Push: ChangePlayer(self); <<Look>>;
@@ -617,7 +617,7 @@ Object -> "olbrzym/"
                rfalse;
            }
            Attack: "Olbrzym patrzy na ciebie smutnymi oczami.
-                    ~Ja nie być taki zły!~";
+                    „Ja nie być taki zły!”";
            default: "Olbrzym nie rozumie twoich poleceń.";
        ],
   has  animate male;
@@ -666,10 +666,10 @@ Constant HEAVINESS_THRESHOLD = 100;
 
 Object Weights_Room "Sala Ciężarów"
   with description
-          "To przybudówka na północ od Sali 14.  Tutaj (choć nigdzie indziej)
+          "To przybudówka na północ od Sali 14. Tutaj (choć nigdzie indziej)
            przedmioty mają określone ciężary i możesz unieść tylko
-           ograniczony łączny ciężar.  (Przedmioty z innych części muzeum
-           ważą po 10 zobów, niezależnie od tego, czym są.)  Im dłużej
+           ograniczony łączny ciężar. (Przedmioty z innych części muzeum
+           ważą po 10 zobów, niezależnie od tego, czym są.) Im dłużej
            nosisz ciężkie przedmioty, tym bardziej się męczysz, aż w końcu
            musisz je upuścić; siły wracają, kiedy niesiesz już tylko lekki
            ładunek.",
@@ -745,7 +745,7 @@ Object balcony "Balkon"
   with description
        [;  print "Odkryty balkon na skalnej ścianie, na której wznosi się podobne do katedry muzeum, setki stóp nad ";
            if (day_state==1) "skąpanymi w słońcu równinami pól i osad.";
-           "mroczną równiną.  Przyćmione światło ze ścian w górze to jedyna
+           "mroczną równiną. Przyćmione światło ze ścian w górze to jedyna
             latarnia w tej bezkresnej nocy.";
        ],
        in_to Foyer,
@@ -792,9 +792,9 @@ Object -> "komandor Data"
        desc_bie "komandora Data", desc_nar "komandorem Data",
        desc_mie "komandorze Data",
        orders
-       [; "~Niestety jestem tu tylko po to, żeby zadziałał przykład gdzie
-            indziej.  Proszę udać się na górę, do 10 Forward, żeby go
-            zobaczyć.~";
+       [; "„Niestety jestem tu tylko po to, żeby zadziałał przykład gdzie
+            indziej. Proszę udać się na górę, do 10 Forward, żeby go
+            zobaczyć.”";
        ],
   has  proper animate male crewmember;
 
@@ -822,16 +822,16 @@ Object -> "plan/+u antresoli"
            ^|                                          |
            ^|                                          |
            ^|               Antresola                  |
-           ^|             (jesteś tutaj)               |
+           ^|             (jesteś tutaj) |
            ^|                   |                      |
            ^|                   |                      |
            ^|           Sala Gramatyki 16              |
-           ^|        (telepatia, budzik)               |
-           ^|     (Charlotte, Dan)   ---  Ten Forward  |
+           ^|        (telepatia, budzik) |
+           ^|     (Charlotte, Dan) ---  Ten Forward  |
            ^|                   |         (replikator) |
-           ^|               Mostek        (komputer)   |
-           ^|              Liberatora     (trikorder)  |
-           ^|                 (Zen)                    |
+           ^|               Mostek        (komputer) |
+           ^|              Liberatora     (trikorder) |
+           ^|                 (Zen) |
            ^+------------------------------------------+^";
            font on;
        ],
@@ -843,17 +843,17 @@ Object -> "ulotk/a o wystawie w Sali 16"
        initial "Na podłodze leży ulotka o wystawie.",
        description
           "Wśród rzadkich i fascynujących eksponatów Sali 16 są:...^^
-           Telekinetyczna (i telepatyczna) Martha.  W kabinie telepatycznej
-           możesz z nią rozmawiać tak, jakby była w Sali 16 razem z tobą -
-           ale jej tu nie ma, jest daleko.  Powiedz jej ~rozejrzyj się~, żeby
+           Telekinetyczna (i telepatyczna) Martha. W kabinie telepatycznej
+           możesz z nią rozmawiać tak, jakby była w Sali 16 razem z tobą –
+           ale jej tu nie ma, jest daleko. Powiedz jej „rozejrzyj się”, żeby
            się dowiedzieć gdzie, a możesz ją też prosić, żeby dała ci różne
            rzeczy (telekinezą).^^
-           Charlotte, która bawi się w ~Szymon mówi~.  Wykona twoje polecenia,
-           pod warunkiem że zaczniesz je od ~szymon mówi~.  (Choć umie tylko
-           pomachać albo klasnąć wiele razy - wystarczy podać liczbę.)^^
+           Charlotte, która bawi się w „Szymon mówi”. Wykona twoje polecenia,
+           pod warunkiem że zaczniesz je od „szymon mówi”. (Choć umie tylko
+           pomachać albo klasnąć wiele razy – wystarczy podać liczbę.)^^
            Dan Dyslektyk umie brać i odkładać rzeczy oraz sprawdzać, co ma
-           przy sobie, ale niestety myli polecenia ~weź~ i ~upuść~.^^
-           Budzikowi można powiedzieć ~włącz~, ~wyłącz~ albo podać godzinę
+           przy sobie, ale niestety myli polecenia „weź” i „upuść”.^^
+           Budzikowi można powiedzieć „włącz”, „wyłącz” albo podać godzinę
            (na którą ma nastawić alarm).",
   has  female;
 
@@ -865,14 +865,14 @@ Object Grammar_Hall "Sala Gramatyki"
           "Główna wystawa drugiego piętra: Sala 16, na południe od antresoli.
            Na @00 biegnie tunel Jefferiesa do sali ze Star Trek: Następne
            Pokolenie, a sześciokątny korytarz na południe prowadzi na mostek
-           statku kosmicznego ~Liberator~.",
+           statku kosmicznego „Liberator”.",
        n_to Second_Floor, e_to Star_Trek, s_to Blakes_Seven;
 
 Object -> booth "kabin/a telepatyczn/a!"
   with name 'telepatia' 'telepatii',
        initial
           "Zachęcająco otwarta stoi kabina telepatyczna z napisem
-           ~Porozmawiaj z Telekinetyczną Marthą~.",
+           „Porozmawiaj z Telekinetyczną Marthą”.",
   has  enterable static female;
 
 Object -> "Charlotte"
@@ -894,18 +894,18 @@ Object -> "Charlotte"
            WaveHands: "Charlotte macha energicznie.";
            Clap: if (self.number==0) "Charlotte zakłada ręce.";
                  for (i=0:i<self.number:i++)
-                 {   print "Klap!  ";
+                 {   print "Klap! ";
                      if (i==100)
-                         print "(Pewnie już tego żałujesz.)  ";
+                         print "(Pewnie już tego żałujesz.) ";
                      if (i==200)
-                         print "(Ale z niej uparta dziewczynka.)  ";
+                         print "(Ale z niej uparta dziewczynka.) ";
                  }
                  if (self.number>100)
                      "^^Charlotte trochę brakuje tchu.";
-                "^^~Łatwizna!~ mówi Charlotte.";
-           default: "~Nie umiem~, mówi Charlotte.";
+                "^^„Łatwizna!” mówi Charlotte.";
+           default: "„Nie umiem”, mówi Charlotte.";
        ],
-       initial "Charlotte chce się bawić w ~Szymon mówi~.",
+       initial "Charlotte chce się bawić w „Szymon mówi”.",
   has  animate female proper crewmember;
 
 Object -> "Dan/"
@@ -916,10 +916,10 @@ Object -> "Dan/"
        ],
        orders
        [;
-           Take: "~Co~, mówi Dan, ~chcesz, żebym wziął ", (bie) noun, "?~";
-           Drop: "~Co~, mówi Dan, ~chcesz, żebym upuścił ", (bie) noun, "?~";
-           Inv: "~To akurat umiem~, mówi Dan.  ~Mam puste ręce.~";
-           default: "~Nie umiem~, mówi Dan.";
+           Take: "„Co”, mówi Dan, „chcesz, żebym wziął ", (bie) noun, "?”";
+           Drop: "„Co”, mówi Dan, „chcesz, żebym upuścił ", (bie) noun, "?”";
+           Inv: "„To akurat umiem”, mówi Dan. „Mam puste ręce.”";
+           default: "„Nie umiem”, mówi Dan.";
        ],
        initial "Jest tu Dan Dyslektyk.",
   has  animate proper male crewmember;
@@ -943,21 +943,21 @@ Object -> "budzik/"
        ],
        daemon
        [;  if (the_time >= self.number && the_time <= self.number+3
-               && self has general) "^Bip!  Bip!  Dzwoni budzik.";
+               && self has general) "^Bip! Bip! Dzwoni budzik.";
        ],
        grammar
        [;  return 'alarm,';
        ],
        orders
-       [;  SwitchOn: give self general; StartDaemon(self); "~Alarm nastawiony.~";
+       [;  SwitchOn: give self general; StartDaemon(self); "„Alarm nastawiony.”";
            SwitchOff: give self ~general; StopDaemon(self);
-               "~Alarm odwołany.~";
+               "„Alarm odwołany.”";
            SetTo:   self.number=noun; <<Examine self>>;
-           default: "~Polecenia: włącz, wyłącz albo godzina, bardzo proszę.~";
+           default: "„Polecenia: włącz, wyłącz albo godzina, bardzo proszę.”";
        ],
        life
        [;  Ask, Answer, Tell:
-           "[Spróbuj ~budzik, coś tam~, żeby zwrócić się do budzika.]";
+           "[Spróbuj „budzik, coś tam”, żeby zwrócić się do budzika.]";
        ],
   has  talkable;
 
@@ -968,7 +968,7 @@ Object Blakes_Seven "Statek kosmiczny Liberator: mostek"
   with description
           "Ogromny, wielopoziomowy mostek obcego statku kosmicznego
            Liberator, przejętego przez grupę rewolucyjnych przestępców Blake'a,
-           uciekających przed uciskiem Federacji Ziemskiej.  (Bez obaw - to
+           uciekających przed uciskiem Federacji Ziemskiej. (Bez obaw – to
            tylko przekonująca replika, a muzeum wciąż jest z powrotem na
            północy.)",
        n_to Grammar_Hall;
@@ -996,19 +996,19 @@ Object -> "Zen"
        orders
        [;  Show: "Główny ekran pokazuje pole gwiazd, obracające się o ",
                   noun, " stopni.";
-           Go:  "~Potwierdzam.~  Statek obiera nowy kurs.";
-           SetTo: if (noun==0) "~Potwierdzam.~  Statek się zatrzymuje.";
-               if (noun>12) "~Prędkość standardowa ", (LanguageNumber) noun,
-                            " przekracza dopuszczalne normy konstrukcyjne.~";
-               "~Potwierdzam.~  Silniki statku przechodzą na prędkość
+           Go:  "„Potwierdzam.” Statek obiera nowy kurs.";
+           SetTo: if (noun==0) "„Potwierdzam.” Statek się zatrzymuje.";
+               if (noun>12) "„Prędkość standardowa ", (LanguageNumber) noun,
+                            " przekracza dopuszczalne normy konstrukcyjne.”";
+               "„Potwierdzam.” Silniki statku przechodzą na prędkość
                 standardową ", (LanguageNumber) noun, ".";
-           Take: if (noun~=force_wall) "~Proszę sprecyzować.~";
-                "~Pole siłowe podniesione.~";
-           Drop: if (noun~=blasters)   "~Proszę sprecyzować.~";
-              "~Komputery bojowe aktywne.  Działa neutronowe gotowe
-                do strzału.~";
-           NotUnderstood: "~Banki językowe nie mogą tego odczytać.~";
-           default: "~Informacja.  Ta funkcja jest niedostępna.~";
+           Take: if (noun~=force_wall) "„Proszę sprecyzować.”";
+                "„Pole siłowe podniesione.”";
+           Drop: if (noun~=blasters)   "„Proszę sprecyzować.”";
+              "„Komputery bojowe aktywne. Działa neutronowe gotowe
+                do strzału.”";
+           NotUnderstood: "„Banki językowe nie mogą tego odczytać.”";
+           default: "„Informacja. Ta funkcja jest niedostępna.”";
        ],
   has  talkable proper static;
 Object -> -> force_wall "pol/e siłow/e!"
@@ -1034,21 +1034,21 @@ Object Star_Trek "10 Forward"
   with description
           "Usiana gwiazdami sala obserwacyjna na przodzie pokładu 10 statku
            kosmicznego Enterprise, gdzie w sytuacjach kryzysowych wypito
-           wiele koktajli mlecznych.  (To oczywiście tylko replika, a muzeum
+           wiele koktajli mlecznych. (To oczywiście tylko replika, a muzeum
            jest z powrotem na @01.)",
        w_to Grammar_Hall;
 
 Object -> "pouczając/a tabliczk/a"
   with name 'tablica' 'tablicę',
        description
-          "[Komputer, nazywany po prostu ~komputerem~, przydaje się do
-           odnajdywania członków załogi: spróbuj ~komputer, gdzie jest
-           komandor data~ albo ~...kapitan picard~, albo kogokolwiek
+          "[Komputer, nazywany po prostu „komputerem”, przydaje się do
+           odnajdywania członków załogi: spróbuj „komputer, gdzie jest
+           komandor data” albo „...kapitan picard”, albo kogokolwiek
            z innych osób, które można znaleźć w muzeum.^^
            Trikorder zeskanuje coś, jeśli podasz mu nazwę osoby albo
            rzeczy, którą chcesz zeskanować.^^
            Replikator to ulepszony automat z napojami: na przykład kapitan
-           Picard lubi mówić ~replikator, herbata earl grey~.  Jest też
+           Picard lubi mówić „replikator, herbata earl grey”. Jest też
            brandy i woda destylowana.]",
   has  static female;
 
@@ -1061,9 +1061,9 @@ Object -> "komputer/+a"
        orders
        [;  Examine:
                if (parent(noun)==0)
-                   "~", (CMian) noun, " - nie ma już na pokładzie tej gry
-                   demonstracyjnej.~";
-               "~", (CMian) noun, " - lokalizacja: ", (name) parent(noun), ".~";
+                   "„", (CMian) noun, " – nie ma już na pokładzie tej gry
+                   demonstracyjnej.”";
+               "„", (CMian) noun, " – lokalizacja: ", (name) parent(noun), ".”";
            default: "Komputer nadaje się właściwie tylko do odnajdywania załogi.";
        ],
        life
@@ -1077,12 +1077,12 @@ Object -> "trikorder/"
        [;  return 'tc,';
        ],
        orders
-       [;  Examine: if (noun==player) "~Wykazujesz oznaki życia.~";
-               print "~", (CMian) noun;
-               if (noun hasnt animate) " nie wykazuje oznak życia.~";
-              " wykazuje oznaki życia.~";
-           default: "Trikorder piszczy.  Przyjmuje tylko polecenia
-               ~trikorder, <coś>~.";
+       [;  Examine: if (noun==player) "„Wykazujesz oznaki życia.”";
+               print "„", (CMian) noun;
+               if (noun hasnt animate) " nie wykazuje oznak życia.”";
+              " wykazuje oznaki życia.”";
+           default: "Trikorder piszczy. Przyjmuje tylko polecenia
+               „trikorder, <coś>”.";
        ],
        life
        [;  Ask, Answer, Tell: "Trikorder jest na to za prosty.";
@@ -1100,7 +1100,7 @@ Object -> "replikator/"
        orders
        [;  Give:
                "Replikator podaje kubek ", (dop) noun, ", który łapczywie wypijasz.";
-           default: "Replikator nie może spełnić prośby.  Musisz podać mu
+           default: "Replikator nie może spełnić prośby. Musisz podać mu
                nazwę napoju, który zna.";
        ],
        life
@@ -1135,25 +1135,25 @@ Object -> martha "Marth/a"
        orders
        [ r; r=parent(self);
            Give:
-               if (noun notin r) "~To przekracza moją telekinezę.~";
-               if (noun==self) "~Teleportacja jest dla mnie za trudna.~";
+               if (noun notin r) "„To przekracza moją telekinezę.”";
+               if (noun==self) "„Teleportacja jest dla mnie za trudna.”";
                move noun to player;
-               "~No to jazda...~ i telekinetyczne zdolności Marthy w magiczny
+               "„No to jazda...” i telekinetyczne zdolności Marthy w magiczny
                 sposób przenoszą ", (bie) noun, " do twoich rąk.";
            Look:
-               print "~", (string) r.description;
-               if (children(r)==1) ".  Nie ma tu nic poza mną.~";
-               print ".  Widzę ";
+               print "„", (string) r.description;
+               if (children(r)==1) ". Nie ma tu nic poza mną.”";
+               print ". Widzę ";
                ListaWPrzypadku(r, PRZYP_BIE);
                WriteListFrom(child(r),CONCEAL_BIT+ENGLISH_BIT);
                ListaWPrzypadku(0);
-              ".~";
-           default: "~Obawiam się, że w tym nie pomogę.~";
+              ".”";
+           default: "„Obawiam się, że w tym nie pomogę.”";
        ],
        life
-       [;  Ask: "~Tym razem radzisz sobie sam", (nop) Gracz("", "a"), ".~";
+       [;  Ask: "„Tym razem radzisz sobie sam", (nop) Gracz("", "a"), ".”";
            Tell: "Martha cmoka ze współczuciem.";
-           Answer: "~No proszę~, odpowiada Martha.";
+           Answer: "„No proszę”, odpowiada Martha.";
        ];
 
 ! ==============================================================================
@@ -1161,7 +1161,7 @@ Object -> martha "Marth/a"
 Object Third_Floor "Trzecie piętro"
   with name 'klapa' 'klapę' 'klapy',
        description
-          "Z holu trzeciego piętra, na szczycie marmurowych schodów, wychodzi się do sal z rozdziału V.  Prowadzą:^
+          "Z holu trzeciego piętra, na szczycie marmurowych schodów, wychodzi się do sal z rozdziału V. Prowadzą:^
            ^  na południe do Korytarza 22 (ekwipunki)
            i Biura Własności Listy,
            ^  na @00 do Sali 24 (Ciekawe Nazwy),
@@ -1181,19 +1181,19 @@ Object -> "plan/+u trzeciego piętra"
           "^+------------------------------------------+
            ^|                                          |
            ^|   (szklana                               |
-           ^|     szyba)                               |
-           ^|      !                                   |
+           ^|     szyba) |
+           ^|      ! |
            ^| Sala ! 28  ---  Schody  ---   Sala 24    |
-           ^|      !       (jesteś tutaj)     Nazwy    |
+           ^|      ! (jesteś tutaj) Nazwy    |
            ^|                   |              |       |
            ^|                   |      Kawiarnia muzeum|
            ^|               Korytarz 22                |
-           ^|              (ekwipunki)                 |
+           ^|              (ekwipunki) |
            ^|            /      |        @@92             |
            ^|           /       |         @@92            |
            ^| Sala 23 Z ---   Sala 23  --- Sala 23 W   |
-           ^| (maszyna     Biuro Własności  (I Ching)  |
-           ^|  do list)        Listy                   |
+           ^| (maszyna     Biuro Własności  (I Ching) |
+           ^|  do list) Listy                   |
            ^+------------------------------------------+^";
            font on;
        ],
@@ -1206,18 +1206,18 @@ Object -> "Leksykon/+u"
        description
           "(Na grzbiecie leksykonu wypisano numer 27.)^^
            W środku jest wiele znajomych czasowników, których regularnie
-           używasz w grach Informu.  Są też specjalne, dostępne tylko
+           używasz w grach Informu. Są też specjalne, dostępne tylko
            w muzeum...^^
-           ~megaspójrz~ : jak ~rozejrzyj się~, ale o wiele dokładniej;^
-           ~potrój <przedmiot> <przedmiot> <przedmiot>~ : właściwie nic
+           „megaspójrz” : jak „rozejrzyj się”, ale o wiele dokładniej;^
+           „potrój <przedmiot> <przedmiot> <przedmiot>” : właściwie nic
            nie robi, ale pokazuje, jak rozpoznać czasownik z trzema
            dopełnieniami zamiast zwykłych od 0 do 2;^
-           ~czas <godzina>~ : ustawia aktualną porę dnia (wyjdź na balkon,
+           „czas <godzina>” : ustawia aktualną porę dnia (wyjdź na balkon,
            żeby zobaczyć wschód słońca o 6:00);^
-           ~fp <liczba ułamkowa>~ : pokazuje, jak rozpoznawać liczby
+           „fp <liczba ułamkowa>” : pokazuje, jak rozpoznawać liczby
            z częścią ułamkową;^
-           ~wybierz <numer telefonu>~ : podobnie numery telefonów.^^
-           Do tego w muzeum ~zamknij~ i ~otwórz~ potrafią sprytnie domyślić
+           „wybierz <numer telefonu>” : podobnie numery telefonów.^^
+           Do tego w muzeum „zamknij” i „otwórz” potrafią sprytnie domyślić
            się klucza jako drugiego dopełnienia.";
 
 ! ------------------------------------------------------------------------------
@@ -1260,7 +1260,7 @@ Object -> "księg/a Geoffreya"
                self.invent = "tę zabójczą starą księgę Geoffreya";
               "Na pozór nieszkodliwa księga robi się w twoich rękach
                rozpalona do czerwoności, a twój wzrok przyciągają ohydne
-               znaki wyryte w środku...  W ostatniej chwili przełamujesz
+               znaki wyryte w środku... W ostatniej chwili przełamujesz
                spojrzenie gorgony i odwracasz oczy.^^
                [Od tej chwili jej opis w ekwipunku się zmienia.]";
        ],
@@ -1268,8 +1268,8 @@ Object -> "księg/a Geoffreya"
 
 Object -> "platynow/a piramid/a"
   with description "Bez względu na to, ile razy ją podniesiesz i odłożysz,
-           nigdy nie stanie się ~zwykłym~ przedmiotem w opisie
-           pomieszczenia - zawsze ma osobny wiersz.",
+           nigdy nie stanie się „zwykłym” przedmiotem w opisie
+           pomieszczenia – zawsze ma osobny wiersz.",
        describe
        [;  "^Platynowa piramida pięknie łapie światło.";
        ],
@@ -1298,7 +1298,7 @@ Object -> "ozdobn/e pudełk/o"
   has  open openable container neuter;
 
 Object -> -> "perł/a"
-  with description "Nie patrz na mnie - jestem bez znaczenia.",
+  with description "Nie patrz na mnie – jestem bez znaczenia.",
   has  female;
 
 ! ------------------------------------------------------------------------------
@@ -1330,11 +1330,11 @@ Object -> -> list_go "przycisk/+u start"
        [ i j;  Push:
             objectloop (i in list_machine)
                 if (i~=self && i has on) j=j+i.number;
-            print "~W tym stylu twój ekwipunek wygląda tak...^";
+            print "„W tym stylu twój ekwipunek wygląda tak...^";
             ListaWPrzypadku(player, PRZYP_BIE);
             WriteListFrom(child(player), j, 1);
             ListaWPrzypadku(0);
-           "...~";
+           "...”";
        ],
   has  static;
 
@@ -1439,7 +1439,7 @@ Class  Coin
        after
        [ j;
            Drop, PutOn:
-                 self.number=random(2); print (Face) self, ".  ";
+                 self.number=random(2); print (Face) self, ". ";
                  if (self ofclass GoldCoin) j=GoldCoin; else j=SilverCoin;
                  if (CoinsTogether(j)~=0)
                  {   print "Trygram ";
@@ -1458,8 +1458,8 @@ Class  SilverCoin class Coin
 
 Object Room23b "Sala 23, część @02: Pokój Chiński"
   with description "Mały, harmonijny chiński pokój do medytacji, przez który
-           ~może wiać wiatr~.  (Ale tylko między wyjściem na @01 a wyjściem
-           na północny @01, bo innych wyjść nie ma.)  Z każdego narożnika
+           „może wiać wiatr”. (Ale tylko między wyjściem na @01 a wyjściem
+           na północny @01, bo innych wyjść nie ma.) Z każdego narożnika
            sufitu spogląda w dół cherubin.",
        w_to Room23, nw_to Corridor22,
   has  light;
@@ -1494,7 +1494,7 @@ Class  Cherub
              {   parser_action=##PluralFound; flag=1;
                  if (cherub_warning_given==0)
                      print "(Puszczę to płazem, ale po polsku liczba mnoga od
-                         ~cherubin~ to ~cherubiny~.)^";
+                         „cherubin” to „cherubiny”.)^";
                  cherub_warning_given = true;
              }
              if (j=='cherubiny' or 'cherubinów' or 'cherubinom' or 'cherubinami'
@@ -1520,7 +1520,7 @@ Cherub -> "południowo-zachodni cherubin"
 Object Room23 "Sala 23: Biuro Własności Listy"
   with description
           "To Biuro Własności Listy (wygląda na to, że kiedyś zgubiło się
-           jakieś ~Rzeczy Znalezione~), na południowym końcu najwyższego
+           jakieś „Rzeczy Znalezione”), na południowym końcu najwyższego
            piętra; kierownictwo uprzejmie zapewniło stół z zielonym suknem,
            a cała reszta to zapewne dzieło zwiedzających.^^
            Sala 23 ciągnie się na @00 i na @01.",
@@ -1608,7 +1608,7 @@ Object -> "kostk/a do gry"
 
 
 !   Gwiazdki z kilku metali: wypisywane razem ("osiem gwiazdek: cztery
-!   srebrne, jedna brązowa i trzy złote"), a w grupie każda nazwa skraca się
+! srebrne, jedna brązowa i trzy złote"), a w grupie każda nazwa skraca się
 !   do samego metalu.
 
 Class  Star
@@ -1679,7 +1679,7 @@ GoldStar -> "złota gwiazdka";
 
 Object Room24 "Ciekawe Nazwy"
   with description
-          "To Sala 24, na @00 od antresoli.  Eksponatów jest tu pełno, ale
+          "To Sala 24, na @00 od antresoli. Eksponatów jest tu pełno, ale
            na szczęście jest też tabliczka, która nadaje temu wszystkiemu
            jakiś sens.",
        w_to Third_Floor, s_to Museum_Cafe,
@@ -1690,13 +1690,13 @@ Object -> plaque "tabliczk/a"
           "Tabliczka Sali 24^^
            Księżniczka po pocałunku potrafi zaskakująco zmienić imię.^^
            Potarcie lampy dżina może sprawić, że z twoją zdolnością nazywania
-           kolorów ~biały~ i ~czarny~ zaczną się dziać niepokojące rzeczy.
+           kolorów „biały” i „czarny” zaczną się dziać niepokojące rzeczy.
            Kamyki pomogą ci z tym poeksperymentować.^^
-           Jeśli masz przy sobie lupę, możesz ~powiększać~ rzeczy.^^
+           Jeśli masz przy sobie lupę, możesz „powiększać” rzeczy.^^
            Parser gry został specjalnie zaprogramowany dla muchy
-           w bursztynie, więc ~włóż muchę w bursztynie do pudełka~ zadziała
-           poprawnie (i nie zostanie zrozumiane jako ~włóż (muchę) w
-           (bursztynie do pudełka)~).",
+           w bursztynie, więc „włóż muchę w bursztynie do pudełka” zadziała
+           poprawnie (i nie zostanie zrozumiane jako „włóż (muchę) w
+           (bursztynie do pudełka)”).",
   has  scenery female;
 
 Object -> genies_lamp "lamp/a dżina"
@@ -1706,8 +1706,8 @@ Object -> genies_lamp "lamp/a dżina"
                if (self hasnt general) give self general;
                else give self ~general;
                "Z lampy wyłania się dżin i oznajmia:^^
-                  ~Psoty to jedyna moja zabawa:^
-                   biel czernią, czerń bielą odtąd się nazywa!~";
+                  „Psoty to jedyna moja zabawa:^
+                   biel czernią, czerń bielą odtąd się nazywa!”";
        ],
   has  female;
 
@@ -1733,7 +1733,7 @@ Object -> "much/a w bursztynie"
 Object -> magnifier "lup/a"
   with name 'szkło' 'szkła' 'powiększające' 'powiększającego' 'soczewka'
             'soczewkę',
-       description "Za jej pomocą możesz ~powiększać~ rzeczy.",
+       description "Za jej pomocą możesz „powiększać” rzeczy.",
   has  female;
 
 [ MagnifySub;
@@ -1741,13 +1741,13 @@ Object -> magnifier "lup/a"
       "Nie trzymasz lupy.";
    if (noun==magnifier) "Światło nie jest aż tak giętkie.";
    print "Ledwie udaje ci się dostrzec, że na ", (mie) noun,
-      " jest napis ~obiekt ", noun, "~.^";
+      " jest napis „obiekt ", noun, "”.^";
    if (magnifier hasnt general)
    {   give magnifier general;
       "^(Kiedy masz przy sobie lupę, możesz w ten sposób odwoływać się do
         rzeczy przez ich numery; możesz nawet użyć # na oznaczenie
-        ~dowolnego jednego przedmiotu~ i * na oznaczenie ~wszystkich
-        przedmiotów~.)";
+        „dowolnego jednego przedmiotu” i * na oznaczenie „wszystkich
+        przedmiotów”.)";
    }
 ];
 
@@ -1795,7 +1795,7 @@ Object -> "/?%?/ (artystka znana wcześniej jako Księżniczka)"
        [;   Kiss: give self general; self.life = NULL;
                 "Jak w baśniowej przemianie Księżniczka cofa się o krok i ku
                  zdumieniu świata ogłasza, że odtąd będzie znana jako
-                 ~/?%?/~.";
+                 „/?%?/”.";
        ],
   has  animate proper female;
 
@@ -1815,9 +1815,9 @@ Object -> "lodówk/a"
                print
               "Na wewnętrznej stronie drzwiczek jest kartka z informacją, że
                papryka jest zwyczajnie nazwanym obiektem Informu i można o niej
-               mówić ~zielona~, ~papryka~, ~zielona papryka~, ~papryka
-               zielona~ itd.; natomiast w przypadku czerwonego pomidora
-               ~czerwony~ czy ~pomidor smażony czerwony~ itd. nie są
+               mówić „zielona”, „papryka”, „zielona papryka”, „papryka
+               zielona” itd.; natomiast w przypadku czerwonego pomidora
+               „czerwony” czy „pomidor smażony czerwony” itd. nie są
                dozwolone.^^";
                <<Search self>>;
        ],
@@ -1879,7 +1879,7 @@ Object -> -> "przycisk automatu"
              if (parent(drink) ~= 0) "Automat się zepsuł.";
              drink.number = self.number; move drink to player;
              PronounNotice(drink);
-             "Wrrr!  Automat wkłada ci do rąk ", (bie) drink, ".";
+             "Wrrr! Automat wkłada ci do rąk ", (bie) drink, ".";
            Attack: "Automat się trzęsie i pryska na ciebie colą.";
            Drink:  "Nie da się pić, dopóki nie uruchomisz automatu.";
         ];
@@ -1912,7 +1912,7 @@ Object  drink "napój"
         number 0,
         before
         [; Drink: remove self;
-            "Fuj, to było okropne.  Zgniatasz kubek i odpowiedzialnie go
+            "Fuj, to było okropne. Zgniatasz kubek i odpowiedzialnie go
              wyrzucasz.";
         ];
 
@@ -1920,7 +1920,7 @@ Object  drink "napój"
 
 Class  WindowRoom
   with description
-       [;  print "To jeden koniec długiej sali biegnącej ze wschodu na zachód.  ";
+       [;  print "To jeden koniec długiej sali biegnącej ze wschodu na zachód. ";
            if (self==window_w) "Wyjście prowadzi z powrotem na @00.";
           "Po tej stronie nie widać żadnego wejścia ani wyjścia.";
        ],
@@ -1984,7 +1984,7 @@ Object roof "Dach muzeum: obszar 33"
        description
           "Z tego krytego dachówką dachu do muzeum prowadzi w dół mała klapa.
            Widok jest nie do opisania, co oszczędza mi trochę pisania,
-           a tobie czytania, prawda?  Tak - to jeden z tych postmodernistycznych
+           a tobie czytania, prawda? Tak – to jeden z tych postmodernistycznych
            opisów pomieszczeń, które przypominają, że to tylko gra.",
        d_to Third_Floor,
   has  light;
@@ -1996,10 +1996,10 @@ Object -> "pokrętł/o"
        initial
           "Pokrętło ma tu cztery ustawienia, które sterują wyglądem linii
            statusu, rysowanej przez komputer, żeby pokazać stan gry.
-           Ustawienia: 1 - niewidoczna; 2 - tylko wyśrodkowana nazwa
-           miejsca; 3 - standardowe Wynik/Ruchy; 4 - róża wiatrów
-           z możliwymi kierunkami.  (Żeby wybrać, wpisz na przykład
-           ~nastaw pokrętło na 4~.)",
+           Ustawienia: 1 – niewidoczna; 2 – tylko wyśrodkowana nazwa
+           miejsca; 3 – standardowe Wynik/Ruchy; 4 – róża wiatrów
+           z możliwymi kierunkami. (Żeby wybrać, wpisz na przykład
+           „nastaw pokrętło na 4”.)",
        before
        [;  SetTo:
                if (second<1 || second>4) "Są tylko cztery ustawienia.";

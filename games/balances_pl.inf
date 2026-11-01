@@ -130,10 +130,10 @@ Class  FeaturelessCube
             else
             {   PoPrzyp(self, "sześcian", "sześcianu", "sześcianowi", "sześcian",
                     "sześcianem", "sześcianie");
-                print " ~";
+                print " „";
                 while (((self.&number)->i) ~= 0)
                     print (char) (self.&number)->i++;
-                print "~";
+                print "”";
             }
             rtrue;
        ],
@@ -198,7 +198,7 @@ Object burin "magiczn/y ryl/e/c/"
                   potrzebował", (nop) Gracz("byś", "abyś"), " zaklęcia gnusto!";
              if (second ofclass Scroll)
                  "Na magicznym pergaminie zwoju nie można napisać byle czego:
-                  można na nim tylko ~skopiować~ zaklęcie.";
+                  można na nim tylko „skopiować” zaklęcie.";
        ];
 
 [ WriteOnSub; "Bazgranie po ścianach jest zakazane."; ];
@@ -256,7 +256,7 @@ Object memory
                        if (k==j-1) print " i ";
                        if (k<j-1) print ", ";
                    }
-               print " znasz na zawsze.  Poza tym ";
+               print " znasz na zawsze. Poza tym ";
            }
            j=0; k=0;
            objectloop (i in self) if (i.number<100) j++;
@@ -314,7 +314,7 @@ Spell -> gnusto_spell
        [ i a_book;
             if (second ofclass SpellBook)
                "W odróżnieniu od zwojów księgi zaklęć są magicznie chronione
-                przed ~kradzieżą~ zapisanej w nich wiedzy.";
+                przed „kradzieżą” zapisanej w nich wiedzy.";
             if (second==0 || ~~(second ofclass Scroll))
                "Zaklęcie gdzieś się rozmywa.";
             if (second notin player)
@@ -331,10 +331,10 @@ Spell -> gnusto_spell
             }
             a_book.learn_spell(i); remove second;
             print_ret
-               "Księga zaklęć zaczyna łagodnie świecić.  Powoli,
+               "Księga zaklęć zaczyna łagodnie świecić. Powoli,
                 ozdobnie zapisują się w niej słowa zaklęcia ", (address)
                 (i.&name)-->0, ", świecąc jeszcze jaśniej niż sama księga.
-                Blask księgi gaśnie, ale zaklęcie zostaje!  Za to zwój,
+                Blask księgi gaśnie, ale zaklęcie zostaje! Za to zwój,
                 na którym było zapisane, znika, gdy tylko zostaje
                 przepisane ostatnie słowo.";
        ];
@@ -353,8 +353,8 @@ Class SpellBook
        [; Open, Close:
               print_ret
               (CMian) self, " jest zawsze otwarta na właściwej stronie, ale
-              zarazem zawsze zamknięta.  Dzięki temu nie trzeba żmudnie
-              kartkować i szukać zaklęć.  Ta magiczna innowacja ocaliła już
+              zarazem zawsze zamknięta. Dzięki temu nie trzeba żmudnie
+              kartkować i szukać zaklęć. Ta magiczna innowacja ocaliła już
               wiele żyć.";
           Attack:
               print_ret "Kiedy kończysz, ", (mian) self, " jest nienaruszona.";
@@ -390,7 +390,7 @@ Class Scroll
             give self general;
             if (i==0 || ~~(i ofclass Spell))
                 "Pismo na zwoju wyblakło i nie da się go odczytać.";
-            print "Na zwoju jest napisane: ~"; i.specification(); "~.";
+            print "Na zwoju jest napisane: „"; i.specification(); "”.";
        ],
        invent
        [;   if (inventory_stage==2 && self has general)
@@ -489,7 +489,7 @@ Global the_spell_was = gnusto_spell;
               if (Refers(i,x)==1 && i has known_about) flag=1;
       if (flag==1)
       {   if (vb==0 or 1)
-             "Nie masz tego zaklęcia w pamięci.  [Wpisz ~zaklęcia~, żeby
+             "Nie masz tego zaklęcia w pamięci. [Wpisz „zaklęcia”, żeby
               zobaczyć, co pamiętasz.]";
           if (vb==2)
              "Tak cię wyszkolono, że takie zaklęcie możesz zapamiętać tylko
@@ -561,8 +561,8 @@ Question "Helistar"
             'przyjaciel',
        description
       "Helistar to twoja koleżanka po fachu, Zaklinaczka jak ty, o której
-       ostatnio dużo myślisz.  Badała jakąś naprawdę mroczną magię
-       i najwyraźniej gdzieś przepadła.  Szczegóły pamiętasz jak przez mgłę.";
+       ostatnio dużo myślisz. Badała jakąś naprawdę mroczną magię
+       i najwyraźniej gdzieś przepadła. Szczegóły pamiętasz jak przez mgłę.";
 Question "rylec"
   with name 'magiczny' 'rylec' 'rylca',
        description "Rylec to narzędzie do grawerowania i pisania.";
@@ -570,19 +570,19 @@ Question "zmiana"
   with name 'zmiana' 'wielka' 'zmiany' 'wielkiej',
        description
        [; "Coś, z czym miał", (nop) Gracz("eś", "aś"), " sporo wspólnego,
-          ale co dokładnie?  Nie, uleciało.";
+          ale co dokładnie? Nie, uleciało.";
        ];
 Question "cyklop"
   with name 'cyklop' 'cyklopi' 'cyklopa' 'cyklopy',
        description
-      "Jednooki olbrzym, zwykle wrogi.  (Czy w szkole poszukiwaczy przygód
+      "Jednooki olbrzym, zwykle wrogi. (Czy w szkole poszukiwaczy przygód
        niczego już dziś nie uczą?)";
 Question "grue"
   with name 'grue',
        description
       "Grue to złowroga istota czająca się w ciemnych zakamarkach ziemi.
        Najbardziej lubi jadać poszukiwaczy przygód, ale jej nienasycony
-       apetyt hamuje strach przed światłem.  Nikt nigdy nie widział grue
+       apetyt hamuje strach przed światłem. Nikt nigdy nie widział grue
        w świetle dnia, a niewielu przeżyło spotkanie z jej straszliwymi
        szczękami i może o tym opowiedzieć.";
 Question "grymuar"
@@ -594,18 +594,18 @@ Question "zaklęcia"
   with name 'zaklęcia' 'zaklęcie' 'zaklęć' 'czary' 'magia' 'działają'
             'działa' 'rzuca' 'się',
        description
-      "Pamięć wciąż masz zamgloną snem, ale wszystko powoli wraca.  Jako
+      "Pamięć wciąż masz zamgloną snem, ale wszystko powoli wraca. Jako
        wyszkolona Zaklinaczka czy Zaklinacz potrafisz rzucać zaklęcia takie
-       jak ~frotz~, pod warunkiem że się ich wcześniej nauczysz.  Niektóre
+       jak „frotz”, pod warunkiem że się ich wcześniej nauczysz. Niektóre
        zaklęcia rzuca się na coś, inne bez celu.
-     ^^Zaklęcia są bardzo skomplikowane.  Każde rzucone zaklęcie zapominasz
+     ^^Zaklęcia są bardzo skomplikowane. Każde rzucone zaklęcie zapominasz
        (choć można to obejść, ucząc się go kilka razy, żeby mieć w zanadrzu
-       kilka użyć).  Jedynym sposobem na zachowanie zaklęcia jest mieć je
-       zapisane, na zwoju albo w księdze zaklęć.  Zwoje się do tego nie
-       nadają, bo uczyć się można tylko z księgi.  (Ale do księgi można
+       kilka użyć). Jedynym sposobem na zachowanie zaklęcia jest mieć je
+       zapisane, na zwoju albo w księdze zaklęć. Zwoje się do tego nie
+       nadają, bo uczyć się można tylko z księgi. (Ale do księgi można
        dopisywać nowe zaklęcia.)
-     ^^[Na przykład wpisz ~naucz się frotz~, a potem ~frotz monetę~.  Możesz
-       też wpisać ~zaklęcia~, żeby zobaczyć, co masz w pamięci.]";
+     ^^[Na przykład wpisz „naucz się frotz”, a potem „frotz monetę”. Możesz
+       też wpisać „zaklęcia”, żeby zobaczyć, co masz w pamięci.]";
 
 ! ------------------------------------------------------------------------------
 !   Kilka identycznych przedmiotów - monety - zrobionych w wersji de luxe.
@@ -726,7 +726,7 @@ Spell frotz_spell
            give second light;
            print_ret
             "Następuje niemal oślepiający błysk i ", (mian) second, " ",
-            (nop) PL(second, "zaczyna", "zaczynają"), " świecić!  Blask powoli słabnie i przestaje razić oczy, ale ", (mian) second,
+            (nop) PL(second, "zaczyna", "zaczynają"), " świecić! Blask powoli słabnie i przestaje razić oczy, ale ", (mian) second,
             " ", (nop) PL(second, "nadaje", "nadają"), " się teraz świetnie na źródło światła.";
        ],
        unmagic
@@ -740,7 +740,7 @@ Spell frotz_spell
                    (nop) PL(second, "świeci", "świecą"), ".";
            give second ~light;
            print_ret "Wokół ", (dop) second, " gęstnieje kałuża ciemności,
-                 ale powoli wszystko wraca do normy.  Mimo to ", (mian) second,
+                 ale powoli wszystko wraca do normy. Mimo to ", (mian) second,
                  " nie ", (nop) PL(second, "jest", "są"), " już żadnym
                  źródłem światła.";
        ];
@@ -783,7 +783,7 @@ Spell yomin_spell
        [;  if (second==0 || second hasnt animate)
                "To musi być roślina albo minerał.";
            if (second==player) "Przyprawiasz się o lekki ból głowy.";
-           print_ret "Zaglądasz w myśli ", (dop) second, ".  Nic ciekawego, same zwyczajne sprawy.";
+           print_ret "Zaglądasz w myśli ", (dop) second, ". Nic ciekawego, same zwyczajne sprawy.";
        ],
        unmagic
        [;  if (second==0 || second hasnt animate)
@@ -803,13 +803,13 @@ Class Place
 Place Hut "Rozpadająca się chata"
   with description
        [; "Jeszcze niedawno ktoś tu mieszkał, tego jesteś pewn",
-          (nop) Gracz("y", "a"), ".  Teraz meble nadają się tylko na
-           podpałkę, a w oknach nie ma szyb.  Na zewnątrz jest ciepły,
+          (nop) Gracz("y", "a"), ". Teraz meble nadają się tylko na
+           podpałkę, a w oknach nie ma szyb. Na zewnątrz jest ciepły,
            słoneczny dzień, a łąki ciągną się aż po niskie wzgórza na
            horyzoncie.";
        ],
        out_to Grasslands, w_to Grasslands,
-       cant_go "Jest tu tylko jedna izba: lepiej ~wyjdź~.",
+       cant_go "Jest tu tylko jedna izba: lepiej „wyjdź”.",
        name 'okna' 'okno' 'łąki' 'łąka' 'trawa' 'wzgórza';
 
 Object -> furniture "połaman/e mebl/e"
@@ -835,7 +835,7 @@ SpellBook -> helistars_book "księg/a czarów Helistar"
   with name 'grimoire' 'grymuar' 'helistar' 'książka' 'książkę',
        desc_cel "księdze czarów Helistar", desc_mie "księdze czarów Helistar",
        description "To musi być księga groźnych zaklęć, którą trzymała twoja
-                    lekkomyślna przyjaciółka Helistar.  Wielu stron brakuje,
+                    lekkomyślna przyjaciółka Helistar. Wielu stron brakuje,
                     ale kilka zaklęć się zachowało:^",
   has  proper female;
 
@@ -856,7 +856,7 @@ Place Grasslands "Łąki koło chaty"
 Place Valley "Ukryta dolinka"
   with name 'dolina' 'dolinka' 'szlak' 'szlaku',
        description
-          "Miła, ukryta dolinka wśród trawiastych wzgórz.  Przebiega przez nią
+          "Miła, ukryta dolinka wśród trawiastych wzgórz. Przebiega przez nią
            szlak z północy na południe.",
        n_to "Szlak się urywa i zawracasz w obawie, że zgubisz się tak, że do
              zmroku nie znajdziesz drogi do chaty.",
@@ -899,22 +899,22 @@ Object -> horse "koń"
        [;  Cast: if (the_spell_was == bozbar_spell)
                  {   give self general;
                     "Na potężnych łopatkach konia nagle wyrastają piękne
-                     brązowe skrzydła.  Koń obraca się w kółko z wyrazem
+                     brązowe skrzydła. Koń obraca się w kółko z wyrazem
                      zdziwienia na pysku.";
                  }
                  if (the_spell_was == yomin_spell)
-                    "Myśli głównie o owsie.  Trochę o tym, kim jesteś i co
+                    "Myśli głównie o owsie. Trochę o tym, kim jesteś i co
                      knujesz, ale głównie o owsie.";
            Enter: <<Ride self>>;
            Ride: if (horse hasnt general)
                     "Jeździsz przez chwilę w kółko, dając koniowi trochę ruchu,
                      ale szybko ma tego dość i z naciskiem odwozi cię z powrotem
-                     do owsa.  Uprzejmie zsiadasz, a on znów zaczyna się paść.";
+                     do owsa. Uprzejmie zsiadasz, a on znów zaczyna się paść.";
 
-           print "Ruszasz na północ.  Potem, z początku powoli, ale coraz
-                  pewniej, koń zaczyna bić potężnymi skrzydłami.  Wznosisz się
+           print "Ruszasz na północ. Potem, z początku powoli, ale coraz
+                  pewniej, koń zaczyna bić potężnymi skrzydłami. Wznosisz się
                   majestatycznie w powietrze i szybujesz z gracją nad
-                  przepaścią, w której urywają się wzgórza.  Koń ląduje
+                  przepaścią, w której urywają się wzgórza. Koń ląduje
                   łagodnie po drugiej stronie, zostawia cię tam i znów wzbija
                   się w niebo.^";
            PlayerTo(Edge); rtrue;
@@ -929,7 +929,7 @@ Object -> oats "kupk/a owsa"
                self.before=NULL;
                move shiny_scroll to player; score=score+5;
                PronounNotice(shiny_scroll);
-               "Przesiewając owies, znajdujesz lśniący zwój!  Szczęście, że
+               "Przesiewając owies, znajdujesz lśniący zwój! Szczęście, że
                 trafił", (nop) Gracz("eś", "aś"), " na niego przed koniem.
                 Obracasz go w dłoniach: wygląda na nieuszkodzony.";
            Take:  "Po co ci cały ten owies?";
@@ -955,7 +955,7 @@ Spell -> bozbar_spell
            if (second==player) "Jakie skrzydła?";
            if (second==horse && horse has general)
            {   give horse ~general;
-               "Zaklinacz dał, Zaklinacz odebrał.  Koń wygląda na
+               "Zaklinacz dał, Zaklinacz odebrał. Koń wygląda na
                 niepocieszonego, ale wraca do owsa.";
            }
            print_ret (CMian) second, " nie ma skrzydeł, które mógłby stracić.";
@@ -968,16 +968,16 @@ Spell -> bozbar_spell
 Place Edge "Krawędź przepaści"
   with name 'przepaść' 'przepaści' 'droga' 'drogę' 'drogi' 'żonkile' 'kępa',
        description
-          "Droga nagle kończy się nad szeroką przepaścią.  Prowadzi pod górę
+          "Droga nagle kończy się nad szeroką przepaścią. Prowadzi pod górę
            na północ, a po południowej stronie przepaści widać, jak biegnie
            dalej.",
        u_to Up_Road, n_to Up_Road,
-       cant_go "Do przepaści strach podchodzić.  Jedyna bezpieczna droga
+       cant_go "Do przepaści strach podchodzić. Jedyna bezpieczna droga
                prowadzi w górę, na północ.",
        before
        [;  Jump, JumpIn, JumpOver: deadflag = true;
               "Dzielnie skaczesz w przepaść i spadasz... z gracją przez
-               powietrze.  (Potem robi się nieco mniej szlachetnie
+               powietrze. (Potem robi się nieco mniej szlachetnie
                i przewiewnie.)";
        ];
 
@@ -987,7 +987,7 @@ Object -> snake "sycząc/y w/ą=ę/ż/"
          "Na krawędzi przepaści leży zwinięty w ciasny kłębek syczący wąż.",
        description
          "Ma jakieś znaki w kształcie litery V, trochę łusek i barwy od
-          szarej po rudobrązową.  Czy to coś pomaga?",
+          szarej po rudobrązową. Czy to coś pomaga?",
        life
        [; "Wąż syczy wściekle!"; ],
        before
@@ -1029,7 +1029,7 @@ FeaturelessCube -> snakes_cube "sześcian"
 Place Up_Road "Grzbiet wzgórza"
   with description
           "Droga przecina tu szczyt grzbietu i opada na południe i na
-           północny zachód.  Na wschód odchodzi ścieżka.",
+           północny zachód. Na wschód odchodzi ścieżka.",
        nw_to Cave_Mouth, s_to Edge, d_to Edge, e_to Track;
 
 Object -> tortoise "żółw"
@@ -1048,11 +1048,11 @@ Object -> tortoise "żółw"
                         move chewed_scroll to parent(self); remove self;
                         StartDaemon(self); score=score+5;
                        "Żółw nie jest chyba zdolny do okazania zdziwienia, ale
-                        teraz szybuje wysoko w niebie.  Zostawia za sobą coś
+                        teraz szybuje wysoko w niebie. Zostawia za sobą coś
                         dość brudnego.";
                     yomin_spell:
                        "Przez chwilę wydaje ci się, że nic tam nie ma, gdy
-                        w zamyśleniu przeżuwasz liść.  Ale gdzieś w środku
+                        w zamyśleniu przeżuwasz liść. Ale gdzieś w środku
                         żółwia jest zachwyt nad cudownym błękitnym sklepieniem
                         nieba.";
                 }
@@ -1109,19 +1109,19 @@ Spell -> lobal_spell
        ];
 
 Scroll chewed_scroll "przeżut/y zw/ó=o/j/+u"
-  with initial "Wygląda na to, że żółw coś jadł - kiedyś mógł to być zwój,
+  with initial "Wygląda na to, że żółw coś jadł – kiedyś mógł to być zwój,
                 ale teraz leży tu przeżuty jak liść sałaty.",
        before
        [;  Cast: if (the_spell_was == caskly_spell)
                  {   move torn_scroll to parent(self);
                      remove self; score=score+5;
                      "Na twoich oczach zwój zaczyna się naprawiać i nie udaje
-                      mu się to dopiero przy ostatnim rozdarciu.  Może nie
+                      mu się to dopiero przy ostatnim rozdarciu. Może nie
                       całkiem doskonały, ale z pewnością czytelny, choć
                       podarty zwój.";
                  }
-           Eat:  "~Zjadanie własnych słów~ jest dla czarodzieja wyjątkowo
-                  niebezpieczne.  Przestawione w żołądku zaklęcie mogłoby
+           Eat:  "„Zjadanie własnych słów” jest dla czarodzieja wyjątkowo
+                  niebezpieczne. Przestawione w żołądku zaklęcie mogłoby
                   zrobić cokolwiek!";
        ];
 
@@ -1139,7 +1139,7 @@ Place Cave_Mouth "Wylot jaskini"
   with name 'janowiec' 'janowca' 'ścieżka' 'ścieżkę' 'jaskinia' 'jaskini' 'wylot',
        description
           "To wylot jaskini na końcu drogi, która wije się na południowy
-           wschód po wznoszącym się terenie.  Wejście do jaskiń na zachodzie
+           wschód po wznoszącym się terenie. Wejście do jaskiń na zachodzie
            to ciemny tunel, a na północ, w zarośla janowca, prowadzi już
            tylko wąska ścieżka.",
        u_to Up_Road, se_to Up_Road, in_to Iron_Door, w_to Iron_Door,
@@ -1174,9 +1174,9 @@ Object -> sapphire "doskonał/y szafir/+u"
                     players_book.learn_spell(caskly_spell);
                     caskly_spell.number=100;
                     "Kiedy wpatrujesz się w doskonały błękit szafiru, w głowie
-                     zaczyna ci się kręcić.  Nie mogąc znieść nagiego widoku
-                     doskonałości, ze wstydem odwracasz wzrok.  Wtedy szafir
-                     pęka i rozsypuje się w cienki, gorący pył.  Ale coś
+                     zaczyna ci się kręcić. Nie mogąc znieść nagiego widoku
+                     doskonałości, ze wstydem odwracasz wzrok. Wtedy szafir
+                     pęka i rozsypuje się w cienki, gorący pył. Ale coś
                      zostaje, coś w umyśle...";
        ];
 
@@ -1201,7 +1201,7 @@ Spell caskly_spell
 
 Place In_Cave "W jaskini"
   with description
-       [; "Szeroka, ale płytka jaskinia niedaleko w głębi wzgórza.  Nie widać
+       [; "Szeroka, ale płytka jaskinia niedaleko w głębi wzgórza. Nie widać
            żadnego wyjścia poza tym, którym przyszł", (nop) Gracz("eś", "aś"), ".";
        ],
        out_to
@@ -1215,7 +1215,7 @@ Place In_Cave "W jaskini"
        e_to
        [;  return self.out_to();
        ],
-       cant_go "Jedyna droga prowadzi z powrotem ~na zewnątrz~ przez żelazne
+       cant_go "Jedyna droga prowadzi z powrotem „na zewnątrz” przez żelazne
                 drzwi.",
   has  ~light;
 
@@ -1228,7 +1228,7 @@ Object -> scales "wag/a"
        number 0,
        describe
        [;  print "^Na wsporniku w ścianie jaskini wisi spora waga z dwiema
-                  szalkami.  ";
+                  szalkami. ";
            if (self.number==0)  "Szalki są w równowadze.";
            if (self.number==1)  "Lewa szalka jest wyżej.";
            "Prawa szalka jest wyżej.";
@@ -1295,14 +1295,14 @@ Spell  -> -> -> urbzig_spell
                if (second==mace && cyclops in location)
                {   remove cyclops; move eye_cube to location;
                    " zmienia się w gładki biały sześcian dokładnie w chwili, gdy
-                    cyklop miał cię nią uderzyć.  Strasznie zawstydzony
+                    cyklop miał cię nią uderzyć. Strasznie zawstydzony
                     upuszcza sześcian i ucieka!";
                }
                print " ", (nop) PL(second, "zmienia", "zmieniają"),
                    " się w ćmę i odfruwa.^";
                rtrue;
            }
-           print_ret "Nic widocznego się nie dzieje.  Może ", (mian) second,
+           print_ret "Nic widocznego się nie dzieje. Może ", (mian) second,
                      " nie ", (nop) PL(second, "jest", "są"), " wcale
                      aż tak groźn", (nop) Forma(second, "y", "a", "e", "e", "i"), ".";
        ],
@@ -1323,7 +1323,7 @@ Spell  -> -> -> urbzig_spell
                 trzyma w ręce.";
            }
            if (cyclops has general)
-               "Nic się nie dzieje.  Może to i lepiej, po tym, co było
+               "Nic się nie dzieje. Może to i lepiej, po tym, co było
                 ostatnio.";
            move cyclops to location;
            remove second; give cyclops general; StartTimer(cyclops, 5);
@@ -1336,10 +1336,10 @@ Object cyclops "zębat/y cyklop/"
        initial "Grozi ci ogromny zębaty cyklop, uzbrojony w ciężką maczugę!",
        before
        [;  Cast: if (the_spell_was == bozbar_spell)
-                     "Czy określenie ~życzenie śmierci~ coś ci mówi?";
+                     "Czy określenie „życzenie śmierci” coś ci mówi?";
                  if (the_spell_was == urbzig_spell)
                      "Cyklop ryczy z radości, bo zaklęcie nie działa.
-                      (W końcu nie byłby ~groźny~, gdyby działało na niego
+                      (W końcu nie byłby „groźny”, gdyby działało na niego
                       zaklęcie urbzig, prawda?)";
        ],
        life [; "Ryczy coś niezrozumiale, wymachując maczugą!"; ],
@@ -1359,8 +1359,8 @@ Object cyclops "zębat/y cyklop/"
               "^Kręcąc maczugą młynka, cyklop bełkocze coś do ciebie.";
             if (i==3)
               "^Cyklop traci cierpliwość (odpowiednie słowo cyklopów jest nie
-                do przetłumaczenia, ale z grubsza znaczy ~wstrzemięźliwość
-                w nierozbijaniu wszystkich czaszek w pobliżu~).";
+                do przetłumaczenia, ale z grubsza znaczy „wstrzemięźliwość
+                w nierozbijaniu wszystkich czaszek w pobliżu”).";
             "^Cyklop dźga cię maczugą i prawie łamie ci żebro.";
        ],
   has  animate male transparent;
@@ -1383,7 +1383,7 @@ FeaturelessCube -> eye_cube "sześcian"
 Place Footpath "Zarośla janowca"
   with description
            "Ścieżka od wylotu jaskini wbiega w gęste, nieprzebyte krzaki
-            janowca.  Może to nie była ścieżka, tylko rowek w ziemi, w którym
+            janowca. Może to nie była ścieżka, tylko rowek w ziemi, w którym
             nie chciały się przyjąć korzenie; tak czy inaczej, jedyna droga
             prowadzi z powrotem na południe.",
        s_to Cave_Mouth;
@@ -1393,7 +1393,7 @@ Object -> carpet "piękn/y czerwon/y dywan/+u"
        initial
           "Na jednym z krzaków janowca jest przewieszony piękny czerwony dywan.",
        description
-          "To dywan o niezwykłym wzorze.  Jest czerwony, pięknie tkany
+          "To dywan o niezwykłym wzorze. Jest czerwony, pięknie tkany
            i ozdobiony deseniem z sześcianów.",
        before
        [ i;  Receive:
@@ -1405,11 +1405,11 @@ Object -> carpet "piękn/y czerwon/y dywan/+u"
                      "Dopóki dywan nie leży na ziemi, nic z tego.";
                  if (location==Balance_Room)
                      "Dywan tajemniczo marszczy się i szarpie, aż cię z siebie
-                      zrzuca.  Potem z zadowolonym westchnieniem układa się
+                      zrzuca. Potem z zadowolonym westchnieniem układa się
                       z powrotem na białej podłodze.";
                  if (location==In_Cave)
                      "Dywan nagle się wznosi, uderza w strop jaskini i zrzuca
-                      cię z siebie.  Boleśnie.";
+                      cię z siebie. Boleśnie.";
                  if (location==Bazaar) i=Up_Road; else i=Bazaar;
                  print "Dywan nagle wzbija się w puszyste białe obłoki i po
                         szaleńczej podróży wysadza cię...^";
@@ -1437,9 +1437,9 @@ Global tickets_taken = 0;
 Class Ticket(6)
   with number -1,
        description
-       [;  if (self.number==2306) "Napisano na nim: ~Pierwsza nagroda~!";
-           if (self.number==5802) "Napisano na nim: ~Dziewiętnasta nagroda~.";
-           "~Przegrywasz~, mówi los z uśmiechniętą buźką.  ~Spróbuj jeszcze raz!~";
+       [;  if (self.number==2306) "Napisano na nim: „Pierwsza nagroda”!";
+           if (self.number==5802) "Napisano na nim: „Dziewiętnasta nagroda”.";
+           "„Przegrywasz”, mówi los z uśmiechniętą buźką. „Spróbuj jeszcze raz!”";
        ],
        short_name
        [;  if (self.number==-1)
@@ -1479,33 +1479,33 @@ Class Ticket(6)
                if (self in board)
                   "Zaglądanie do zwiniętych losów, które jeszcze tkwią
                    w tablicy, byłoby oszustwem.";
-           Cast: "~Spadaj stąd, koleś!~, mówi naganiacz z obrzydzeniem.";
+           Cast: "„Spadaj stąd, koleś!”, mówi naganiacz z obrzydzeniem.";
        ];
 
 Place Bazaar "Zatłoczony bazar"
   with description
-           "To zatłoczony, gwarny bazar.  Tuż przed tobą jest loteria!  Ale
+           "To zatłoczony, gwarny bazar. Tuż przed tobą jest loteria! Ale
             pogardliwie wyglądającemu naganiaczowi idzie bardzo słabo: mało
             kto chce jego pierwszą nagrodę, wielkiego pluszowego słonia,
             a nawet dziewiętnastą, gładki biały sześcian.",
        each_turn
        [;   switch(random(4))
-            {   1: "^~Podchodźcie!  Podchodźcie!  Jedna srebrna moneta za trzy
-                    losowania!~";
-                2: "^~No dalej!  Za jedną srebrną monetę aż trzy losy!~";
-                3: "^~Pomyślcie, co można wygrać za jedną srebrną monetę!~";
-                4: "^~To może być wasz szczęśliwy dzień!~";
+            {   1: "^„Podchodźcie! Podchodźcie! Jedna srebrna moneta za trzy
+                    losowania!”";
+                2: "^„No dalej! Za jedną srebrną monetę aż trzy losy!”";
+                3: "^„Pomyślcie, co można wygrać za jedną srebrną monetę!”";
+                4: "^„To może być wasz szczęśliwy dzień!”";
             }
        ],
        before
        [;   Learn:
-                "~Żadnych takich!~ warczy ze złością naganiacz i wybija cię
-                 z rytmu nauki.  Mamrocze coś o ~oszustach Zaklinaczach~, ale
+                "„Żadnych takich!” warczy ze złością naganiacz i wybija cię
+                 z rytmu nauki. Mamrocze coś o „oszustach Zaklinaczach”, ale
                  w tych okolicznościach postanawiasz puścić tę zniewagę
                  płazem.";
        ],
        cant_go "Wszędzie tłumy trajkoczących tubylców zagradzają ci drogę do
-           co lepszych straganów.  Właściwie jedyny, do którego możesz się
+           co lepszych straganów. Właściwie jedyny, do którego możesz się
            dopchać, to ta żałosna loteria.";
 
 Object -> board "tablic/a loteryjn/a!"
@@ -1513,13 +1513,13 @@ Object -> board "tablic/a loteryjn/a!"
        name 'otwory' 'otworów' 'dziurki' 'dziurek' 'loteria' 'loterię' 'loterii',
        description
            "Ma po sto otworów w każdą stronę, co daje, hm, zaraz, tak,
-            dziesięć tysięcy losów.  Ale nagród jest dziewiętnaście, więc
+            dziesięć tysięcy losów. Ale nagród jest dziewiętnaście, więc
             szanse muszą być, no, w każdym razie nie najgorsze.",
        before
        [ i; LetGo:
                 if (self.credit == 0)
-                   "Naganiacz dźga cię palcem w pierś.  ~Najpierw srebrna
-                    moneta, koleś!~";
+                   "Naganiacz dźga cię palcem w pierś. „Najpierw srebrna
+                    moneta, koleś!”";
 
                 if (explicit_flag)
                 {   objectloop (i ofclass Ticket)
@@ -1539,8 +1539,8 @@ Object -> board "tablic/a loteryjn/a!"
 
                 i = Ticket.create();
                 if (i == 0)
-                   "Naganiacz wygląda na metafizycznie zakłopotanego.  ~Yyy,
-                    system tworzenia obiektów Informu chyba nie zadziałał.~";
+                   "Naganiacz wygląda na metafizycznie zakłopotanego. „Yyy,
+                    system tworzenia obiektów Informu chyba nie zadziałał.”";
 
                 i.number = last_called; PronounNotice(i);
 
@@ -1555,8 +1555,8 @@ Object -> board "tablic/a loteryjn/a!"
             Examine: ;
             Receive:
                 if (noun ofclass Ticket)
-                   "~Nie ma zmieniania zdania, ten los jest teraz twój!  Daj mi
-                     go, jeśli chcesz zagrać.~";
+                   "„Nie ma zmieniania zdania, ten los jest teraz twój! Daj mi
+                     go, jeśli chcesz zagrać.”";
                 <<Push self>>;
             default:
                 "Naganiacz jest krzepki i nie pozwoli ci majstrować przy
@@ -1578,23 +1578,23 @@ Object -> barker "naganiacz/"
             wybrzeżu, tak byś obstawiał", (nop) Gracz("", "a"), ".";
        ],
        life
-       [;  Attack, Kiss: "Nie ma mowy.  Waży chyba dwa razy tyle co ty.";
+       [;  Attack, Kiss: "Nie ma mowy. Waży chyba dwa razy tyle co ty.";
            Ask:  switch(second)
                  {   'nagroda', 'nagrodę', 'nagrody', 'nagród', 'nagrodach':
-                         "~Tylko jedna srebrna moneta i nagroda może być
-                          twoja!~";
+                         "„Tylko jedna srebrna moneta i nagroda może być
+                          twoja!”";
                      'biały', 'gładki', 'sześcian', 'białym', 'gładkim',
                      'sześcianie', 'sześciany', 'sześcianach':
-                         "Zdmuchuje z niego kurz.  ~Prawdziwy antyk.~";
+                         "Zdmuchuje z niego kurz. „Prawdziwy antyk.”";
                      'słoń', 'słoniu', 'słonia', 'zabawka', 'zabawkę',
                      'zabawce', 'pluszowy', 'pluszowym', 'pluszaku':
-                         "~Towar dobrej jakości~, mówi tonem, który sugeruje,
+                         "„Towar dobrej jakości”, mówi tonem, który sugeruje,
                           że z tych trzech słów potrafiłby przeliterować
                           najwyżej jedno.";
                      'los', 'losy', 'losie', 'losach', 'loteria', 'loterię',
                      'loterii', 'bilet', 'bilety':
-                         "~Trzy losy za jedną srebrną monetę!~";
-                     default: "~Po prostu graj, koleś.~";
+                         "„Trzy losy za jedną srebrną monetę!”";
+                     default: "„Po prostu graj, koleś.”";
                  }
            Order, Answer: "Naganiacz patrzy na ciebie spode łba.";
            Give: if (noun ofclass Ticket)
@@ -1603,7 +1603,7 @@ Object -> barker "naganiacz/"
                      {   move elephant to player; give elephant moved;
                          remove pelephant;
                          Bazaar.description =
-           "To zatłoczony, gwarny bazar.  Tuż przed tobą jest loteria!";
+           "To zatłoczony, gwarny bazar. Tuż przed tobą jest loteria!";
                          "Z bardzo kwaśną miną naganiacz wciska ci w ramiona
                           pluszowego słonia.";
                      }
@@ -1611,25 +1611,25 @@ Object -> barker "naganiacz/"
                      {   move barker_cube to player; give barker_cube moved;
                          remove pcube;
                          Bazaar.description =
-           "To zatłoczony, gwarny bazar.  Tuż przed tobą jest loteria!";
+           "To zatłoczony, gwarny bazar. Tuż przed tobą jest loteria!";
                          score=score+5;
                          "Z ukrywaną ulgą naganiacz wciska ci do rąk gładki
                           biały sześcian.";
                      }
-                     "~Pech!  Przegrywasz!~";
+                     "„Pech! Przegrywasz!”";
                  }
-                 if (self.number==2) "~Dość już się nagrał", (nop) Gracz("eś",
-                     "aś"), "!~ warczy.  Nic dziwnego, że interes kiepsko idzie.";
+                 if (self.number==2) "„Dość już się nagrał", (nop) Gracz("eś",
+                     "aś"), "!” warczy. Nic dziwnego, że interes kiepsko idzie.";
                  if (~~(noun ofclass Coin))
-                     "~A to co ma być?  Jedna srebrna moneta i grasz!~";
+                     "„A to co ma być? Jedna srebrna moneta i grasz!”";
                  if (noun.typ == 3)
-                     "~Brązowa!  Nie ma mowy, słoneczko.~";
+                     "„Brązowa! Nie ma mowy, słoneczko.”";
                  remove noun;
                  board.credit = board.credit + 3;
                  self.number++;
                  if (noun.typ == 1)
-                     "Naganiacz z radością chwyta złotą monetę.  ~Sorry,
-                      koleś, nie wydaję reszty.  Interes dziś słabo idzie!~";
+                     "Naganiacz z radością chwyta złotą monetę. „Sorry,
+                      koleś, nie wydaję reszty. Interes dziś słabo idzie!”";
                  "Naganiacz niechętnie bierze srebrną monetę, zakłada ręce i odsuwa się, żeby dopuścić cię do tablicy.";
        ],
        before
@@ -1648,11 +1648,11 @@ Object -> barker "naganiacz/"
                           stracone nagrody i chuderlawych Zaklinaczy.";
                          if (self hasnt general)
                          {   give self general;
-                            "~Oby ten chuderlawy Zaklinacz nie wyciągnął 2306!~
+                            "„Oby ten chuderlawy Zaklinacz nie wyciągnął 2306!”
                              myśli naganiacz (powoli).";
                          }
-                         "~Jeśli ten frajer już wygra, to oby tylko bezwartościowe
-                          stare 5802~, rozmyśla naganiacz.";
+                         "„Jeśli ten frajer już wygra, to oby tylko bezwartościowe
+                          stare 5802”, rozmyśla naganiacz.";
                  }
        ],
   has  animate male scenery;
@@ -1660,7 +1660,7 @@ Object -> barker "naganiacz/"
 Object -> prizes "nagrod/y"
   with name 'nagroda' 'nagrodę',
        desc_dop "nagród",
-       before [; "~Łapy precz od nagród!~"; ],
+       before [; "„Łapy precz od nagród!”"; ],
   has  scenery pluralname female;
 
 Object -> pelephant "pluszowy słoń"
@@ -1669,8 +1669,8 @@ Object -> pelephant "pluszowy słoń"
        desc_dop "pluszowego słonia", desc_cel "pluszowemu słoniowi",
        desc_bie "pluszowego słonia", desc_nar "pluszowym słoniem",
        desc_mie "pluszowym słoniu",
-       description "Różowy.  Pluszowy.  Zabawkowy.  Słoń.  Wszystko jasne.",
-       before [; Examine: ; default: "~Łapy precz od nagród!~"; ],
+       description "Różowy. Pluszowy. Zabawkowy. Słoń. Wszystko jasne.",
+       before [; Examine: ; default: "„Łapy precz od nagród!”"; ],
   has  scenery;
 
 Object -> pcube "biał/y sześcian/+u"
@@ -1678,7 +1678,7 @@ Object -> pcube "biał/y sześcian/+u"
        description
        [; "Nie chciał", (nop) Gracz("byś", "abyś"), " go wygrać?";
        ],
-       before [; Examine: ; default: "~Łapy precz od nagród!~"; ],
+       before [; Examine: ; default: "„Łapy precz od nagród!”"; ],
   has  scenery;
 
 Object elephant "pluszowy słoń"
@@ -1687,11 +1687,11 @@ Object elephant "pluszowy słoń"
        desc_dop "pluszowego słonia", desc_cel "pluszowemu słoniowi",
        desc_bie "pluszowego słonia", desc_nar "pluszowym słoniem",
        desc_mie "pluszowym słoniu",
-       description "Różowy.  Pluszowy.  Zabawkowy.  Słoń.  Wszystko jasne.",
+       description "Różowy. Pluszowy. Zabawkowy. Słoń. Wszystko jasne.",
        before
        [;  Cast: if (the_spell_was == bozbar_spell)
-                     "Niech no się upewnię.  Ty, Zaklinacz, który pokonał
-                      Krilla, samego przywódcę Gildii z Borphee...  próbujesz
+                     "Niech no się upewnię. Ty, Zaklinacz, który pokonał
+                      Krilla, samego przywódcę Gildii z Borphee... próbujesz
                       wyhodować skrzydła różowemu pluszowemu słoniowi?";
                  if (the_spell_was == yomin_spell) "Puchato.";
        ];
@@ -1707,7 +1707,7 @@ Spell lleps_spell
        purpose "odwraca działanie zapamiętanego zaklęcia",
        magic
        [;   if (second==0 || second notin memory)
-                "Zaklęcie obraca się przeciwko tobie.  Boli.";
+                "Zaklęcie obraca się przeciwko tobie. Boli.";
             if (second.number==100)
                 "Znasz to zaklęcie zbyt dobrze, żeby umysł mógł przyjąć
                  taką zmianę.";
@@ -1747,7 +1747,7 @@ Spell mortin_spell
   if (~~prepared_flag) rfalse;
 
   if (player in Balance_Room)
-      "^^Zapobiegliwe przygotowanie zmartwychwstania poszło na marne.  Splątana magia Komnaty Równowagi owinęła się wokół twojego
+      "^^Zapobiegliwe przygotowanie zmartwychwstania poszło na marne. Splątana magia Komnaty Równowagi owinęła się wokół twojego
          marnego zaklęcia jak dusiciel.";
 
   prepared_flag = false; deadflag = false; hearing_good = false;
@@ -1758,7 +1758,7 @@ Spell mortin_spell
   move players_book to player;
 
   print "^^Z wielką zapobiegliwością przygotował", (nop) Gracz("eś", "aś"),
-        " się na zmartwychwstanie...  Umysł masz trochę słabszy, ale
+        " się na zmartwychwstanie... Umysł masz trochę słabszy, ale
         przynajmniej żyjesz.^";
   PlayerTo(Boneyard);
 ];
@@ -1766,8 +1766,8 @@ Spell mortin_spell
 Place Boneyard "Kostnica"
   with name 'kości' 'kość' 'łopatki' 'czaszki' 'czaszka',
        description
-          "To komnata z kości.  Podłogę tworzą łopatki, ściany czaszki,
-           a futryny drzwi kości nóg.  Wyjście na zachodzie prowadzi
+          "To komnata z kości. Podłogę tworzą łopatki, ściany czaszki,
+           a futryny drzwi kości nóg. Wyjście na zachodzie prowadzi
            w ciemność, ale przez drzwi na północy widać na pozór całkiem
            zwyczajny widok.",
        n_to
@@ -1813,7 +1813,7 @@ Place Track "Ścieżka przed świątynią"
                 if (~~hearing_good) "Śpiew jest za cichy, żeby go zrozumieć.";
                 "Niekończący się, powtarzany tren mnichów opowiada legendę
                  o kimś, kto pewnego dnia oświeci ich zakon i dzięki temu
-                 zostanie wyniesiony na wyższy poziom istnienia.  On (albo
+                 zostanie wyniesiony na wyższy poziom istnienia. On (albo
                  ona, jak można przypuszczać) nazywany jest Tym, Który Jest
                  Czterema Sześcianami.";
        ],
@@ -1827,7 +1827,7 @@ Object -> Temple "sześcienna świątynia"
        desc_mie "sześciennej świątyni",
        before
        [ i j;
-         Enter: "Świątynia jest gładka i bez żadnej skazy.  Może jest otwarta
+         Enter: "Świątynia jest gładka i bez żadnej skazy. Może jest otwarta
                  od góry, bo dźwięk musi skądś dochodzić... ale nie
                  założył", (nop) Gracz("byś", "abyś"), " się o to.";
          Cast:   switch(the_spell_was)
@@ -1839,12 +1839,12 @@ Object -> Temple "sześcienna świątynia"
                              if (i ofclass FeaturelessCube) j++;
                          if (j==0)
                              "Świątynia drży, ale zaraz znów nieruchomieje.";
-                         if (j<4) "Świątynia drży!  Białe światło igra na twoich
+                         if (j<4) "Świątynia drży! Białe światło igra na twoich
                              dłoniach i rzeczach, ale potem wszystko znów
                              nieruchomieje.";
                          print "Świątynia drży, a ciebie zalewa białe światło.
                              Płynnie rozkłada się w czterowymiarowy sposób,
-                             który zmysły ledwie ogarniają.  Wiesz
+                             który zmysły ledwie ogarniają. Wiesz
                              tylko tyle, że kiedy jest po wszystkim,
                              znajdujesz się w...^";
                          hearing_good = false; score=score+5;
@@ -1853,7 +1853,7 @@ Object -> Temple "sześcienna świątynia"
        ],
        describe
        [;   print "^Stoisz przed ogromną świątynią w kształcie doskonałego,
-                   gładkiego białego sześcianu o boku czterystu stóp.  Gdzieś
+                   gładkiego białego sześcianu o boku czterystu stóp. Gdzieś
                    z jej wnętrza dochodzi ";
             if (hearing_good) print "ryczący";
             else print "cichutki";
@@ -1862,7 +1862,7 @@ Object -> Temple "sześcienna świątynia"
        description
        [;  "Wygląda zupełnie jak każda inna gigantyczna świątynia
             w kształcie gładkiego białego sześcianu, jaką kiedykolwiek
-            widział", (nop) Gracz("eś", "aś"), ".  Nie widać żadnego wejścia.";
+            widział", (nop) Gracz("eś", "aś"), ". Nie widać żadnego wejścia.";
        ],
   has  static female;
 
@@ -1873,11 +1873,11 @@ Object -> Temple "sześcienna świątynia"
 Place Balance_Room "Komnata Równowagi"
   with description
            "To chyba wnętrze gładkiego białego sześcianu o boku czterdziestu
-            stóp.  Powietrze jest stęchłe i nie ma stąd wyjścia.";
+            stóp. Powietrze jest stęchłe i nie ma stąd wyjścia.";
 
 Object -> balance_meter "obraz/+u wagi"
   with name 'wizerunek' 'wizerunku' 'waga' 'wagę' 'szalki' 'szale',
-       initial "Wysoko w powietrzu wisi obraz wagi.  Jedna szalka jest
+       initial "Wysoko w powietrzu wisi obraz wagi. Jedna szalka jest
                 o wiele niżej niż druga.",
        before
        [; "To tylko obraz.";
@@ -1886,7 +1886,7 @@ Object -> balance_meter "obraz/+u wagi"
 
 Object -> dusty_podium "zakurzon/y postument/+u"
   with name 'podium' 'kurz' 'kurzu' 'pajęczyny' 'pajęczyn' 'zakurzone',
-       initial "Daleko pod wagą, pośrodku ~podłogi~, stoi postument
+       initial "Daleko pod wagą, pośrodku „podłogi”, stoi postument
                 o łatwym do przewidzenia kształcie, ale jest tak zakurzony
                 i oblepiony pajęczynami, że nie widać, czym kiedyś był.",
        before
@@ -1898,7 +1898,7 @@ Object -> dusty_podium "zakurzon/y postument/+u"
                  PronounNotice(balance_key);
                 "Czasem nic nie zastąpi staroświeckiej ciężkiej pracy i po
                  długim, cierpliwym (i pełnym kichania) szorowaniu postument
-                 ukazuje się w całej swojej białej chwale.  Osadzone są
+                 ukazuje się w całej swojej białej chwale. Osadzone są
                  w nim cztery gniazda, ułożone w kwadrat dwa na dwa.";
        ],
   has  static;
@@ -1907,8 +1907,8 @@ Object balance_key "postument/+u"
   with name 'podium' 'piedestał' 'piedestału' 'platforma' 'platformę'
             'sześcienny' 'sześciennego',
        description "Tak jak można było przewidzieć, jest sześcienny.",
-       initial "Daleko pod wagą, pośrodku ~podłogi~, stoi postument o łatwym
-                do przewidzenia kształcie.  Osadzone są w nim cztery gniazda,
+       initial "Daleko pod wagą, pośrodku „podłogi”, stoi postument o łatwym
+                do przewidzenia kształcie. Osadzone są w nim cztery gniazda,
                 ułożone w kwadrat dwa na dwa.",
   has  static supporter;
 
@@ -1917,7 +1917,7 @@ Object -> sockets "kwadrat/+u dwa na dwa"
        before
        [ i;  if (action~=##Examine || number_filled==0)
               "Musisz powiedzieć, o które gniazdo ci chodzi.
-               (Nazwijmy je ~lewe górne~, ~prawe dolne~ i tak dalej.)";
+               (Nazwijmy je „lewe górne”, „prawe dolne” i tak dalej.)";
            objectloop (i in parent(self))
              if (i ofclass Socket)
              {   print (CMian) i;
@@ -1960,7 +1960,7 @@ Class Socket
                  ^^A potem, rzecz jasna, budzisz się i ponuro uświadamiasz
                    sobie, że czas iść do pracy w nowych Laboratoriach
                    Borphee i do tych wszystkich doświadczeń z mostkiem
-                   Wheatstone'a.  Ale przynajmniej możesz pomarzyć
+                   Wheatstone'a. Ale przynajmniej możesz pomarzyć
                    o dawnych czasach.";
                }
               "Wszystkie gniazda są już pełne, ale to jeszcze nie znaczy, że
@@ -2016,17 +2016,17 @@ Socket -> ur_socket "praw/e górn/e gniazd/o"
 
   give gnusto_spell known_about;
 
- "^^^^^[Witaj w krótkim opowiadaniu ~Równowaga~, jednej z przykładowych gier
-       systemu Inform.  Niektórzy rozpoznają ten świat, a inni mogą zechcieć
-       wpisać ~jak działają zaklęcia~ - gra odpowiada na kilka takich
+ "^^^^^[Witaj w krótkim opowiadaniu „Równowaga”, jednej z przykładowych gier
+       systemu Inform. Niektórzy rozpoznają ten świat, a inni mogą zechcieć
+       wpisać „jak działają zaklęcia” – gra odpowiada na kilka takich
        pytań.]
      ^^Nie bardzo wiesz, jak się tu znalazł", (nop) Gracz("eś", "aś"),
-       ".  Coś to miało wspólnego z Helistar!  No właśnie, i z tym, jak
+       ". Coś to miało wspólnego z Helistar! No właśnie, i z tym, jak
        bardzo świat stracił ostatnio równowagę po Wielkiej Zmianie.^^";
 ];
 
 [ OpisCiemnosci;
-  "Jest zupełnie ciemno.  Możesz tu zostać pożart", (nop) Gracz("y", "a"),
+  "Jest zupełnie ciemno. Możesz tu zostać pożart", (nop) Gracz("y", "a"),
   " przez grue.";
 ];
 
@@ -2047,7 +2047,7 @@ Socket -> ur_socket "praw/e górn/e gniazd/o"
           chyba sprawny.";
       3: "Jak na kogoś, kto umarł dwa razy, jesteś w niezłej formie.";
   }
-  "Ile razy już umarł", (nop) Gracz("eś", "aś"), "?  Pamięć już nie ta.";
+  "Ile razy już umarł", (nop) Gracz("eś", "aś"), "? Pamięć już nie ta.";
 ];
 
 ! ------------------------------------------------------------------------------

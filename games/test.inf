@@ -81,7 +81,7 @@ Object  -> kowal "kowal/"
             Ask, Tell, Answer: "Kowal tylko kiwa głową.";
         ],
         orders [;
-            Take: "~Sam sobie weź~, mruczy kowal.";
+            Take: "„Sam sobie weź”, mruczy kowal.";
         ],
   has   animate male proper;
 

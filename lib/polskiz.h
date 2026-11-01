@@ -22,7 +22,8 @@ Constant POLSKI_ZNAKI;
 
 ! Polskie litery spoza ZSCII (ó jest już w domyślnej tablicy ISO 8859-1).
 Zcharacter table + '@{105}' '@{107}' '@{119}' '@{142}' '@{144}' '@{15B}' '@{17A}' '@{17C}'
-                   '@{104}' '@{106}' '@{118}' '@{141}' '@{143}' '@{15A}' '@{179}' '@{17B}';
+                   '@{104}' '@{106}' '@{118}' '@{141}' '@{143}' '@{15A}' '@{179}' '@{17B}'
+                   '@{2013}' '@{201E}' '@{201D}';  ! półpauza i polskie cudzysłowy
 
 ! Słownik maszyny Z mieści 9 z-znaków na słowo. Litera spoza alfabetu zajmuje
 ! 4 z-znaki, więc końcówki polskich słów by się gubiły ('ścianę' = 'ściany').

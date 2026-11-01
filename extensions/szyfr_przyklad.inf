@@ -25,7 +25,7 @@ Object  Gabinet "Gabinet"
 
 Object  -> kartka "pożółkł/a kartk/a"
   with  name 'notatka' 'notatkę' 'notatki',
-        description "Ktoś zapisał ołówkiem: ~sejf 15-43-2, drzwi 0042~.",
+        description "Ktoś zapisał ołówkiem: „sejf 15-43-2, drzwi 0042”.",
   has   female;
 
 ! Kod jako napis: liczą się wszystkie cyfry, także zera z przodu.

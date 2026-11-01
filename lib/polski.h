@@ -859,8 +859,8 @@ Include "odmiana";
       'miejsca', 'places':           print "zobaczyć listę miejsc";
       'pomoc', 'help', 'instrukcja', 'podpowiedź', 'pomocy':
                                      print "przeczytać pomoc";
-      'nie', 'n//':                  print "odpowiedzieć ~nie~";
-      'tak', 't//':                  print "odpowiedzieć ~tak~";
+      'nie', 'n//':                  print "odpowiedzieć „nie”";
+      'tak', 't//':                  print "odpowiedzieć „tak”";
       'przepraszam', 'wybacz', 'sorry':
                                      print "przeprosić";
       'obudź', 'zbudź', 'przebudź':  print "obudzić";
@@ -1687,15 +1687,15 @@ Array pl_wielkosc --> 1;
     }
   LMode1:   print "Włączony jest teraz ";
             if (initial_lookmode == 1) print "domyślny ";
-            "tryb ~normalny~: pełne opisy miejsc przy pierwszej wizycie,
+            "tryb „normalny”: pełne opisy miejsc przy pierwszej wizycie,
              a potem skrócone.";
   LMode2:   print "Włączony jest teraz ";
             if (initial_lookmode ~= 1 or 3) print "domyślny ";
-            "tryb ~pełny~: zawsze pełne opisy miejsc, nawet tych już
+            "tryb „pełny”: zawsze pełne opisy miejsc, nawet tych już
              odwiedzonych.";
   LMode3:   print "Włączony jest teraz ";
             if (initial_lookmode == 3) print "domyślny ";
-            "tryb ~skrócony~: zawsze krótkie opisy miejsc, nawet tych
+            "tryb „skrócony”: zawsze krótkie opisy miejsc, nawet tych
              jeszcze nieodwiedzonych.";
   Lock: switch (n) {
         1:  "Tego nie da się zamknąć na klucz.";
@@ -1754,31 +1754,31 @@ Array pl_wielkosc --> 1;
             print " czy zakończyć (KONIEC)?";
         6:  "[Ten interpreter nie pozwala cofać ruchów. Przykro mi!]";
             #Ifdef TARGET_ZCODE;
-        7:  "Nie udało się ~cofnąć~ ruchu. [Nie wszystkie interpretery to potrafią.]";
+        7:  "Nie udało się „cofnąć” ruchu. [Nie wszystkie interpretery to potrafią.]";
             #Ifnot; ! TARGET_GLULX
-        7:  "[Nie można już niczego więcej ~cofnąć~.]";
+        7:  "[Nie można już niczego więcej „cofnąć”.]";
             #Endif; ! TARGET_
         8:  "Wybierz, proszę, jedną z powyższych odpowiedzi.";
         9:  "^Zrobiło się zupełnie ciemno!";
         10: "Słucham?";
-        11: "[Nie można ~cofnąć~ czegoś, co się jeszcze nie wydarzyło!]";
-        12: "[Nie można ~cofnąć~ dwa razy z rzędu. Przykro mi!]";
+        11: "[Nie można „cofnąć” czegoś, co się jeszcze nie wydarzyło!]";
+        12: "[Nie można „cofnąć” dwa razy z rzędu. Przykro mi!]";
         13: "[Poprzedni ruch został cofnięty.]";
         14: "Niestety, tego nie da się poprawić.";
         15: "Nie ma za co.";
-        16: "~Ups~ poprawia tylko jedno słowo.";
+        16: "„Ups” poprawia tylko jedno słowo.";
         17: "Jest zupełnie ciemno i nic nie widzisz.";
         18: print "siebie";
         19: "Wyglądasz jak zwykle świetnie.";
-        20: "Aby powtórzyć polecenie typu ~żabo, skacz~, napisz po prostu ~powtórz~,
-             a nie ~żabo, powtórz~.";
+        20: "Aby powtórzyć polecenie typu „żabo, skacz”, napisz po prostu „powtórz”,
+             a nie „żabo, powtórz”.";
         21: "Tego raczej nie da się powtórzyć.";
         22: "Polecenie nie może zaczynać się od przecinka.";
         23: "Wygląda na to, że chcesz z kimś porozmawiać, ale nie wiem z kim.";
         24: print "Nie możesz rozmawiać ";
             if (PL_Ze(x1, PRZYP_NAR)) print "ze "; else print "z ";
             print_ret (nar) x1, ".";
-        25: "Aby z kimś porozmawiać, napisz na przykład ~kowalu, cześć~.";
+        25: "Aby z kimś porozmawiać, napisz na przykład „kowalu, cześć”.";
         26: "(najpierw bierzesz ", (bie) x1, ")";
         27: "Nie zrozumiałem tego polecenia.";
         28: print "Zrozumiałem tylko tyle, że chcesz ";
@@ -1788,13 +1788,13 @@ Array pl_wielkosc --> 1;
         32: "Nie trzymasz tego!";
         33: "Tego czasownika nie można użyć z kilkoma przedmiotami naraz.";
         34: "Kilku przedmiotów naraz można użyć tylko raz w poleceniu.";
-        35: "Nie wiem, do czego odnosi się ~", (address) x1, "~.";
+        35: "Nie wiem, do czego odnosi się „", (address) x1, "”.";
         36: "Wykluczasz coś, czego i tak nie było na liście.";
         37: "Można to zrobić tylko z kimś żywym.";
         38: "Nie znam takiego czasownika.";
         39: "W tej grze nie musisz się tym zajmować.";
         40: if (x2 == player) "Nie zrozumiałem tego polecenia.";
-            "Nie widzisz teraz ~", (address) x1, "~ (", (dop) x2, ").";
+            "Nie widzisz teraz „", (address) x1, "” (", (dop) x2, ").";
         41: "Nie zrozumiałem końcówki tego polecenia.";
         42: if (x1 == 0) "Żadna z tych rzeczy nie jest dostępna.";
             if (x1 == 1) "Jest tylko jedna sztuka.";
@@ -1901,15 +1901,14 @@ Array pl_wielkosc --> 1;
         8:  Kto(actor, "Kładziesz", "kładzie", "kładą"); " ", (bie) x1, " na ", (mie) x2, ".";
     }
   Quit: switch (n) {
-        1:  print "Odpowiedz ~tak~ lub ~nie~.";
+        1:  print "Odpowiedz „tak” lub „nie”.";
         2:  print "Czy na pewno chcesz zakończyć grę? ";
     }
   Remove: switch (n) {
         1:  print_ret "Niestety, ", (mian) x1, " ", (JestSa) x1, " ", (nop) PL_PrzymZ(x1, "zamknięt", "zamknięci"), ".";
         2:  "Ale ", (JegoJejIch) x1, " tam teraz nie ma.";
         3:  "Wzięte.";
-        4:  print_ret "Ale ", (mian) x1, " nie ", (nop) PL(x1, "znajduje", "znajdują"),
-                " się ani w niczym, ani na niczym.";
+        4:  "Ale ", (dop) x1, " tam nie ma.";
     }
   Restart: switch (n) {
         1:  print "Czy na pewno chcesz zacząć od nowa? ";
@@ -1926,20 +1925,20 @@ Array pl_wielkosc --> 1;
   RunTimeError: print "** ";
     switch (n) {
     1:  print "Nie znaleziono przyimka (to nie powinno się zdarzyć)";
-    2:  print "Wartość własności nie jest procedurą ani tekstem: ~", (property) x2,
-            "~ obiektu ~", (name) x1, "~ (", x1, ")";
-    3:  print "Element listy własności nie jest procedurą ani tekstem: ~",
-            (property) x2, "~ obiektu ~", (name) x1, "~ (", x1, ")";
+    2:  print "Wartość własności nie jest procedurą ani tekstem: „", (property) x2,
+            "” obiektu „", (name) x1, "” (", x1, ")";
+    3:  print "Element listy własności nie jest procedurą ani tekstem: „",
+            (property) x2, "” obiektu „", (name) x1, "” (", x1, ")";
     4:  print "Zbyt wiele jednocześnie aktywnych zegarów/demonów.
             Limit to stała biblioteki MAX_TIMERS
             (obecnie ", MAX_TIMERS, "), którą należy zwiększyć";
-    5:  print "Obiekt ~", (name) x1, "~ nie ma własności ~", (property) x2, "~";
-    7:  print "Obiekt ~", (name) x1, "~ może być graczem tylko wtedy, gdy ma
-            własność ~number~";
+    5:  print "Obiekt „", (name) x1, "” nie ma własności „", (property) x2, "”";
+    7:  print "Obiekt „", (name) x1, "” może być graczem tylko wtedy, gdy ma
+            własność „number”";
     8:  print "Próba wylosowania elementu z pustej tablicy";
     9:  print x1, " nie jest poprawnym numerem własności kierunku";
     10: print "Obiekt gracza jest poza drzewem obiektów";
-    11: print "Pomieszczenie ~", (name) x1, "~ nie ma własności ~", (property) x2, "~";
+    11: print "Pomieszczenie „", (name) x1, "” nie ma własności „", (property) x2, "”";
     12: print "Próba ustawienia nieistniejącego zaimka w SetPronoun";
     13: print "Po tokenie 'topic' może występować tylko przyimek";
     14: print "Przepełnienie bufora o rozmiarze ", x1,

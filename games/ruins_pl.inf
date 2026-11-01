@@ -91,13 +91,13 @@ Class   Treasure
 !   WIELKI PLAC - tu zaczyna się gra (DM4 §4, zmieniony w §8, §9 i §23)
 ! ------------------------------------------------------------------------------
 
-Object  Forest "~Wielki Plac~"
+Object  Forest "„Wielki Plac”"
   with  description
             "Tak przynajmniej nazywasz w notatkach tę niską wapienną skarpę,
              choć las deszczowy dawno już ją sobie odebrał. Ciemne,
              oliwkowe drzewa napierają ze wszystkich stron, powietrze paruje
              mgiełką po ciepłym, niedawnym deszczu, w górze wiszą chmary
-             muszek. ~Budowla 10~ to bezładne rumowisko kamieni, które mogło
+             muszek. „Budowla 10” to bezładne rumowisko kamieni, które mogło
              kiedyś być piramidą grobową. Niewiele z niej ocalało poza
              wykutymi w kamieniu schodami, prowadzącymi w dół, w ciemność.",
         d_to steps,
@@ -134,7 +134,7 @@ Object  -> mushroom "cętkowan/y grzyb/"
                 steps.rubble_filled = false;
                 "Nadgryzasz brzeg kapelusza i nie potrafisz określić, skąd
                  bierze się ten cierpki smak, bo rozprasza cię ara
-                 przelatująca nad głową - zdaje się wyłaniać prosto ze słońca.
+                 przelatująca nad głową – zdaje się wyłaniać prosto ze słońca.
                  Łopot jej skrzydeł jest niemal ogłuszający, kamień uderza
                  o kamień.";
             ],
@@ -171,8 +171,8 @@ Object  -> -> newspaper "gazet/a sprzed miesiąca"
   with  name 'times' 'dziennik' 'dziennika' 'dziennikowi' 'dziennikiem'
              'dzienniku' 'stara' 'starą' 'starej',
         description
-            "~The Times~ z 26 lutego 1938 roku. Po miesiącu w tym klimacie
-             gazeta jest zarazem wilgotna i krucha - mniej więcej tak jak ty.
+            "„The Times” z 26 lutego 1938 roku. Po miesiącu w tym klimacie
+             gazeta jest zarazem wilgotna i krucha – mniej więcej tak jak ty.
              Może w Londynie jest mgła. Może spadają bomby.",
   has   female;
 
@@ -325,11 +325,11 @@ Object  -> paintings "malowidł/a+e"
         initial
             "Jaskrawe, roiące się od postaci malowidła, przedstawiające
              opancerzonego Władcę depczącego jeńca, są tak barwne, że aż
-             trudno na nie patrzeć - graffiti zorganizowanej tłuszczy.",
+             trudno na nie patrzeć – graffiti zorganizowanej tłuszczy.",
         description
             "Ciała mają barwę krwistej czerwieni. Znaki Długiej Rachuby datują
              przedstawione wydarzenie na 10 baktun 4 katun 0 tun 0 uinal
-             0 kin - na rocznicę tego rodzaju, w którą jakiś Władca mógł
+             0 kin – na rocznicę tego rodzaju, w którą jakiś Władca mógł
              wreszcie ściąć pojmanego rywala, torturowanego rytualnie przez
              kilka lat, w zbałkanizowanym szaleństwie majańskich
              miast-państw.",
@@ -341,7 +341,7 @@ Object  -> stone_table "kamienn/y ołtarz/"
              'płyta' 'płyty' 'płycie' 'płytę' 'płytą'
              'wielki' 'wielkiego' 'wielkim',
         initial
-            "Sanktuarium dominuje wielka kamienna płyta - stół albo ołtarz.",
+            "W sanktuarium dominuje wielka kamienna płyta – stół albo ołtarz.",
   has   enterable supporter static;
 
 ! DM4 §11
@@ -520,7 +520,7 @@ Treasure -> "rytowan/a ko/ść=ści/"
              'kostkę' 'kostką',
         initial
             "Ze wszystkich ofiar wrzuconych w przepaść być może nic nie da
-             się odzyskać - nic poza rytowaną kością, lżejszą, niż się
+             się odzyskać – nic poza rytowaną kością, lżejszą, niż się
              wydaje, która wystaje z kieszeni mokrego mułu w ścianie kanionu.",
         description
             "Z paszczy Itzamn@'a, wynalazcy pisma, przedstawionego pod
@@ -591,12 +591,12 @@ Object  -> -> skeletons "obłąkan/e szkielet/y"
 Object  Burial_Shaft "Szyb grobowy"
   with  description
             "W twoich przyszłych notatkach terenowych zostanie to zapisane
-             tak: ~Krypta o sklepieniu wspornikowym, zamknięta od góry ubitym
+             tak: „Krypta o sklepieniu wspornikowym, zamknięta od góry ubitym
              ziemnym czopem, z malowanymi postaciami przedstawiającymi
              przypuszczalnie Dziewięciu Władców Nocy. Rozproszone kości
              należą najpewniej do jednego starszego mężczyzny i kilkorga dzieci
              złożonych w ofierze; wśród innych szczątków grobowych są łapy
-             jaguara.~ (W notatkach terenowych nie wolno w żadnym razie
+             jaguara.” (W notatkach terenowych nie wolno w żadnym razie
              zdradzić, kiedy było się śmiertelnie przerażonym.)",
         n_to Wormcast,
         u_to [;
@@ -643,7 +643,7 @@ Treasure -> honeycomb "starożytn/y plast/e/r/ miodu"
 Object  Wormcast "Robacze Chodniki"
   with  description
             "Niepokojące miejsce pełne zagłębień wyżłobionych na kształt
-             pajęczej sieci - pasma pustej przestrzeni zawieszone w kamieniu.
+             pajęczej sieci – pasma pustej przestrzeni zawieszone w kamieniu.
              Jedyne nory dość szerokie, by się przez nie przeczołgać, biegną
              na północny wschód, na południe i w górę.",
         w_to Square_Chamber,
@@ -762,7 +762,7 @@ Object  dictionary "słownik/ dialektu Majów Waldecka"
              'księgę' 'księgą' 'majów' 'waldeck' 'waldecka',
         description
             "Opracowany na podstawie niewiarygodnych litografii legendarnego
-             gawędziarza i podróżnika, ~hrabiego~ Jeana Fr@'ed@'erica
+             gawędziarza i podróżnika, „hrabiego” Jeana Fr@'ed@'erica
              Maximiliena Waldecka (1766??-1875), ten przewodnik zawiera to
              niewiele, co wiadomo o glifach starożytnego miejscowego
              dialektu.",
@@ -774,27 +774,27 @@ Object  dictionary "słownik/ dialektu Majów Waldecka"
                 if (consult_words == 1 && (~~PL_Glif(w1))) glyph = w1;
                 else if (consult_words == 2 && PL_Glif(w1)) glyph = w2;
                 else if (consult_words == 2 && PL_Glif(w2)) glyph = w1;
-                else "Spróbuj ~sprawdź <nazwa glifu> w słowniku~.";
+                else "Spróbuj „sprawdź <nazwa glifu> w słowniku”.";
                 switch (glyph) {
                     'q1':
                         "(To jedyny glif, który znasz na pamięć!)^^
-                         Q1: ~miejsce święte~.";
+                         Q1: „miejsce święte”.";
                     'półksiężyc', 'półksiężyca', 'półksiężycu':
-                        "Półksiężyc: przypuszczalnie wymawiany ~xibalba~,
+                        "Półksiężyc: przypuszczalnie wymawiany „xibalba”,
                          choć jego znaczenie nie jest znane.";
                     'strzała', 'strzały', 'strzałę', 'strzale':
-                        "Strzała: ~podróż; stawanie się~.";
+                        "Strzała: „podróż; stawanie się”.";
                     'czaszka', 'czaszki', 'czaszkę', 'czaszce':
-                        "Czaszka: ~śmierć, zguba; los (niekoniecznie zły)~.";
+                        "Czaszka: „śmierć, zguba; los (niekoniecznie zły)”.";
                     'koło', 'koła', 'kole':
-                        "Koło: ~Słońce; także życie, czas życia~.";
+                        "Koło: „Słońce; także życie, czas życia”.";
                     'jaguar', 'jaguara', 'jaguarze':
-                        "Jaguar: ~władca~.";
+                        "Jaguar: „władca”.";
                     'małpa', 'małpy', 'małpę', 'małpie':
-                        "Małpa: ~kapłan?~.";
+                        "Małpa: „kapłan?”.";
                     'ptak', 'ptaka', 'ptaku':
-                        if (self.correct) "Ptak: ~martwy jak kamień~.";
-                        "Ptak: ~bogaty, zamożny?~.";
+                        if (self.correct) "Ptak: „martwy jak kamień”.";
+                        "Ptak: „bogaty, zamożny?”.";
                     default:
                         "Tego glifu jak dotąd nie odnotowano.";
                 }
@@ -834,43 +834,43 @@ Object  priest "zmumifikowan/y kapłan/"
                 'słownik', 'słownika', 'słowniku', 'książkę', 'książka',
                 'książce', 'księgę', 'księga', 'księdze':
                     if (dictionary.correct == false)
-                        "~Glif @<<ptak@>>... bardzo zabawne.~";
-                    "~Słownik? Doprawdy?~";
+                        "„Glif @<<ptak@>>... bardzo zabawne.”";
+                    "„Słownik? Doprawdy?”";
                 'glif', 'glify', 'glifach', 'glifie', 'majów', 'majach',
                 'dialekt', 'dialekcie', 'pismo', 'piśmie':
-                    "~W naszej kulturze kapłani zawsze umieją czytać.~";
+                    "„W naszej kulturze kapłani zawsze umieją czytać.”";
                 'władcę', 'władca', 'władcy', 'grób', 'grobie', 'grobowiec',
                 'grobowcu', 'sanktuarium', 'świątynię', 'świątynia',
                 'świątyni':
-                    "~To sprawa prywatna.~";
+                    "„To sprawa prywatna.”";
                 'malowidła', 'malowidło', 'malowidłach', 'malowidle':
-                    "Kapłan od kalendarza marszczy brwi. ~10 baktunów,
+                    "Kapłan od kalendarza marszczy brwi. „10 baktunów,
                      4 katuny, to daje 1 468 800 dni od początku czasu:
-                     w waszym kalendarzu 19 stycznia 909 roku.~";
+                     w waszym kalendarzu 19 stycznia 909 roku.”";
                 'ruiny', 'ruinach', 'ruinę':
-                    "~Ruiny zawsze pokonają złodziei. W podziemnym świecie
-                     rabusie są torturowani przez całą wieczność.~ Pauza.
-                     ~Tak samo jak archeolodzy.~";
+                    "„Ruiny zawsze pokonają złodziei. W podziemnym świecie
+                     rabusie są torturowani przez całą wieczność.” Pauza.
+                     „Tak samo jak archeolodzy.”";
                 'sieć', 'sieci', 'chodniki', 'chodnikach', 'robacze',
                 'robaczych':
-                    "~Nikt nie przejdzie przez Robacze Chodniki.~";
+                    "„Nikt nie przejdzie przez Robacze Chodniki.”";
                 'xibalba', 'xibalbę', 'xibalbie', 'xibalby':
                     if (Shrine.sw_to == Junction)
                         "Kapłan grozi ci kościstym palcem.";
                     Shrine.sw_to = Junction;
                     "Kapłan wyciąga kościsty palec na południowy zachód,
                      w stronę sopli, które znikają jak szron, gdy przemawia.
-                     ~Xibalb@'a, Podziemny Świat.~";
+                     „Xibalb@'a, Podziemny Świat.”";
                 }
-                print "~Odpowiedź musisz znaleźć ";
+                print "„Odpowiedź musisz znaleźć ";
                 Gracz("sam", "sama");
-                ".~";
+                ".”";
             Tell:
                 "Kapłana nie interesuje twoje nędzne życie.";
             Attack, Kiss:
                 remove self;
                 "Kapłan wysycha i rozsypuje się w pył, aż nic po nim nie
-                 zostaje - ani podmuch, ani kość.";
+                 zostaje – ani podmuch, ani kość.";
             ThrowAt:
                 move noun to location; <<Attack self>>;
             Show, Give:
@@ -881,18 +881,18 @@ Object  priest "zmumifikowan/y kapłan/"
                      nanosi gdzieś poprawkę, po czym oddaje ci księgę.";
                 }
                 if (noun == newspaper)
-                    "Kapłan spogląda na datę. ~12 baktunów 16 katunów 4 tuny
-                     1 uinal 12 kinów~, oznajmia, po czym przegląda pierwszą
-                     stronę. ~Ach. Postęp, jak widzę.~";
+                    "Kapłan spogląda na datę. „12 baktunów 16 katunów 4 tuny
+                     1 uinal 12 kinów”, oznajmia, po czym przegląda pierwszą
+                     stronę. „Ach. Postęp, jak widzę.”";
                 "Kapłana nie interesują rzeczy ziemskie.";
             ],
         orders [;
             Go:
-                "~Nie wolno mi opuszczać sanktuarium.~";
+                "„Nie wolno mi opuszczać sanktuarium.”";
             NotUnderstood:
-                "~Mówisz zagadkami.~";
+                "„Mówisz zagadkami.”";
             default:
-                "~Nie twoim rozkazom służę.~";
+                "„Nie twoim rozkazom służę.”";
             ],
   has   animate male;
 

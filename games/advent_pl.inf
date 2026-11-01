@@ -203,7 +203,7 @@ Scenic  -> "drug/a stron/a wzgórza"
 Aboveground Inside_Building "W budynku"
   with  name 'budynek' 'budynku' 'domek' 'domku' 'studnia' 'studni',
         description
-            "Jesteś w budynku - w domku zbudowanym nad dużym źródłem.",
+            "Jesteś w budynku – w domku zbudowanym nad dużym źródłem.",
         cant_go
             "Strumień wypływa przez dwie rury kanalizacyjne o średnicy
              jednej stopy. Jedyne wyjście prowadzi na zachód.",
@@ -563,7 +563,7 @@ Room    In_Debris_Room "Komnata z rumowiskiem"
              Niski, szeroki korytarz z kocimi łbami jest tu zatkany błotem
              i śmieciami, ale w górę i na zachód prowadzi niewygodny kanion.
              ^^
-             Na ścianie wisi kartka: ~Magiczne słowo XYZZY.~",
+             Na ścianie wisi kartka: „Magiczne słowo XYZZY.”",
         e_to In_Cobble_Crawl,
         u_to In_Awkward_Sloping_E_W_Canyon,
         w_to In_Awkward_Sloping_E_W_Canyon,
@@ -581,7 +581,7 @@ Scenic  -> "rumowisk/o"
 
 Scenic  -> "kartk/a"
   with  name 'kartka' 'notatka' 'notatkę' 'notatki' 'napis' 'napisu',
-        description "Na kartce jest napisane ~Magiczne słowo XYZZY~.",
+        description "Na kartce jest napisane „Magiczne słowo XYZZY”.",
   has   female;
 
 Object  -> black_rod "czarn/y pręt/ z zardzewiałą gwiazdą"
@@ -740,7 +740,7 @@ Scenic  -> "mał/a jam/a"
 
 Scenic  -> PitCrack "wąsk/a szpar/a"
   with  name 'szczelina' 'szczelinę' 'szczeliny' 'pęknięcie' 'pęknięcia',
-        description "Szpara jest bardzo wąska - o wiele za wąska, żeby się
+        description "Szpara jest bardzo wąska – o wiele za wąska, żeby się
                      przez nią przecisnąć.",
   has   female;
 
@@ -816,12 +816,12 @@ Room    In_Nugget_Of_Gold_Room "Niska komnata"
         description
             "To niska komnata z prymitywnym napisem na ścianie:
              ^^
-             ~Nie wniesiesz tego po schodach~.",
+             „Nie wniesiesz tego po schodach”.",
         n_to In_Hall_Of_Mists;
 
 Scenic  -> "prymitywn/y napis/+u"
   with  name 'kartka' 'kartki' 'kartkę' 'notatka' 'notatkę',
-        description "Napis głosi: ~Nie wniesiesz tego po schodach~.";
+        description "Napis głosi: „Nie wniesiesz tego po schodach”.";
 
 Treasure -> large_gold_nugget "duż/y samorod/e/k/ złota"
   with  name 'złoto' 'złota' 'złotem' 'bryłka' 'bryłkę' 'bryłki' 'ciężki'
@@ -1081,15 +1081,15 @@ Treasure -> rare_coins "rzadk/ie monet/y"
 !   Komnata ze skałą Y2 i okolice, nieco niżej
 ! ------------------------------------------------------------------------------
 
-Room    At_Y2 "Przy ~Y2~"
+Room    At_Y2 "Przy „Y2”"
   with  name 'y2',
         description
             "Jesteś w dużej komnacie z korytarzem na południe, korytarzem na
              zachód i ścianą z pokruszonej skały na wschodzie. Na skale
-             pośrodku komnaty widnieje wielki napis ~Y2~.",
+             pośrodku komnaty widnieje wielki napis „Y2”.",
         after [;
           Look:
-            if (random(100) <= 25) print "^Głuchy głos mówi: ~Plugh.~^";
+            if (random(100) <= 25) print "^Głuchy głos mówi: „Plugh.”^";
         ],
         before [;
           Plugh:
@@ -1111,7 +1111,7 @@ Room    At_Y2 "Przy ~Y2~"
 Scenic  -> "skał/a z napisem Y2"
   with  name 'kamień' 'kamienia' 'kamieniu' 'głaz' 'głazu' 'głazie' 'napis'
              'napisu',
-        description "Na skale namalowano wielki napis ~Y2~.",
+        description "Na skale namalowano wielki napis „Y2”.",
   has   supporter female;
 
 ! ------------------------------------------------------------------------------
@@ -1513,7 +1513,7 @@ Room    In_West_Pit "W zachodniej jamie"
             if (noun == Plant) rfalse;
             if (Plant.height == TINY_P)
                 "Nie ma tu na co się wspinać. Żeby wyjść z jamy, wpisz
-                 ~do góry~ albo ~wyjdź~.";
+                 „do góry” albo „wyjdź”.";
         ],
         u_to At_West_End_Of_Twopit_Room,
   has   nodwarf;
@@ -1527,10 +1527,10 @@ Object  -> Plant "roślin/a"
         describe [;
             switch (self.height) {
               TINY_P:
-                "W jamie rośnie malutka roślinka i mruczy: ~Wody, wody...~";
+                "W jamie rośnie malutka roślinka i mruczy: „Wody, wody...”";
               TALL_P:
                 "Z jamy wyrasta łodyga fasoli wysoka na dwanaście stóp
-                 i ryczy: ~Wody!! Wody!!~";
+                 i ryczy: „Wody!! Wody!!”";
               HUGE_P:
                 "Olbrzymia łodyga fasoli sięga aż do samej dziury.";
             }
@@ -1562,7 +1562,7 @@ Object  -> Plant "roślin/a"
                 "Butelka jest pusta.";
               oil_in_the_bottle:
                 remove oil_in_the_bottle;
-                "Roślina z oburzeniem strząsa olej z liści i pyta: ~Wody?~";
+                "Roślina z oburzeniem strząsa olej z liści i pyta: „Wody?”";
             }
             remove water_in_the_bottle;
             switch ((self.height)++) {
@@ -1881,7 +1881,7 @@ Object  DragonCorpse "ciał/o smoka"
 ! ------------------------------------------------------------------------------
 
 DeadendRoom Dead_End_8
-  with  description "Kanion kończy się zwałem głazów - ślepy zaułek.",
+  with  description "Kanion kończy się zwałem głazów – ślepy zaułek.",
         s_to In_Tall_E_W_Canyon,
         out_to In_Tall_E_W_Canyon;
 
@@ -1997,7 +1997,7 @@ Room    In_Giant_Room "Komnata Olbrzyma"
             "Jesteś w Komnacie Olbrzyma. Strop jest tak wysoko, że twoja
              lampa go nie oświetla. Na wschód, północ i południe prowadzą
              przepastne korytarze. Na zachodniej ścianie ktoś nabazgrał:
-             ~Fee fie foe foo~ [sic].",
+             „Fee fie foe foo” [sic].",
         s_to In_Narrow_Corridor,
         e_to At_Recent_Cave_In,
         n_to In_Immense_N_S_Passage;
@@ -2005,7 +2005,7 @@ Room    In_Giant_Room "Komnata Olbrzyma"
 Scenic  -> "nabazgran/y napis/+u"
   with  name 'bazgroły' 'bazgrołów' 'pismo' 'pisma' 'inskrypcja'
              'inskrypcję' 'inskrypcji',
-        description "Napis głosi: ~Fee fie foe foo [sic].~";
+        description "Napis głosi: „Fee fie foe foo [sic].”";
 
 Treasure -> golden_eggs "gniazd/o ze złotymi jajami"
   with  name 'jaja' 'jaj' 'jajami' 'jajo' 'jajko' 'jajka' 'złote' 'złotych'
@@ -2056,7 +2056,7 @@ Object  -> RustyDoor "zardzewiał/e drzwi/"
             if (self has open)
                 "Po takim wysiłku przy otwieraniu tych drzwi nie radziłbym
                  ich znowu zamykać.";
-            "Nie ma problemu - już są zamknięte.";
+            "Nie ma problemu – już są zamknięte.";
           Oil:
             if (bottle in player && oil_in_the_bottle in bottle) {
                 remove oil_in_the_bottle;
@@ -2292,7 +2292,7 @@ Object  -> "kamienn/a tablic/a"
              'napisu',
         initial
             "W ścianę wmurowana jest masywna kamienna tablica z napisem:
-             ~Gratulacje z okazji wniesienia światła do Ciemnej Komnaty!~",
+             „Gratulacje z okazji wniesienia światła do Ciemnej Komnaty!”",
   has   static female;
 
 Treasure -> "platynow/a piramid/a"
@@ -2351,8 +2351,8 @@ Object  -> giant_bivalve "olbrzym/i małż/"
             if (location == At_Ne_End or At_Sw_End)
                 "Ciekawe. Na spodzie ostrygi chyba coś napisano:
                  ^^
-                 ~W tym miejscu jest coś dziwnego: jedno z przekleństw,
-                 które znam od zawsze, działa tu teraz inaczej.~";
+                 „W tym miejscu jest coś dziwnego: jedno z przekleństw,
+                 które znam od zawsze, działa tu teraz inaczej.”";
             "Jakiś olbrzymi małż.";
           Open:
             "Nie masz dość siły, żeby otworzyć małża gołymi rękami.";
@@ -2417,22 +2417,22 @@ Object  -> "szyld/+u"
   with  name 'tablica' 'tablicę' 'tablicy' 'witt' 'witta' 'firma' 'firmy'
              'budowlana' 'budowlanej',
         initial
-            "W powietrzu wisi szyld: ~Dalej jaskinia w budowie. Wstęp na
-             własne ryzyko. [Przedsiębiorstwo Budowlane Witt]~",
+            "W powietrzu wisi szyld: „Dalej jaskinia w budowie. Wstęp na
+             własne ryzyko. [Przedsiębiorstwo Budowlane Witt]”",
         before [;
           Take:
             "Wisi wysoko nad twoją głową.";
         ],
   has   static;
 
-Object  -> "najnowsz/e numer/y ~Grotołaza Dzisiaj~"
+Object  -> "najnowsz/e numer/y „Grotołaza Dzisiaj”"
   with  name 'czasopisma' 'czasopism' 'czasopismo' 'magazyn' 'magazyny'
              'magazynów' 'numer' 'numeru' 'grotołaz' 'grotołaza'
              'dzisiaj' 'gazety' 'gazet',
         description "Obawiam się, że czasopisma są napisane w języku
                      krasnoludów.",
-        initial "Leży tu kilka najnowszych numerów czasopisma ~Grotołaz
-                 Dzisiaj~.",
+        initial "Leży tu kilka najnowszych numerów czasopisma „Grotołaz
+                 Dzisiaj”.",
         after [;
           Take:
             if (location == At_Witts_End) score--;
@@ -2486,10 +2486,10 @@ Object  -> "zawieszon/e lustr/o"
   with  name 'zwierciadło' 'zwierciadła' 'masywne' 'ogromne' 'ogromnego'
              'wiszące' 'wiszącego' 'dwustronne' 'dwustronnego' 'krasnoludów',
         description
-            "Lustro najwyraźniej służy krasnoludom, które - jak wiadomo - są
+            "Lustro najwyraźniej służy krasnoludom, które – jak wiadomo – są
              niezwykle próżne.",
         initial
-            "Lustro najwyraźniej służy krasnoludom, które - jak wiadomo - są
+            "Lustro najwyraźniej służy krasnoludom, które – jak wiadomo – są
              niezwykle próżne.",
         before [;
           Attack, Remove:
@@ -2604,7 +2604,7 @@ Object  -> RicketyBridge "chybotliw/y most/+u"
                 "Nad przepaścią rozpięty jest chybotliwy drewniany most, który
                  znika we mgle.
                  ^^
-                 Na moście wisi tabliczka: ~Stój! Zapłać trollowi!~^";
+                 Na moście wisi tabliczka: „Stój! Zapłać trollowi!”^";
             if (Troll notin location)
                 "Trolla nigdzie nie widać.";
             rtrue;
@@ -2640,9 +2640,9 @@ Object  -> -> Troll "krzepk/i troll/"
                 "Troll łapie twój skarb i umyka gdzieś poza zasięg wzroku.";
             }
             if (noun == tasty_food)
-                "Obżarstwo nie należy do wad trolla. Chciwość - owszem.";
+                "Obżarstwo nie należy do wad trolla. Chciwość – owszem.";
             "Troll zręcznie łapie ", (bie) noun, ", ogląda uważnie i odrzuca
-             ci z powrotem, oznajmiając: ~Dobra robota, ale za mało cenne.~";
+             ci z powrotem, oznajmiając: „Dobra robota, ale za mało cenne.”";
           Order:
             "Chyba śnisz.";
           Answer, Ask:
@@ -2863,7 +2863,7 @@ Room    In_Front_Of_Barren_Room "Przed pustą komnatą"
   with  name 'wejście' 'wejściu' 'pusta' 'pustej' 'komnata' 'komnaty',
         description
             "Stoisz przy wejściu do dużej, pustej komnaty. Nad wejściem wisi
-             tabliczka: ~Uwaga! W komnacie niedźwiedź!~",
+             tabliczka: „Uwaga! W komnacie niedźwiedź!”",
         w_to In_Limestone_Passage,
         u_to In_Limestone_Passage,
         e_to In_Barren_Room,
@@ -2872,8 +2872,8 @@ Room    In_Front_Of_Barren_Room "Przed pustą komnatą"
 
 Scenic  -> "tabliczk/a ostrzegawcz/a!"
   with  name 'tablica' 'tablicę' 'tablicy' 'uwaga' 'ostrzeżenie' 'ostrzeżenia',
-        description "Na tabliczce jest napisane: ~Uwaga! W komnacie
-                     niedźwiedź!~",
+        description "Na tabliczce jest napisane: „Uwaga! W komnacie
+                     niedźwiedź!”",
   has   female;
 
 ! ------------------------------------------------------------------------------
@@ -2932,7 +2932,7 @@ Object  -> Bear "wielk/i niedźwied/ź=zi/ jaskiniow/y!"
             if (self.is_friendly)
                 "Niedźwiedź nie wydaje się zbytnio zainteresowany twoją
                  propozycją.";
-            "Ojej - twoja propozycja tylko jeszcze bardziej rozzłościła
+            "Ojej – twoja propozycja tylko jeszcze bardziej rozzłościła
              niedźwiedzia!";
           Order, Ask, Answer:
             "To Miś o Bardzo Małym Rozumku.";
@@ -3185,15 +3185,15 @@ Scenic  -> "napis/+u w kurzu"
   with  name 'wiadomość' 'wiadomości' 'bazgroły' 'pismo' 'pisma' 'ozdobne'
              'ozdobnym' 'nabazgrany',
         description
-            "Napis głosi: ~To nie ten labirynt, w którym pirat zostawia swoją
-             skrzynię ze skarbem.~";
+            "Napis głosi: „To nie ten labirynt, w którym pirat zostawia swoją
+             skrzynię ze skarbem.”";
 
 Scenic  -> VendingMachine "automat/+u"
   with  name 'maszyna' 'maszynę' 'maszyny' 'maszynie' 'otwór' 'otworu'
              'szczelina' 'szczelinę' 'masywny' 'masywnego' 'automacie',
         description
-            "Instrukcja na automacie głosi: ~Wrzuć monety, a otrzymasz świeże
-             baterie.~",
+            "Instrukcja na automacie głosi: „Wrzuć monety, a otrzymasz świeże
+             baterie.”",
         before [;
           Receive:
             if (noun == rare_coins) {
@@ -3217,8 +3217,8 @@ Scenic  -> VendingMachine "automat/+u"
 Object  fresh_batteries "śwież/e bateri/e+y" VendingMachine
   with  name 'bateria' 'baterię' 'baterii' 'nowe' 'nowych',
         description
-            "Wyglądają jak zwykłe baterie. (Grobowy głos mówi: ~Wciąż
-             działają!~)",
+            "Wyglądają jak zwykłe baterie. (Grobowy głos mówi: „Wciąż
+             działają!”)",
         initial "Leżą tu świeże baterie.",
         before [;
           Count:
@@ -3327,7 +3327,7 @@ Object  dwarf "groźn/y mał/y krasnolud/"
             <<Give noun second>>;
           Give:
             if (noun == tasty_food)
-                "Głupi pomysł - krasnoludy jedzą tylko węgiel! Teraz jest
+                "Głupi pomysł – krasnoludy jedzą tylko węgiel! Teraz jest
                  *naprawdę* wściekły!";
             "Krasnolud wcale nie jest zainteresowany twoją propozycją.
              (Może dlatego, że jeśli cię zabije, i tak dostanie wszystko,
@@ -3373,8 +3373,8 @@ Object  pirate
                  odwracasz, dostrzegasz brodatego pirata. Niesie dużą
                  skrzynię.
                  ^^
-                 ~Do stu tysięcy beczek śledzi!~ woła. ~Ktoś mnie zobaczył!
-                 Lepiej zmykam do labiryntu schować skrzynię!~
+                 „Do stu tysięcy beczek śledzi!” woła. „Ktoś mnie zobaczył!
+                 Lepiej zmykam do labiryntu schować skrzynię!”
                  ^^
                  I już znika w mroku.";
             }
@@ -3385,9 +3385,9 @@ Object  pirate
                 if (obj in player) score = score - 5;
                 move obj to Dead_End_13;
             }
-            "^Z cienia za tobą wyskakuje brodaty pirat! ~Har, har~ - rechocze.
-             ~Wezmę sobie cały ten łup i schowam go razem z moją skrzynią
-             głęboko w labiryncie!~ Porywa twój skarb i znika w mroku.";
+            "^Z cienia za tobą wyskakuje brodaty pirat! „Har, har” – rechocze.
+             „Wezmę sobie cały ten łup i schowam go razem z moją skrzynią
+             głęboko w labiryncie!” Porywa twój skarb i znika w mroku.";
         ],
         has_stolen_something false,
         has_been_spotted false;
@@ -3411,9 +3411,9 @@ Object  cave_closer
             remove Bear;
             remove Dragon;
             StartTimer(endgame_timer, 25);
-            "^Grobowy głos niesie się echem po jaskini: ~Jaskinia wkrótce
+            "^Grobowy głos niesie się echem po jaskini: „Jaskinia wkrótce
              zostanie zamknięta. Wszyscy poszukiwacze przygód proszeni są
-             o natychmiastowe wyjście przez główne biuro.~";
+             o natychmiastowe wyjście przez główne biuro.”";
         ];
 
 Object  endgame_timer
@@ -3429,7 +3429,7 @@ Object  endgame_timer
             move little_bird to At_Sw_End;
             move velvet_pillow to At_Sw_End;
             print
-                "^Grobowy głos oznajmia: ~Jaskinia jest zamknięta.~ Gdy echo
+                "^Grobowy głos oznajmia: „Jaskinia jest zamknięta.” Gdy echo
                  cichnie, następuje oślepiający błysk światła (i mały obłoczek
                  pomarańczowego dymu)...
                  ^^
@@ -3446,13 +3446,13 @@ Room    At_Ne_End "Północno-wschodni koniec magazynu"
         description
             "Jesteś na północno-wschodnim końcu ogromnej sali, większej
              nawet od Komnaty Olbrzyma. Wygląda na magazyn programu
-             ~Przygoda~. Masywne pochodnie wysoko w górze zalewają salę
+             „Przygoda”. Masywne pochodnie wysoko w górze zalewają salę
              zadymionym żółtym światłem. Dookoła leży stos butelek
              (wszystkie puste), szkółka młodych łodyg fasoli cicho
              mruczących pod nosem, ławica ostryg, pęk czarnych prętów
              z zardzewiałymi gwiazdami na końcach i kolekcja mosiężnych lamp.
              Z boku na podłodze śpi mnóstwo krasnoludów, głośno chrapiąc.
-             Tabliczka obok głosi: ~Nie budzić krasnoludów!~",
+             Tabliczka obok głosi: „Nie budzić krasnoludów!”",
         sw_to At_Sw_End,
   has   light;
 
@@ -3484,7 +3484,7 @@ Scenic  -> "zbi/ó=o/r/+u materiałów do gry"
         before [;
           Take:
             "Zabranie stąd łupu zepsułoby grę przyszłym graczom, więc
-             zostawiasz materiały ~Przygody~ tam, gdzie są.";
+             zostawiasz materiały „Przygody” tam, gdzie są.";
         ];
 
 Scenic  -> SleepingDwarves "śpiąc/e krasnolud/y"
@@ -3525,8 +3525,8 @@ Room    At_Sw_End "Południowo-zachodni koniec magazynu"
              W jednym kącie leży pęk czarnych prętów z zardzewiałymi znakami
              na końcach. Po podłodze porozrzucano mnóstwo aksamitnych poduszek.
              Na północny wschód ciągnie się olbrzymie lustro. U twoich stóp jest
-             duża stalowa krata, a obok niej tabliczka: ~SKARBIEC. Klucze
-             w głównym biurze.~",
+             duża stalowa krata, a obok niej tabliczka: „SKARBIEC. Klucze
+             w głównym biurze.”",
         d_to RepositoryGrate,
         ne_to At_Ne_End,
   has   light;
@@ -3550,7 +3550,7 @@ Scenic  -> "zbi/ó=o/r/+u materiałów do gry"
         before [;
           Take:
             "Zabranie stąd łupu zepsułoby grę przyszłym graczom, więc
-             zostawiasz materiały ~Przygody~ tam, gdzie są.";
+             zostawiasz materiały „Przygody” tam, gdzie są.";
         ];
 
 Object  -> black_mark_rod "czarn/y pręt/ z zardzewiałym znakiem"
@@ -3731,22 +3731,22 @@ Object  -> black_mark_rod "czarn/y pręt/ z zardzewiałym znakiem"
         print
             "Znam miejsca, czynności i przedmioty. Możesz mną kierować za
              pomocą poleceń w trybie rozkazującym. Żeby się poruszać, spróbuj
-             poleceń takich jak ~wejdź~, ~wschód~, ~zachód~, ~północ~,
-             ~południe~, ~góra~, ~dół~, ~wejdź do budynku~, ~wespnij się
-             na słup~ itd.^^";
+             poleceń takich jak „wejdź”, „wschód”, „zachód”, „północ”,
+             „południe”, „góra”, „dół”, „wejdź do budynku”, „wespnij się
+             na słup” itd.^^";
         print
             "Znam kilka szczególnych przedmiotów, na przykład czarny pręt
              ukryty w jaskini. Można coś z nimi robić za pomocą czasowników,
              które znam. Zwykle trzeba podać czasownik, a po nim przedmiot
              (w razie potrzeby z przymiotnikami), ale czasem potrafię się
              domyślić przedmiotu z samego czasownika. Niektóre przedmioty
-             same wskazują czynność; na przykład ~ekwipunek~ oznacza
-             ~sprawdź ekwipunek~, a wtedy podaję listę tego, co masz przy
+             same wskazują czynność; na przykład „ekwipunek” oznacza
+             „sprawdź ekwipunek”, a wtedy podaję listę tego, co masz przy
              sobie. Przedmioty mają skutki uboczne; na przykład pręt
              płoszy ptaszka.^^";
         print
-            "Wiele poleceń ma skróty. Na przykład zamiast ~ekwipunek~ możesz
-             wpisać ~i~, zamiast ~zbadaj przedmiot~ - ~x przedmiot~ itd.
+            "Wiele poleceń ma skróty. Na przykład zamiast „ekwipunek” możesz
+             wpisać „i”, zamiast „zbadaj przedmiot” – „x przedmiot” itd.
              Kierunki skraca się tak: pn, pd, w, z, pnw, pnz, pdw, pdz,
              g (góra) i d (dół).^^";
         print
@@ -3760,10 +3760,10 @@ Object  -> black_mark_rod "czarn/y pręt/ z zardzewiałym znakiem"
              z komnaty na północ wcale nie gwarantuje, że do następnej wejdzie
              się od południa.^^";
         print
-            "Jeśli chcesz wcześniej zakończyć przygodę, wpisz ~koniec~. Żeby
-             przerwać przygodę i dokończyć ją później, wpisz ~zapisz~, a żeby
-             wczytać zapisaną grę - ~wczytaj~. Żeby zobaczyć, jak ci idzie,
-             wpisz ~wynik~. Pełną liczbę punktów za skarb dostaje się dopiero
+            "Jeśli chcesz wcześniej zakończyć przygodę, wpisz „koniec”. Żeby
+             przerwać przygodę i dokończyć ją później, wpisz „zapisz”, a żeby
+             wczytać zapisaną grę – „wczytaj”. Żeby zobaczyć, jak ci idzie,
+             wpisz „wynik”. Pełną liczbę punktów za skarb dostaje się dopiero
              po bezpiecznym złożeniu go w budynku, choć część punktów dostaje
              się już za samo odnalezienie. Punkty traci się za śmierć albo za
              rezygnację, przy czym śmierć kosztuje więcej. Są też punkty
@@ -3813,7 +3813,7 @@ Object  -> black_mark_rod "czarn/y pręt/ z zardzewiałym znakiem"
              i grece, zasłynął jako «główny władca» swojego podziemnego
              królestwa. W wolnym czasie zbadał i nazwał dużą część jaskini,
              w ciągu roku podwajając znaną mapę. Charakterystyczny styl nazw
-             w jaskini - na wpół swojski amerykański, na wpół klasyczny -
+             w jaskini – na wpół swojski amerykański, na wpół klasyczny –
              zaczął się od Stephena: rzeka Styks, Komnata Śnieżki, Aleja
              Małego Nietoperza, Wielka Kopuła. Stephen znalazł dziwne ślepe
              ryby, węże, nieme świerszcze, szczątki niedźwiedzi jaskiniowych
@@ -3843,7 +3843,7 @@ Object  -> black_mark_rod "czarn/y pręt/ z zardzewiałym znakiem"
             "Przekonani, że jaskinie Mamucia i Flint Ridge tworzą jeden wielki
              system, grotołazi latami szukali tajnych wejść, aż w końcu
              zyskali oficjalne poparcie. Przez całe lata sześćdziesiąte
-             wszystkie połączenia z Flint Ridge - trudne, zalane wodą tunele -
+             wszystkie połączenia z Flint Ridge – trudne, zalane wodą tunele –
              kończyły się frustrująco zwałami głazów. Przełomu dokonała w 1972
              roku «chuda jak trzcina» fizyczka Patricia Crowther, która
              przecisnęła się przez Ciasne Miejsce i znalazła błotnisty
@@ -3857,12 +3857,12 @@ Object  -> black_mark_rod "czarn/y pręt/ z zardzewiałym znakiem"
         print
             "Jaskinia Mamucia jest ogromna, a jej pełny zasięg wciąż jest
              przedmiotem spekulacji (szacunki wahają się od 300 do 500 mil).
-             Choć grę często nazywano ~Colossal Cave~, w rzeczywistości jest
+             Choć grę często nazywano „Colossal Cave”, w rzeczywistości jest
              ona symulacją rejonu jaskini Bedquilt. Oto jak jej powstanie
              opisuje Will Crowther:^^";
         print
-            "~Grałem wtedy w niekomputerową grę fabularną, Dungeons and
-             Dragons, a do tego aktywnie zwiedzałem jaskinie - zwłaszcza
+            "„Grałem wtedy w niekomputerową grę fabularną, Dungeons and
+             Dragons, a do tego aktywnie zwiedzałem jaskinie – zwłaszcza
              Jaskinię Mamucią w Kentucky. Nagle przyszedł rozwód i trochę mnie
              to na różne sposoby rozbiło. Przede wszystkim brakowało mi dzieci.
              Skończyło się też chodzenie po jaskiniach, bo zrobiło się
@@ -3871,12 +3871,12 @@ Object  -> black_mark_rod "czarn/y pręt/ z zardzewiałym znakiem"
              grą dla dzieci, może z elementami Dungeons and Dragons, w które
              grałem.^^";
         print
-            "~Chodziło mi o to, żeby była to gra komputerowa, która nie
+            "„Chodziło mi o to, żeby była to gra komputerowa, która nie
              onieśmieli ludzi niemających do czynienia z komputerami, i między
              innymi dlatego zrobiłem tak, żeby gracz kierował grą w języku
              naturalnym, a nie za pomocą bardziej ustandaryzowanych poleceń.
-             Moje dzieci świetnie się przy niej bawiły.~ [Cytat z ~Genesis II:
-             Creation and Recreation with Computers~, Dale Peterson (1983).]^^";
+             Moje dzieci świetnie się przy niej bawiły.” [Cytat z „Genesis II:
+             Creation and Recreation with Computers”, Dale Peterson (1983).]^^";
         print
             "Oryginalny program Crowthera w FORTRAN-ie miał mniej więcej pięć
              skarbów, ale żadnej formalnej punktacji. Wyzwaniem było przede
@@ -3905,8 +3905,8 @@ Object  -> black_mark_rod "czarn/y pręt/ z zardzewiałym znakiem"
              Bedquilt. Wszystkie liczne naśladownictwa i rozszerzenia
              oryginalnej Przygody opierają się w gruncie rzeczy na
              350-punktowej wersji Woodsa. (W internecie krąży wiele
-             rozdętych, zepsutych albo ulepszonych - zależnie od punktu
-             widzenia - wersji gry, a najlepiej rozpoznawać je po
+             rozdętych, zepsutych albo ulepszonych – zależnie od punktu
+             widzenia – wersji gry, a najlepiej rozpoznawać je po
              maksymalnej liczbie punktów. Istnieje wiele wersji do mniej
              więcej 400 i 500 punktów, a jedna nawet do 1000. Sam Woods wciąż
              wydaje nowe wersje swojej gry; większość innych rozszerzających
@@ -3944,8 +3944,8 @@ Object  -> black_mark_rod "czarn/y pręt/ z zardzewiałym znakiem"
              przedmioty i miejsca są dokładnie takie jak w oryginalnej
              350-punktowej wersji Woodsa.^^";
         print
-            "Tu i ówdzie dodałem kilka pomocnych komunikatów, takich jak ~To
-             ślepy zaułek.~, i przywróciłem niektóre opisy początkowego
+            "Tu i ówdzie dodałem kilka pomocnych komunikatów, takich jak „To
+             ślepy zaułek.”, i przywróciłem niektóre opisy początkowego
              położenia przedmiotów, na przykład (dość kulawe)
              ^^  Leży tu smaczne jedzenie.^^
              z plików źródłowych, które są na pewno wczesne, ale wątpliwego
@@ -3953,7 +3953,7 @@ Object  -> black_mark_rod "czarn/y pręt/ z zardzewiałym znakiem"
         print
             "System punktacji jest oryginalny, z tym że nie traci się już
              4 punktów za rezygnację (w grach Inform i tak nie widać wyniku
-             po rezygnacji, więc to bez różnicy) i - co kontrowersyjne -
+             po rezygnacji, więc to bez różnicy) i – co kontrowersyjne –
              przyznaję 5 punktów za samo noszenie skarbu, jak w niektórych
              przeniesieniach z początku lat osiemdziesiątych. Nazwy rang są
              trochę uporządkowane. Jedyna istotna zmiana zasad polega na tym,

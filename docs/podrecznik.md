@@ -169,6 +169,7 @@ Object  Forest "~Wielki Plac~"
   has   light;
 ```
 
+- **Polskie cudzysłowy i półpauza** są w tablicy znaków biblioteki: w tekstach można pisać wprost „tak” i –. Gry przykładowe już tak robią. Znak `~` nadal drukuje prosty cudzysłów.
 - **Nazwa miejsca** (`"~Wielki Plac~"`) pojawia się w nagłówku opisu i w linii statusu. Znak `~` oznacza w napisach Inform cudzysłów. Nazw miejsc nie trzeba zapisywać w notacji odmiany, bo biblioteka wypisuje je zawsze w mianowniku.
 - **`description`** to opis wyświetlany po wejściu do miejsca i po poleceniu „rozejrzyj się”.
 - **Wyjścia** to właściwości `n_to`, `s_to`, `e_to`, `w_to`, `ne_to`, `nw_to`, `se_to`, `sw_to`, `u_to`, `d_to`, `in_to` i `out_to`. Wartością może być inne miejsce, drzwi (tutaj schody) albo tekst. W tym ostatnim przypadku gracz zostaje na miejscu i czyta podany tekst – tak jest przy próbie wspięcia się na drzewa (`u_to`).

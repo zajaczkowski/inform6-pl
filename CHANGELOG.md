@@ -6,6 +6,11 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
 
 ## Niewydane
 
+- Typografia: polskie cudzysłowy „ ” i półpauza – w bibliotece i grach (dopisane
+  na końcu tablicy `Zcharacter`), jedna spacja po kropce w grach (409 miejsc).
+- Rzadkie sytuacje: `Ale tornistra tam nie ma` zamiast sztucznego komunikatu,
+  poprawiony błąd programu w „Alicji” przy rozkazach dla kotków.
+
 - Najdziwniejsze polecenia (każdy czasownik gramatyki z obiektami każdego rodzaju):
   - bezokoliczniki wszystkich czasowników w „Zrozumiałem tylko tyle, że chcesz…”,
     dopełniacz („dotykać kota”) i przyimek („dmuchnąć w lampę”, „się wspiąć na
