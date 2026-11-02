@@ -6,7 +6,7 @@
 !   gier Inform 6.
 !
 !   Gra naśladuje wygląd gier Scotta Adamsa: krótkie opisy, lista
-!   "Widoczne wyjścia" i przedmioty wypisane w jednym wierszu.  Skarby mają
+!   wyjść i przedmioty wypisane w jednym wierszu.  Skarby mają
 !   w nazwie gwiazdki; trzeba je złożyć we wnętrzu pnia (13 skarbów, 100
 !   punktów).
 !
@@ -72,12 +72,18 @@ Class Sign
       short_name
       [;  PoPrzyp(self, "tabliczka", "tabliczki", "tabliczce", "tabliczkę",
               "tabliczką", "tabliczce");
-          print " z napisem: ", (object) self; rtrue;
+          print " z napisem „", (object) self, "”"; rtrue;
       ],
       description
-      [;  print_ret "Tabliczka głosi: ", (object) self;
+      [;  print_ret "Tabliczka głosi: „", (object) self, "”.";
       ],
   has static female;
+
+! Przecinek albo "i" przed elementem nr d wyliczenia c elementów.
+[ Separator d c;
+    if (d == 0) return;
+    if (d == c-1) print " i "; else print ", ";
+];
 
 Class ScottRoom
  with initial
@@ -85,20 +91,21 @@ Class ScottRoom
       ],
       describe
       [ i c d;  print (string) self.description;
-          print "^^Widoczne wyjścia: ";
+          print "^^";
           for (i=n_to: i<=d_to: i++)
               if (self.i ~= 0) c++;
-          if (c==0) print "żadnych!";
+          if (c==0) print "Nie widać żadnych wyjść!";
           else
-          {   for (i=n_to: i<=d_to: i++)
+          {   print "Wyjścia prowadzą ";
+              for (i=n_to: i<=d_to: i++)
                   if (self.i ~= 0)
-                  {   if (d++>0) print ", ";
-                      if (i==n_to) print "Północ";
-                      if (i==s_to) print "Południe";
-                      if (i==e_to) print "Wschód";
-                      if (i==w_to) print "Zachód";
-                      if (i==u_to) print "Góra";
-                      if (i==d_to) print "Dół";
+                  {   Separator(d++, c);
+                      if (i==n_to) print "na północ";
+                      if (i==s_to) print "na południe";
+                      if (i==e_to) print "na wschód";
+                      if (i==w_to) print "na zachód";
+                      if (i==u_to) print "w górę";
+                      if (i==d_to) print "w dół";
                   }
               print ".";
           }
@@ -107,12 +114,12 @@ Class ScottRoom
           objectloop (i in self)
               if (i ~= player) { c++; give i concealed; }
           if (c==0) rtrue;
-          print "^Widzisz też: ";
+          print "^Widzisz też ";
           objectloop (i in self)
               if (i ~= player)
-              {   if (d++>0) print " – "; print (bie) i;
+              {   Separator(d++, c); print (bie) i;
               }
-          new_line; rtrue;
+          print ".^"; rtrue;
       ];
 
 [ GamePreRoutine i c d;
@@ -120,11 +127,11 @@ Class ScottRoom
    c=0; d=0;
    objectloop (i in player) c++;
    if (c==0) "Nic nie niesiesz.";
-   print "Niesiesz:^";
+   print "Niesiesz ";
    objectloop (i in player)
-   {   if (d++>0) print " – "; print (bie) i;
+   {   Separator(d++, c); print (bie) i;
    }
-   new_line; rtrue;
+   print ".^"; rtrue;
 ];
 
 [ GamePostRoutine i;
@@ -667,7 +674,7 @@ ScottRoom Maze3 "Labirynt"
        u_to Maze5,  d_to Maze6;
 Object -> "rysy"
   with name 'rysy' 'rys' 'rysami' 'zadrapania' 'zadrapań' 'skała' 'skale',
-       short_name "dziwne rysy na skale głoszą: TU BYŁ ALADYN",
+       short_name "dziwne rysy na skale z napisem „TU BYŁ ALADYN”",
   has  static pluralname;
 
 ScottRoom Maze4 "Labirynt"

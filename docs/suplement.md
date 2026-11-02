@@ -1369,10 +1369,10 @@ Drugi argument `PlayerTo` (1) pomija opis miejsca, bo dywan wywołuje `Look` sam
 ```inform
       describe
       [ i c d;  print (string) self.description;
-          print "^^Widoczne wyjścia: ";
+          print "^^";
           for (i=n_to: i<=d_to: i++)
               if (self.i ~= 0) c++;
-          if (c==0) print "żadnych!";
+          if (c==0) print "Nie widać żadnych wyjść!";
 ```
 
 Właściwości kierunków mają kolejne numery od `n_to` do `d_to`, więc można po nich przejść pętlą. Przedmioty, które `describe` już wymieniło, dostają atrybut `concealed`, żeby biblioteka nie wypisała ich drugi raz; `GamePostRoutine` zdejmuje go po zakończeniu `Look`.
@@ -1381,9 +1381,9 @@ Właściwości kierunków mają kolejne numery od `n_to` do `d_to`, więc można
 Ponure bagno
 Jesteś na ponurym bagnie.
 
-Widoczne wyjścia: Północ, Południe, Wschód, Zachód, Góra.
+Wyjścia prowadzą na północ, na południe, na wschód, na zachód i w górę.
 
-Widzisz też: cyprys - cuchnące błoto - bagienny gaz - rój meszek
+Widzisz też cyprys, cuchnące błoto, bagienny gaz i rój meszek.
 ```
 
 Ekwipunek ma ten sam styl dzięki `GamePreRoutine`, która przejmuje akcję `Inv`, zanim obsłuży ją biblioteka.

@@ -6,8 +6,8 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
 
 ## Niewydane
 
-- „Kraina Przygód”: listy „Widzisz też:” i „Niesiesz:” w bierniku, „tabliczkę
-  z napisem: …” zamiast „tabliczka głosi- …”.
+- „Kraina Przygód”: opisy miejsc i ekwipunek jako polskie zdania („Wyjścia prowadzą
+  na północ i w dół.”, „Widzisz też wodę i tabliczkę z napisem „…”.”).
 
 - Polecenie `stan` działa jak `wynik`; `stan na stole` nadal znaczy „stań na stole”.
 
