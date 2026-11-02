@@ -372,7 +372,7 @@ Biblioteka napisze wtedy „dwie złote monety”, ale „pięć złotych monet�
 
 Dwa ograniczenia: liczebnik rodzaju męskoosobowego („dwaj rycerze”, „dwóch rycerzy”) nie jest obsługiwany, a napis w `list_together` zawsze dostaje liczebnik męski. Przy rzeczach rodzaju żeńskiego lepsza jest procedura `list_together` (zob. `games/toyshop_pl.inf`).
 
-Gracz może użyć liczby mnogiej w poleceniu nawet wtedy, gdy obiekty nie mają `plural`: „weź klucze” bierze wszystkie klucze w zasięgu, a przy poleceniach dla jednego obiektu („zbadaj klucze”) biblioteka pyta, o który chodzi. Końcówki liczby mnogiej biblioteka zgaduje; forma nieregularna („ludzie”, „dzieci”) wymaga słowa z flagą `//p` w `name`.
+Gracz może użyć liczby mnogiej w poleceniu nawet wtedy, gdy obiekty nie mają `plural`: „weź klucze” bierze wszystkie klucze w zasięgu, a przy poleceniach dla jednego obiektu („pocałuj kotki”) biblioteka pyta, o który chodzi. Końcówki liczby mnogiej biblioteka zgaduje; forma nieregularna („ludzie”, „dzieci”) wymaga słowa z flagą `//p` w `name`.
 
 ---
 

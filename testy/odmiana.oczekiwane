@@ -101,8 +101,9 @@ czerwona lampa: Wzięte.
 zielona lampa: Wzięte.
   zieloną lampę
   czerwoną lampę
-Co masz na myśli: zieloną lampę czy czerwoną lampę?
-Czerwona lampa nie wyróżnia się niczym szczególnym.
+zielona lampa: Zielona lampa nie wyróżnia się niczym szczególnym.
+czerwona lampa: Czerwona lampa nie wyróżnia się niczym szczególnym.
+Nie znam takiego czasownika.
 Nie ma tu nic, co można by upuścić.
 Nie ma tu nic, co można by wziąć.
 Wzięte.
@@ -113,7 +114,6 @@ Do czego chcesz włożyć te rzeczy?
 O co chcesz zapytać kucharkę? Napisz na przykład: zapytaj kucharkę o klucz.
 Co chcesz powiedzieć kucharce? Napisz na przykład: powiedz kucharce tak.
 Masz go przy sobie.
-Nie znam takiego czasownika.
 Słucham?
 Ciężki młotek nie wyróżnia się niczym szczególnym.
 Nie widzisz niczego takiego.
@@ -125,21 +125,8 @@ skrzynia: Upuszczone.
 ciężki młotek: Upuszczone.
 zielona lampa: Upuszczone.
 czerwona lampa: Upuszczone.
-Tego czasownika nie można użyć z kilkoma przedmiotami naraz.
-Można to zrobić tylko z kimś żywym.
-Są tylko 2 sztuki.
-Niestety, tego nie da się poprawić.
-Aby powtórzyć polecenie typu „żabo, skacz”, napisz po prostu „powtórz”, a nie „żabo, powtórz”.
-Nie możesz rozmawiać z ciężkim młotkiem.
-Zrozumiałem tylko tyle, że chcesz obejrzeć ciężki młotek.
-Tam nie da się wejść.
-Skrzynia jest już tutaj.
-Nie masz z czego wyjść.
-Na co chcesz ustawić ciężki młotek?
-Co chcesz obejrzeć?
-[Poprzedni ruch został cofnięty.]
-Zrozumiałem tylko tyle, że chcesz pójść w tę stronę.
-czerwona lampa: Kucharka ma ciekawsze rzeczy do roboty.
-Do tej pory wykonałeś 32 ruchy.
-Na skrzyni nie da się stanąć.
-Koniec
+żelazny klucz: Żelazny klucz nie wyróżnia się niczym szczególnym.
+miedziany klucz: Miedziany klucz nie wyróżnia się niczym szczególnym.
+ciężki młotek: Ciężki młotek nie wyróżnia się niczym szczególnym.
+skrzynia: Skrzynia jest pusta.
+tablica: Koniec

@@ -319,7 +319,7 @@ Verb 'nie' 'n//'
     *                                           -> No;
 
 Verb 'obejrzyj' 'zbadaj' 'opisz' 'ob' 'x//' 'przyjrzyj' 'zobacz' 'oglądaj'
-    * noun                                      -> Examine;
+    * multi                                     -> Examine;
 
 Verb 'obudź' 'zbudź' 'ocknij' 'przebudź' 'budź'
     *                                           -> Wake

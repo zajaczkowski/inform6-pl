@@ -6,6 +6,8 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
 
 ## Niewydane
 
+- `zbadaj` działa na kilku rzeczach naraz: „zbadaj kotki”, „zbadaj klucze”.
+
 - Czytanie ekranów we wszystkich grach: „W tej grze wykonałaś 18 ruchów.” w grach
   bez punktów, „drzwi do korytarza” w „Krainie Przygód”, „Wyjście prowadzi…”
   przy jednym wyjściu; `test.sh` sprawdza ekrany pod kątem sklejonego tekstu.
