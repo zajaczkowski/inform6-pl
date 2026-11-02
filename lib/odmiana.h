@@ -730,6 +730,8 @@ Array pl_podmienione -> 64;
 
 [ PL_NieznaneSlowa  i w;
     for (i=0 : i<64 : i++) pl_podmienione->i = 0;
+    ! Samo "stan" to wynik gry, ale "stan na stole" to "stań" bez ogonka.
+    if (NumberWords() > 1 && parse-->1 == 'stan') parse-->1 = 'stań';
     for (i=1 : i<=NumberWords() : i++) {
         #Ifdef TARGET_ZCODE;
         ! Stałych ALL*__WD jest pięć: "oba" i jego odmiany parser czyta jak "obie".

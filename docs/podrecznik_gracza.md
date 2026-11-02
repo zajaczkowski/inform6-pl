@@ -480,7 +480,7 @@ Poza `czekaj` żadne z tych poleceń nie zajmuje czasu w świecie gry: po nich n
 | `ups X` | poprawia literówkę w poprzednim poleceniu (`ups lampa`) |
 | `restart` | zaczyna grę od nowa |
 | `koniec`, `q` | kończy grę |
-| `wynik` | pokazuje wynik |
+| `wynik`, `stan` | pokazuje wynik |
 | `pełny wynik` | wynik z wyszczególnieniem |
 | `opisy pełne` | pełny opis miejsca przy każdej wizycie |
 | `opisy skrócone` | sama nazwa miejsca przy ponownej wizycie |

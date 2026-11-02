@@ -2111,7 +2111,11 @@ Extend 'rzuć' first
 Verb 'czaruj' 'zaczaruj'
                 * noun is_spell                  -> Cast reverse
                 * is_spell                       -> Cast;
-Verb 'diagnoza' 'zdrowie' 'stan'
+Verb 'diagnoza' 'zdrowie'
+                *                                -> Diagnose;
+
+! W bibliotece "stan" to wynik; tutaj to stan bohatera.
+Extend only 'stan' replace
                 *                                -> Diagnose;
 Extend 'zetrzyj'
                 * 'kurz' 'z//'/'ze' noun         -> Rub;

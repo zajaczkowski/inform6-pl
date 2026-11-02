@@ -82,7 +82,7 @@ Verb meta 'wczytaj' 'załaduj' 'odczytaj' 'restore'
 Verb meta 'zapisz' 'save'
     *                                           -> Save;
 
-Verb meta 'wynik' 'punkty' 'score'
+Verb meta 'wynik' 'stan' 'punkty' 'score'
     *                                           -> Score;
 
 Verb meta 'pełny' 'fullscore' 'full'

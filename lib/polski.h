@@ -852,7 +852,8 @@ Include "odmiana";
       'powiadamiaj', 'powiadomienia', 'notify':
                                      print "zmienić powiadamianie o wyniku";
       'zaimki', 'pronouns', 'nouns': print "sprawdzić zaimki";
-      'wynik', 'punkty', 'score':    print "sprawdzić wynik";
+      'wynik', 'stan', 'punkty', 'score':
+                                     print "sprawdzić wynik";
       'pełny', 'fullscore', 'full':  print "sprawdzić pełny wynik";
       'wersja', 'version':           print "sprawdzić wersję gry";
       'przedmioty', 'objects':       print "zobaczyć listę przedmiotów";
