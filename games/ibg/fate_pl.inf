@@ -1,0 +1,749 @@
+!% -Cu
+!% +language_name=polski
+! ==============================================================================
+!   KAPITAN FATE - polska wersja przykładowej gry "Captain Fate" z "The Inform
+!   Beginner's Guide".  Wielkie litery w tekście to zamierzona parodia komiksu.
+!
+!   Oryginał copyright (c) Roger Firth i Sonja Kesserich 2004.
+!   Licencja oryginału (dotyczy także tej wersji):
+!
+!       This book and its associated example games are copyright (c) Roger
+!       Firth and Sonja Kesserich 2004.  Copying and distribution, with or
+!       without modification, are permitted in any medium without royalty
+!       provided the copyright notice and this notice are preserved.
+!       Exceptions to these conditions must be negotiated directly with the
+!       authors (roger@firthworks.com and polilla@idecnet.com).
+!
+!   Odstępstwa od oryginału: pname.h nie jest potrzebny, bo polskie nazwy
+!   drzwi, klucza i toalety nie mylą się ze sobą; nową walutą jest kwidbak
+!   ("quidbuck"), a "chcesz się przebrać" to "przebierz się" i "zmień ubranie".
+! ==============================================================================
+
+Include "PolskiZ";
+
+Constant Story "Kapitan Fate";
+Constant Headline
+            "^Prosty przykład w Informie
+             ^Roger Firth i Sonja Kesserich^Wersja polska.^";
+Release 3; Serial "040804";
+
+Constant MANUAL_PRONOUNS;
+Constant MAX_SCORE     2;
+Constant OBJECT_SCORE  1;
+Constant ROOM_SCORE    1;
+
+Include "Parser";
+
+Object  LibraryMessages         ! musi stać między Parser i VerbLib
+  with  before [;
+          Buy:    "Drobny handel interesuje cię tylko w WYJĄTKOWYCH okolicznościach.";
+          Dig:    "Twoje wyostrzone zmysły nie wykrywają pod ziemią NICZEGO,
+                   co zasługiwałoby na natychmiastową uwagę.";
+          Pray:   "Nie musisz niepokoić wszechmocnych BÓSTW, żeby uratować dzień.";
+          Sing:   "Niestety! To akurat nie jest żadna z twoich licznych supermocy.";
+          Sleep:  "Bohater ZAWSZE czuwa.";
+          Sorry:  "Kapitan FATE woli CZYN niż przeprosiny.";
+          Strong: "Mało prawdopodobne słownictwo jak na BOHATERA.";
+          Swim:   "Szybko kierujesz całą UWAGĘ na poszukiwanie miejsca, w którym
+                   mógłbyś się POPISAĆ swoim znakomitym stylem, ale niestety!
+                   Żadnego nie znajdujesz.";
+          Miscellany:
+            if (lm_n == 19)
+                if (clothes has worn)
+                    "W stroju swojej tajnej tożsamości udaje ci się wyjątkowo
+                     skutecznie wyglądać jak nieudacznik wart dwa centy,
+                     ostatnia oferma.";
+                else
+                    "Teraz, kiedy masz na sobie kostium, roztaczasz wizerunek
+                     NIESPOTYKANEJ potęgi, nabrzmiałych, wielobarwnych MIĘŚNI,
+                     ZAWADIACKIEJ, a jednak SKROMNEJ elegancji.";
+            if (lm_n == 38)
+                "Ten czasownik nie jest ci potrzebny, żeby SKUTECZNIE uratować
+                 dzień.";
+            if (lm_n == 39)
+                "O tym nie musisz wspominać, żeby URATOWAĆ dzień.";
+        ];
+
+Include "VerbLib";
+
+! ------------------------------------------------------------------------------
+!   Klasy obiektów
+! ------------------------------------------------------------------------------
+
+Class   Room
+  with  description "W BUDOWIE",
+  has   light;
+
+Class   Appliance
+  with  before [;
+          Take,Pull,Push,PushDir:
+            "Choć twoje RZEŹBIONE, niezniszczalne mięśnie poradziłyby sobie
+             z tym zadaniem, nie popierasz niszczenia cudzej własności.";
+        ],
+  has   scenery;
+
+! ------------------------------------------------------------------------------
+!   Obiekty gry
+! ------------------------------------------------------------------------------
+
+Room    street "Na ulicy"
+  with  name 'miasto' 'miasta' 'budynki' 'budynków' 'wieżowce' 'sklepy' 'mieszkania'
+            'samochody',
+        description [;
+            if (player in booth)
+                "Z tego PUNKTU obserwacyjnego rozciąga się szeroki widok na
+                 chodnik i wejście do kawiarni Benny'ego.";
+            else
+                "Z jednej strony, którą twój WYOSTRZONY zmysł kierunku uznaje
+                 za PÓŁNOC, jest otwarta kawiarnia, gdzie właśnie podają lunch.
+                 Na południu widać budkę telefoniczną.";
+        ],
+        before [;
+          Go:
+            if (player in booth && noun == n_obj) <<Exit booth>>;
+        ],
+        n_to [; <<Enter outside_of_cafe>>; ],
+        s_to [; <<Enter booth>>; ],
+        in_to "Ale w którą stronę?",
+        cant_go
+            "Nie ma teraz czasu na zwiedzanie! W kostiumie Kapitana FATE
+             poruszałbyś się o wiele szybciej.";
+
+Object  pedestrians "przechodni/e+ów" street
+  with  name 'ludzie' 'ludzi',
+        description
+            "To po prostu LUDZIE zajęci swoimi codziennymi, UCZCIWYMI sprawami.",
+        before [;
+          Examine:
+            return false;
+          default:
+            "Przechodnie NIE są teraz twoim zmartwieniem.";
+        ],
+  has   animate male pluralname scenery;
+
+Appliance booth "budk/a telefoniczn/a!" street
+  with  name 'stara' 'starą' 'czerwona' 'czerwoną' 'kabina' 'kabinę' 'kabiny'
+            'kabinie' 'telefon' 'telefonu',
+        description
+            "To jeden ze starych, malowniczych modeli, czerwona kabina z miejscem
+             dla jednej osoby.",
+        before [;
+          Open:
+            "Budka jest już otwarta.";
+          Close:
+            "Tej budki nie da się zamknąć.";
+        ],
+        after [;
+          Enter:
+            "Z niewiarygodną szybkością dajesz nura do budki telefonicznej.";
+        ],
+  has   enterable container open female;
+
+Appliance sidewalk "chodnik/" street
+  with  name 'ulica' 'ulicę' 'ulicy',
+        description
+            "Dokonujesz szybkiego rozpoznania chodnika i ku swojemu wielkiemu
+             zdumieniu stwierdzasz, że wygląda DOKŁADNIE jak każdy inny chodnik
+             w MIEŚCIE!";
+
+Appliance outside_of_cafe "kawiarni/a Benny'ego" street
+  with  name 'wejście' 'wejścia',
+        description
+            "Ulubione miejsce mieszkańców na szybką przekąskę, kawiarnia
+             Benny'ego wygląda jak RAKIETA z lat pięćdziesiątych.",
+        before [;
+          Enter:
+            print "Z imponującą mieszaniną pośpiechu i nonszalancji wkraczasz
+                do otwartej kawiarni.^";
+            PlayerTo(cafe);
+            return true;
+        ],
+  has   enterable proper female;
+
+! ------------------------------------------------------------------------------
+
+Room    cafe "W kawiarni Benny'ego"
+  with  description
+            "U Benny'ego dostaniesz NAJLEPSZE ciastka i kanapki. Klienci
+             oblegają ladę, a sam Benny obsługuje, gotuje i kasuje, nie gubiąc
+             rytmu. W północnej części kawiarni widać czerwone drzwi do toalety.",
+        before [;
+          Go:   ! Gracz właśnie wychodzi.  Czy idzie na ulicę?
+            if (noun ~= s_obj) return false;
+            if (benny.coffee_not_paid == true ||
+                benny.key_not_returned == true) {
+                print "Gdy tylko stajesz na progu, na twoim ramieniu ląduje
+                    wielka dłoń Benny'ego.";
+                if (benny.coffee_not_paid == true &&
+                    benny.key_not_returned == true)
+                    "^^„Ej! Masz mój klucz i nie zapłaciłeś za kawę. Wyglądam
+                     na frajera?” Przepraszasz, jak potrafi tylko BOHATER,
+                     i wracasz do środka.";
+                if (benny.coffee_not_paid == true)
+                    "^^„Chwileczkę, panie”, mówi. „Wymykamy się bez płacenia,
+                     co?” Szybko mamroczesz jakieś usprawiedliwienie i wracasz
+                     do kawiarni. Benny nieufnym okiem wraca do swoich zajęć.";
+                if (benny.key_not_returned == true)
+                    "^^„A dokąd to z kluczem do toalety?”, pyta. „Złodziej
+                     z pana?” Kiedy Benny wciąga cię z powrotem do kawiarni,
+                     szybko zapewniasz, że to tylko ZDUMIEWAJĄCA pomyłka.";
+            }
+            if (costume has worn) {
+                deadflag = 5;           ! zwycięstwo!
+                "Wychodzisz na chodnik, a przechodnie rozpoznają tęczowe
+                 WIDOWISKO, jakim jest kostium Kapitana FATE, i wykrzykują
+                 z podziwem twoje imię, gdy z sensacyjnym rozmachem WZBIJASZ
+                 się w BŁĘKIT porannego nieba!";
+            }
+        ],
+        first_time_out false,           ! pierwsze pojawienie się Kapitana?
+        after [;
+          Go:   ! Gracz właśnie przyszedł.  Czy z toalety?
+            if (noun ~= s_obj) return false;
+            if (costume has worn && self.first_time_out == false) {
+                self.first_time_out = true;
+                StartDaemon(customers);
+            }
+        ],
+        s_to street,
+        n_to toilet_door;
+
+Appliance counter "lad/a" cafe
+  with  name 'bar' 'baru' 'kontuar' 'kontuaru',
+        description
+            "Lada jest z zadziwiającego STOPU metali, ODPORNEGO NA PLAMY,
+             NIEPRZEMAKALNEGO i BARDZO ŁATWEGO w czyszczeniu. Klienci jedzą
+             w SPOKOJU, pewni, że lada wszystko wytrzyma.",
+        before [;
+          Receive:
+            <<Give noun benny>>;
+        ],
+  has   supporter female;
+
+Object  food "przekąsk/i+e" cafe
+  with  name 'jedzenie' 'jedzenia' 'ciastka' 'ciastek' 'ciastko' 'kanapka' 'kanapki'
+            'kanapek' 'pączek' 'pączka' 'pączki',
+        before [; "Nie ma teraz czasu na JEDZENIE."; ],
+  has   scenery pluralname;
+
+Object  menu "menu" cafe
+  with  name 'menu' 'tablica' 'tablicę' 'tablicy' 'obrazek' 'obrazka' 'napisy',
+        desc_dop "menu", desc_cel "menu", desc_bie "menu", desc_nar "menu",
+        desc_mie "menu",
+        description
+            "Na tablicy z menu są dania i napoje Benny'ego wraz z cenami. Szkoda,
+             że nigdy nie nauczyłeś się czytać, ale na szczęście wśród
+             niezrozumiałych napisów jest obrazek dużej filiżanki kawy.",
+        before [;
+          Take:
+            "Tablica wisi na ścianie za Bennym. Poza tym to bezużyteczne NAPISY.";
+        ],
+  has   scenery neuter;
+
+Object  customers "klienci" cafe
+  with  name 'klient' 'klienta' 'klienci' 'klientów' 'klientom' 'klientami'
+            'ludzie' 'ludzi' 'mężczyźni' 'mężczyzn' 'kobiety' 'kobiet',
+        desc_dop "klientów", desc_cel "klientom", desc_bie "klientów",
+        desc_nar "klientami", desc_mie "klientach",
+        description [;
+            if (costume has worn)
+                "Większość skupia się na jedzeniu, ale niektórzy gapią się na
+                 ciebie zupełnie otwarcie. To pewnie OSZAŁAMIAJĄCE barwy twojego
+                 kostiumu.";
+            else
+                "Grupa BEZRADNYCH i NIC NIEPODEJRZEWAJĄCYCH śmiertelników, tych
+                 samych, których Kapitan FATE przysiągł BRONIĆ w dniu, gdy jego
+                 rodzice udławili się PODSTĘPNYM kawałkiem CIASTA MALINOWEGO.";
+        ],
+        life [;
+          Ask,Tell,Answer:
+            if (costume has worn)
+                "Ludzie patrzą z NIEUFNOŚCIĄ na twój BAJECZNY kostium.";
+            else
+                "Jako John Covarth budzisz MNIEJSZE zainteresowanie niż jedzenie
+                 Benny'ego.";
+          Kiss:
+            "Nie wiadomo, jakie ZMUTOWANE bakterie mogą nosić ci OBCY ludzie.";
+          Attack:
+            "Bezmyślna rzeź cywilów to specjalność ZŁOCZYŃCÓW. Masz CHRONIĆ
+             takich ludzi.";
+        ],
+        orders [;
+            "Ci ludzie nie wyglądają na skorych do współpracy.";
+        ],
+        number_of_comments 0,           ! liczy komentarze klientów
+        daemon [;
+            if (location ~= cafe) return;
+            if (self.number_of_comments == 0) {
+                self.number_of_comments = 1;
+                print "^Klienci w pobliżu przyglądają się twojemu kostiumowi
+                    z nieukrywaną ciekawością.^";
+            }
+            if (random(2) == 1) {       ! w połowie przypadków
+                self.number_of_comments = self.number_of_comments + 1;
+                switch (self.number_of_comments) {
+                 2: "^„Nie wiedziałem, że do miasta przyjechał cyrk”, mówi jeden
+                     z klientów do drugiego. „Klauni mają chyba dziś wolne”.";
+                 3: "^„Ci projektanci mody już nie wiedzą, jak się popisać”,
+                     prycha gruby pan, patrząc w twoją stronę. Ci, którzy to
+                     słyszą, próbują ukryć uśmiech.";
+                 4: "^„Znowu karnawał”, mówi mężczyzna do żony, która chichocze
+                     i zerka na ciebie ukradkiem. „Jak ten czas leci”.";
+                 5: "^„Najgorsze w dużych miastach”, mówi ktoś do towarzysza
+                     przy stoliku, „to to, jakie paskudztwa wyłażą z toalet”.";
+                 6: "^„Chciałabym TAK iść do pracy w piżamie”, mówi dziewczyna
+                     w garsonce do koleżanek. „Wygląda TAK wygodnie”.";
+                 default: StopDaemon(self);
+                }
+            }
+        ],
+  has   scenery animate male pluralname;
+
+Object  benny "Benny" cafe
+  with  name 'benny' 'benny^ego' 'bennyego' 'bennego' 'benny^emu' 'bennyemu'
+            'bennemu' 'bennym' 'barman' 'barmana' 'barmanowi' 'barmanem',
+        desc_dop "Benny'ego", desc_cel "Benny'emu", desc_bie "Benny'ego",
+        desc_nar "Bennym", desc_mie "Bennym",
+        description
+            "ZWODNICZO GRUBY człowiek o niesamowitej zwinności, Benny zabawia
+             klientów, rozbijając sobie na czole orzechy kokosowe, kiedy tylko
+             przyjdzie mu na to ochota.",
+        coffee_asked_for false,         ! czy gracz prosił o kawę?
+        coffee_not_paid  false,         ! czy Benny czeka na zapłatę?
+        key_not_returned false,         ! czy Benny czeka na klucz?
+        life [;
+          Give:
+            switch (noun) {
+              clothes:
+                "POTRZEBUJESZ swojego skromnego ubrania Johna Covartha.";
+              costume:
+                "POTRZEBUJESZ swojego zdumiewającego kostiumu ODPORNEGO NA KWASY.";
+              toilet_key:
+                self.key_not_returned = false;
+                move toilet_key to benny;
+                "Benny kiwa głową, gdy GODNIE PODZIWU zwracasz mu klucz.";
+              coin:
+                remove coin;
+                self.coffee_not_paid = false;
+                print "Cudownymi gestami ILUZJONISTY wydobywasz monetę z głębi
+                    swojego ";
+                if (costume has worn) print "KULOODPORNEGO kostiumu";
+                else                  print "zwykłego ubrania";
+                ", jakby spadła na ladę z ucha Benny'ego! Ludzie wokół uprzejmie
+                 klaszczą. Benny bierze monetę i PODEJRZLIWIE ją nadgryza.
+                 „Dziękuję panu. Zapraszamy ponownie”, mówi.";
+            }
+          Attack:
+            if (costume has worn) {
+                deadflag = 4;
+                print "Na oczach przerażonych ludzi WSPANIALE przeskakujesz NAD
+                    ladą i atakujesz Benny'ego z ZADZIWIAJĄCĄ, choć NIE
+                    wystarczającą szybkością. Benny wita cię ZDRADZIECKIM
+                    podbródkowym, który posyła twoją GRANITOWĄ SZCZĘKĘ w lot przez
+                    kawiarnię.^^
+                    „Ci w piżamach myślą, że mogą bić niewinnych ludzi”, prycha
+                    Benny, gdy NIESAMOWITE dłonie CIEMNOŚCI zasnuwają ci wzrok
+                    i tracisz przytomność.^";
+                return true;
+            }
+            else
+                "To byłby mało prawdopodobny czyn jak na POTULNEGO Johna Covartha.";
+          Kiss:
+            "To nie pora na BEZMYŚLNE zauroczenie.";
+          Ask,Tell,Answer:
+            "Benny jest zbyt zajęty, żeby ucinać sobie pogawędki.";
+        ],
+        orders [;   ! obsługuje POPROŚ BENNY'EGO O X i BENNY, DAJ MI X
+          Give:
+            if (second ~= player or nothing) "Benny patrzy na ciebie dziwnie.";
+            switch (noun) {
+              toilet_key:
+                if (toilet_key in player) "Przecież NAPRAWDĘ już masz klucz.";
+                if (self.coffee_asked_for == true)
+                    if (toilet_key in self) {
+                        move toilet_key to player;
+                        self.key_not_returned = true;
+                        "Benny rzuca klucz do toalety na ladę, a ty łapiesz go
+                         zręcznym i precyzyjnym ruchem swojej HIPERZWINNEJ
+                         dłoni.";
+                    }
+                    else
+                        "„Ostatnio ten klucz był u PANA”, burczy Benny. „Proszę
+                         go oddać przed wyjściem”.";
+                else
+                    "„Toaleta jest tylko dla klientów”, burczy, spoglądając
+                     znacząco na tablicę z menu za swoimi plecami.";
+              coffee:
+                if (self.coffee_asked_for == true)
+                    "Jedna kawa powinna wystarczyć.";
+                move coffee to counter;
+                self.coffee_asked_for = true;     ! osobno: na Glulxie łańcuch
+                self.coffee_not_paid = true;      ! przypisań zostawia zero
+                "Dwoma zgrabnymi krokami Benny stawia przed tobą swoje słynne na
+                 cały świat cappuccino.";
+              food:
+                "Jedzenie zajmie za dużo czasu, a musisz się przebrać TERAZ.";
+              menu:
+                "Z ledwie słyszalnym westchnieniem Benny wskazuje głową menu na
+                 ścianie za swoimi plecami.";
+              default:
+                "„Tego chyba nie ma w menu, proszę pana”.";
+            }
+        ],
+  has   scenery animate male proper transparent;
+
+Object  coffee "filiżank/a kawy" benny
+  with  name 'kawa' 'kawę' 'kawie' 'kawą' 'parująca' 'parującą' 'cappuccino'
+            'kapuczino' 'capuccino',
+        description [;
+            if (self in benny)
+                "Obrazek na tablicy z menu WYGLĄDA naprawdę dobrze.";
+            else
+                "Pachnie wybornie.";
+        ],
+        before [;
+          Take,Drink,Taste:
+            if (self in benny) "Najpierw poproś o nią Benny'ego.";
+            else {
+                move self to benny;
+                print "Bierzesz filiżankę i wypijasz łyk. ŚWIATOWA SŁAWA Benny'ego
+                    jest w pełni zasłużona. Gdy tylko kończysz, Benny zabiera
+                    pustą filiżankę.";
+                if (benny.coffee_not_paid == true)
+                    " „Należy się jeden kwidbak, proszę pana”.";
+                else
+                    "";
+            }
+          Buy:
+            if (coin in player) <<Give coin benny>>;
+            else                "Nie masz pieniędzy.";
+          Smell:
+            "Jeśli można ufać twoim NADCZYNNYM przysadkom mózgowym, to Kolumbia.";
+        ],
+  has   female;
+
+Object  outside_of_toilet "toalet/a" cafe
+  with  name 'łazienka' 'łazienkę' 'łazienki' 'ubikacja' 'ubikację' 'ubikacji',
+        before [;
+          Enter:
+            if (toilet_door has open) {
+                PlayerTo(toilet);
+                return true;
+            }
+            else
+                "Twój ZNAKOMITY dedukcyjny umysł wykrywa, że DRZWI są ZAMKNIĘTE.";
+          Examine:
+            if (toilet_door has open)
+                "W twoim NAJWSPANIALSZYM umyśle błyska genialna myśl: dokładne
+                 zbadanie toalety byłoby NIEZWYKLE ułatwione, gdybyś do niej
+                 wszedł.";
+            else
+                "OGROMNYM wysiłkiem woli przywołujesz niezgłębione ASTRALNE
+                 WIDZENIE i kierujesz je W STRONĘ zamkniętych drzwi... aż
+                 przypominasz sobie, że moce mistyczne ma doktor Mystere.";
+          Open:
+            <<Open  toilet_door>>;
+          Close:
+            <<Close toilet_door>>;
+          Take,Push,Pull:
+            "To CZĘŚĆ budynku.";
+        ],
+  has   scenery openable enterable female;
+
+Object  toilet_door "czerwon/e drzwi/"
+  with  description [;
+            if (location == cafe)
+                "Czerwone drzwi z jednoznacznymi czarnymi sylwetkami mężczyzny
+                 i kobiety, oznaczającymi wejście do urządzeń higienicznych.
+                 Na ich powierzchni wisi nabazgrana kartka.";
+            else
+                "Czerwone drzwi bez WYBITNYCH cech.";
+        ],
+        found_in cafe toilet,
+        before [ ks;
+          Open:
+            if (self hasnt locked || toilet_key notin player) return false;
+            ks = keep_silent; keep_silent = true;
+            <Unlock self toilet_key>; keep_silent = ks;
+            return true;
+          Lock:
+            if (self hasnt open) return false;
+            print "(najpierw zamykasz ", (bie) self, ")^";
+            ks = keep_silent; keep_silent = true;
+            <Close self>; keep_silent = ks;
+            return false;
+        ],
+        after [ ks;
+          Unlock:
+            if (self has locked) return false;
+            print "Otwierasz ", (bie) self, " kluczem.^";
+            ks = keep_silent; keep_silent = true;
+            <Open self>; keep_silent = ks;
+            return true;
+          Open:
+            give toilet light;
+          Close:
+            give toilet ~light;
+        ],
+        door_dir [;
+            if (location == cafe) return n_to;
+            else                  return s_to;
+        ],
+        door_to [;
+            if (location == cafe) return toilet;
+            else                  return cafe;
+        ],
+        with_key toilet_key,
+  has   scenery door openable lockable locked pluralname;
+
+Object  toilet_key "klucz/" benny
+  with  invent [;
+            if (clothes has worn) print "NIEZBĘDNY klucz";
+            else                  print "zużyty i NIEISTOTNY klucz";
+            return true;
+        ],
+        description
+            "Twoje NADPOSTRZEGAWCZE zmysły nie wykrywają w tym kluczu niczego
+             istotnego.",
+        before [;
+            if (self in benny)
+                "BADASZ otoczenie z WZMOŻONĄ CZUJNOŚCIĄ, ale nie wykrywasz
+                 żadnego klucza.";
+          Drop:
+            "Benny powierzył ci ten klucz.";
+        ];
+
+Object  note "nabazgran/a kartk/a" cafe
+  with  name 'notatka' 'notatkę' 'notatki',
+        description [;
+            if (self.read_once == false) {
+                self.read_once = true;
+                "Kierujesz na kartkę swój WZMOCNIONY ULTRACZĘSTOTLIWOŚCIOWY wzrok
+                 i mrużysz oczy w skupieniu, aż widzisz, że brzegi kartki
+                 zaczynają czernieć pod niewiarygodną siłą twojego palącego
+                 spojrzenia. Znowu myślisz, jak by to pomogło, gdybyś nauczył
+                 się czytać.
+                 ^^Mija cię miła starsza pani i wyjaśnia: „Trzeba poprosić
+                 Benny'ego o klucz, przy ladzie”.^^
+                 Szybko się odwracasz i zaczynasz: „Och, ja to WIEM, ale...”^^
+                 „Cała przyjemność po mojej stronie, synku”, mówi pani i wychodzi
+                 z kawiarni.";
+                }
+            else
+                "Osmalona, nieczytelna kartka nie ma już przed tobą TAJEMNIC! Ha!";
+        ],
+        read_once false,                ! czy gracz już czytał kartkę?
+        before [;
+          Take:
+            "Nie ma powodu, żeby zbierać NIECZYTELNE kartki.";
+        ],
+  has   scenery female;
+
+! ------------------------------------------------------------------------------
+
+Room    toilet "Toaleta koedukacyjna"
+  with  description
+            "Zaskakująco CZYSTE kwadratowe pomieszczenie wyłożone glazurą, w którym
+             jest niewiele poza sedesem i wyłącznikiem światła. Jedyne wyjście
+             prowadzi na południe, przez drzwi do kawiarni.",
+        s_to toilet_door,
+  has   ~light scored;
+
+Appliance light_switch "wyłącznik/ światła" toilet
+  with  name 'wyłącznik' 'wyłącznika' 'przełącznik' 'przełącznika' 'światło' 'światła',
+        description
+            "Słynne OSIĄGNIĘCIE NAUKI i techniki, eleganckie, a przy tym ŁATWE
+             w obsłudze.",
+        before [;
+          Push:
+            if (self has on) <<SwitchOff self>>;
+            else             <<SwitchOn  self>>;
+        ],
+        after [;
+          SwitchOn:
+            give self light;
+            "Włączasz światło w toalecie.";
+          SwitchOff:
+            give self ~light;
+            "Wyłączasz światło w toalecie.";
+        ],
+  has   switchable ~on;
+
+Appliance lavatory "sedes/+u" toilet
+  with  name 'muszla' 'muszlę' 'muszli' 'ubikacja' 'ubikację' 'ubikacji' 'klozet'
+            'klozetu' 'wc' 'kibel' 'kibla' 'toaleta' 'toaletę' 'toalety',
+        before [;
+          Examine,Search,LookUnder:
+            if (coin in self) {
+                move coin to parent(self);
+                "Ostatni użytkownik ZGODNIE Z ZASADAMI spuścił wodę, ale nie
+                 podniósł CENNEJ monety, która wypadła mu ze spodni.";
+            }
+          Receive:
+            "Inni ŚMIERTELNICY mogliby bezmyślnie wrzucić do ", (dop) self,
+            " byle CO, ale ty pamiętasz MĄDRE nauki swojego mistrza, księcia
+             ELEGANTA, o starej kanalizacji i podnoszącej się wodzie.";
+        ];
+
+Object  coin "cenn/a monet/a" lavatory
+  with  name 'srebrna' 'srebrną' 'srebrnej' 'kwidbak' 'kwidbaka',
+        description "To prawdziwy SREBRNY KWIDBAK.",
+        before [;
+          Drop:
+            if (self notin player) return false;
+            "Taka cenna moneta? Ha, ha! To pewnie pokaz twojego ULTRAFRYWOLNEGO
+             poczucia humoru!";
+        ],
+        after [;
+          Take:
+            "Przyjmujesz pozycję ŚPIĄCEGO SMOKA i zręcznie, z NAJWYŻSZĄ DYSKRECJĄ,
+             chowasz zgubioną monetę do kieszeni.";
+        ],
+  has   scored female;
+
+! ------------------------------------------------------------------------------
+!   Rzeczy gracza
+! ------------------------------------------------------------------------------
+
+Object  clothes "zwykł/e ubrani/e"
+  with  name 'ciuchy' 'ciuchów' 'odzież' 'odzieży',
+        description
+            "Doskonale ZWYCZAJNIE WYGLĄDAJĄCE ubranie dla takiego NIKOGO jak John
+             Covarth.",
+        before [;
+          Wear:
+            if (self has worn)
+                "Już jesteś ubrany jak John Covarth.";
+            else
+                "Miasto POTRZEBUJE potęgi Kapitana FATE, a nie anonimowości Johna
+                 Covartha.";
+          Change,Disrobe:
+            if (self hasnt worn)
+                "Twoje BYSTRE oko dostrzega, że już go nie masz na sobie.";
+            switch (location) {
+              street:
+                if (player in booth)
+                    "Nie masz superszybkości Supermana, więc zdajesz sobie sprawę,
+                     że przebieranie się na oczach przechodniów byłoby niezręczne.";
+                else
+                    "Na środku ulicy? To byłby PUBLICZNY SKANDAL, nie mówiąc już
+                     o ujawnieniu twojej tajnej tożsamości.";
+              cafe:
+                "Benny nie toleruje wygłupów w swoim lokalu.";
+              toilet:
+                if (toilet_door has open)
+                    "Drzwi do kawiarni stoją OTWOREM przed dziesiątkami ciekawskich
+                     oczu. Musiałbyś sam się aresztować za NIEOBYCZAJNE zachowanie.";
+                print "Szybko zdejmujesz ubranie i zwijasz je w INFRAMALUTKĄ
+                    paczuszkę, gotową do łatwego transportu. ";
+                if (toilet_door has locked) {
+                    give clothes ~worn; give costume worn;
+                    "Potem rozkładasz swój NIEZNISZCZALNY BAWEŁNIANY kostium
+                     i stajesz się Kapitanem FATE, obrońcą wolnej woli, wrogiem
+                     tyranii!";
+                }
+                else {
+                    deadflag = 3;
+                    "Gdy tylko wkładasz kostium Kapitana FATE, otwierają się
+                     drzwi i wchodzi młoda kobieta. Patrzy na ciebie i zaczyna
+                     krzyczeć: „ZBOCZENIEC! NAGI ZBOCZENIEC W TOALECIE!!!”^^
+                     Cała kawiarnia biegnie na ratunek i znajduje cię, jak
+                     śmiesznie skaczesz na jednej nodze, usiłując się ubrać.
+                     Ich śmiech SZYBKO KOŃCZY twoją karierę pogromcy przestępców!";
+                }
+              thedark:
+                "Ostatnim razem, kiedy przebierałeś się po ciemku, włożyłeś
+                 kostium na lewą stronę!";
+              default:                  ! to nie powinno się zdarzyć...
+                "Muszą być lepsze miejsca na przebieranie się!";
+            }
+        ],
+  has   clothing neuter;
+
+Object  costume "kolorow/y kostium/+u"
+  with  name 'kapitana' 'kapitan' 'fate' 'strój' 'stroju' 'strojem',
+        description
+            "NAJNOWSZE OSIĄGNIĘCIE techniki, ze wzmocnionej chemicznie w 100%
+             BAWEŁNY Lastyk(tm).",
+        before [;
+          Wear:
+            if (self has worn)
+                 "Już jesteś ubrany jak Kapitan FATE.";
+            else
+                "Najpierw musisz zdjąć swoje pospolite, skromne, INCOGNITO
+                 ubranie Johna Covartha.";
+          Change,Disrobe:
+            if (self has worn)
+                "Kostium jest ci potrzebny, żeby WALCZYĆ z przestępczością!";
+            else
+                "Przecież jeszcze go nie masz na sobie!";
+          Drop:
+            "Twój JEDYNY W SWOIM RODZAJU wielobarwny kostium Kapitana FATE?
+             Najbardziej pożądane UBRANIE w całym mieście? Z pewnością NIE!";
+        ];
+
+! ------------------------------------------------------------------------------
+!   Punkty wejścia
+! ------------------------------------------------------------------------------
+
+[ Initialise;
+    location = street;
+    move costume to player;
+    move clothes to player; give clothes worn;
+    lookmode = 2;
+    "^^Jako łagodny John Covarth, pomocnik w mało znaczącej drogerii, nagle się
+     ZATRZYMUJESZ, bo twój bystry słuch wyłapuje przypadkową wiadomość radiową
+     POLICJI. Jakiś SZALENIEC napada ludzi w parku Granary! Musisz szybko
+     przebrać się w kostium Kapitana FATE...!^^";
+];
+
+[ DeathMessage;
+    if (deadflag == 3) print "Twoja tajna tożsamość wyszła na jaw";
+    if (deadflag == 4) print "Zostałeś HAŃBIĄCO pokonany";
+    if (deadflag == 5) print "Odlatujesz, by URATOWAĆ DZIEŃ";
+];
+
+[ InScope person item;
+    if (person == player && location == thedark && real_location == toilet) {
+        PlaceInScope(light_switch);
+        PlaceInScope(toilet_door);
+    }
+    if (person == player && location == thedark)
+        objectloop (item in parent(player))
+            if (item has moved) PlaceInScope(item);
+    return false;
+];
+
+[ PrintVerb v;
+    switch (v) {
+      'przebierz':          print "się przebrać";
+      'zmień':              print "zmienić";
+      'wymień':             print "wymienić";
+      'zamień':             print "zamienić";
+      default:              rfalse;
+    }
+    rtrue;
+];
+
+! ------------------------------------------------------------------------------
+!   Gramatyka
+! ------------------------------------------------------------------------------
+
+Include "PolskiG";
+
+[ ChangeSub;
+    "Tego nie musisz zmieniać, żeby uratować dzień.";
+];
+
+[ PrzebierzSub;
+    if (costume has worn) <<Change costume>>;
+    <<Change clothes>>;
+];
+
+Verb 'przebierz' 'zmień' 'wymień' 'zamień'
+    *                       -> Przebierz
+    * noun                  -> Change
+    * 'w//'/'we' noun       -> Przebierz;
+
+Extend 'rozbierz' replace
+    *                       -> Przebierz;

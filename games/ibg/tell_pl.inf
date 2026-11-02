@@ -1,0 +1,609 @@
+!% -Cu
+!% +language_name=polski
+! ==============================================================================
+!   WILHELM TELL - polska wersja przykładowej gry "William Tell" z "The Inform
+!   Beginner's Guide".  Wójt to tutejszy odpowiednik szwajcarskiego "vogt".
+!
+!   Oryginał copyright (c) Roger Firth i Sonja Kesserich 2004.
+!   Licencja oryginału (dotyczy także tej wersji):
+!
+!       This book and its associated example games are copyright (c) Roger
+!       Firth and Sonja Kesserich 2004.  Copying and distribution, with or
+!       without modification, are permitted in any medium without royalty
+!       provided the copyright notice and this notice are preserved.
+!       Exceptions to these conditions must be negotiated directly with the
+!       authors (roger@firthworks.com and polilla@idecnet.com).
+!
+!   Gramatyka: oryginalne "talk", "fire at", "salute" i "untie" to tutaj
+!   "porozmawiaj z", "strzel do", "pozdrów" i "odwiąż".
+! ==============================================================================
+
+Include "PolskiZ";
+
+Constant Story "Wilhelm Tell";
+Constant Headline
+            "^Prosty przykład w Informie
+             ^Roger Firth i Sonja Kesserich^Wersja polska.^";
+Release 3; Serial "040804";
+
+Constant MAX_SCORE = 3;
+
+Include "Parser";
+Include "VerbLib";
+
+! ------------------------------------------------------------------------------
+!   Klasy obiektów
+! ------------------------------------------------------------------------------
+
+Class   Room
+  has   light;
+
+Class   Prop
+  with  before [;
+          Examine:
+            return false;
+          default:
+            print_ret "Nie musisz się przejmować ", (nar) self, ".";
+        ],
+  has   scenery;
+
+Class   Furniture
+  with  before [;
+          Take,Pull,Push,PushDir:
+            print (CMian) self, " ", (JestSa) self, " na to za ciężk";
+            Forma(self, "i", "a", "ie", "ie", "ie");
+            ".";
+        ],
+  has   static supporter;
+
+Class   Arrow
+  with  plural "strzał/y",
+        description "Taka sama jak wszystkie twoje strzały: ostra i prosta.",
+        before [;
+          Drop,Give,ThrowAt:
+            print_ret "Twoje strzały są ostre i starannie ich pilnujesz.";
+        ],
+  has   female;
+
+Class   NPC
+  with  life [;
+          Answer,Ask,Order,Tell:
+            print_ret "Napisz po prostu: porozmawiaj z ", (nar) self, ".";
+        ],
+  has   animate;
+
+! ------------------------------------------------------------------------------
+!   Obiekty gry
+! ------------------------------------------------------------------------------
+
+Room    street "Ulica w Altdorfie"
+  with  description [;
+            print "Wąska ulica biegnie na północ, w stronę rynku. Przez bramę na
+                południu napływają do miasta miejscowi ludzie: wołają do siebie
+                na powitanie, zachwalają swoje plony, wymieniają się nowinami,
+                z udawanym niedowierzaniem pytają o ceny towarów u kupców,
+                których stragany jeszcze bardziej utrudniają przejście.^";
+            if (self hasnt visited)
+                print "^„Trzymaj się blisko mnie, synu”, mówisz, „bo zgubisz się
+                    wśród tych wszystkich ludzi”.^";
+        ],
+        n_to below_square,
+        s_to
+            "Tłum napiera na północ, w stronę rynku, więc nie ma mowy,
+             żeby tam przejść.";
+
+Prop    "południow/a bram/a" street
+  with  name 'drewniana' 'drewnianą',
+        description "Wielka drewniana brama w miejskich murach stoi otworem.",
+  has   scenery female;
+
+Prop    "rozmait/e stragan/y"
+  with  description "Jedzenie, ubrania, sprzęt górski: wszystko, co zwykle.",
+        found_in street below_square,
+  has   pluralname;
+
+Prop    "towar/y"
+  with  name 'jedzenie' 'jedzenia' 'ubrania' 'ubrań' 'sprzęt' 'sprzętu'
+            'plony' 'plonów',
+        description "Nic szczególnego nie przyciąga twojego wzroku.",
+        found_in street below_square,
+  has   pluralname;
+
+Prop    "kupcy"
+  with  name 'kupiec' 'kupca' 'kupcy' 'kupców' 'kupcom' 'kupcami'
+            'handlarz' 'handlarze' 'handlarzy',
+        desc_dop "kupców", desc_cel "kupcom", desc_bie "kupców",
+        desc_nar "kupcami", desc_mie "kupcach",
+        description
+            "Kilku oszustów, ale przeważnie uczciwi handlarze, którzy
+             wrzaskliwie i z przesadą zachwalają swoje towary.",
+        found_in street below_square,
+  has   animate male pluralname;
+
+Prop    "miejscowi ludzie"
+  with  name 'ludzie' 'ludzi' 'ludziom' 'ludźmi' 'miejscowi' 'miejscowych'
+            'tłum' 'tłumu' 'tłumem' 'górale' 'górali',
+        desc_dop "miejscowych ludzi", desc_cel "miejscowym ludziom",
+        desc_bie "miejscowych ludzi", desc_nar "miejscowymi ludźmi",
+        desc_mie "miejscowych ludziach",
+        description "Górale, tacy sami jak ty.",
+        found_in [; return true; ],
+  has   animate male pluralname;
+
+! ------------------------------------------------------------------------------
+
+Room    below_square "Dalej wzdłuż ulicy"
+  with  description
+            "Ludzie wciąż przepychają się od południowej bramy w stronę rynku,
+             który jest już niedaleko na północy. Rozpoznajesz właścicielkę
+             straganu z owocami i warzywami.",
+        n_to south_square,
+        s_to street;
+
+Furniture   stall "stragan/+u z owocami i warzywami" below_square
+  with  name 'stół' 'stołu' 'stolik' 'stolika',
+        description
+            "To właściwie tylko mały stolik, a na nim wielka sterta ziemniaków,
+             trochę marchwi i rzepy oraz kilka jabłek.",
+        before [;
+          Search:
+            <<Examine self>>;
+        ],
+  has   scenery;
+
+Prop    "ziemniak/i" below_square
+  with  name 'ziemniak' 'ziemniaka' 'kartofle' 'kartofli',
+        description
+            "To musi być wyjątkowo wczesna odmiana... o jakieś trzysta lat!",
+  has   pluralname;
+
+Prop    "owoce i warzywa" below_square
+  with  name 'owoce' 'owoców' 'warzywa' 'warzyw' 'marchew' 'marchewki' 'marchwi'
+            'rzepa' 'rzepę' 'rzepy' 'jabłka' 'jabłek',
+        desc_dop "owoców i warzyw", desc_cel "owocom i warzywom",
+        desc_nar "owocami i warzywami", desc_mie "owocach i warzywach",
+        description "Dobre, tutejsze plony.",
+  has   pluralname;
+
+NPC     stallholder "Helg/a" below_square
+  with  name 'handlarka' 'handlarkę' 'handlarki' 'handlarce' 'handlarką'
+            'kupcowa' 'kupcową' 'właścicielka' 'właścicielkę' 'właścicielki'
+            'suknia' 'suknię' 'chustka' 'chustkę',
+        description
+            "Helga to pulchna, wesoła kobieta w workowatej sukni i chustce
+             w groszki.",
+        initial [;
+            print "Helga przerywa przebieranie ziemniaków i wesoło do ciebie
+                macha.^";
+            if (location hasnt visited) {
+                move apple to player;
+                print "^„Dzień dobry, Wilhelmie, piękny dzień na handel! To młody
+                    Walter? Ale urósł! Masz, to jabłko dla niego. Niech uważa
+                    na tę parchatą część, reszta jest całkiem dobra. Jak się
+                    miewa pani Tell? Pozdrów ją ode mnie”.^";
+            }
+        ],
+        times_spoken_to 0,       ! liczy tematy rozmowy
+        life [;
+          Kiss:
+            print_ret "„Ojej, ale z ciebie zuchwalec!”";
+          Talk:
+            self.times_spoken_to = self.times_spoken_to + 1;
+            switch (self.times_spoken_to) {
+             1: score = score + 1;
+                print_ret "Serdecznie dziękujesz Heldze za jabłko.";
+             2: print_ret "„Do zobaczenia wkrótce”.";
+             default:
+                return false;
+            }
+        ],
+  has   female proper;
+
+! ------------------------------------------------------------------------------
+
+Room    south_square "Południowa strona rynku"
+  with  description
+            "Wąska ulica z południa wychodzi tu na rynek i biegnie dalej po jego
+             drugiej stronie. Żeby dojść do celu, do garbarni Johanssona,
+             musisz przejść na północ przez brukowany plac, a pośrodku widać
+             kapelusz Gesslera na tej obrzydliwej tyczce. Jeśli pójdziesz dalej,
+             nie da się jej ominąć. Cesarscy żołnierze przepychają się przez
+             ciżbę, popychają ludzi, kopią i głośno klną.",
+        n_to mid_square,
+        s_to below_square;
+
+Prop     "kapelusz/ na tyczce"
+  with   name 'tyczka' 'tyczkę' 'tyczki' 'tyczką' 'pal' 'pala',
+         before [;
+           default:
+             print_ret "Na razie jesteś za daleko.";
+         ],
+         found_in south_square north_square;
+
+Prop    "żołnierz/e"
+  with  name 'żołnierz' 'żołnierza' 'strażnik' 'strażnicy' 'strażników' 'gwardzista',
+        description "To nieokrzesani, brutalni ludzie, nie stąd.",
+        before [;
+          FireAt:
+            print_ret "Jest ich o wiele za dużo.";
+          Talk:
+            print_ret "Tacy łajdacy nie są warci twojej uwagi.";
+        ],
+        found_in south_square mid_square north_square marketplace,
+  has   animate male pluralname proper;
+
+! ------------------------------------------------------------------------------
+
+Room    mid_square "Środek rynku"
+  with  description
+            "Pośrodku rynku tłok jest mniejszy, bo większość ludzi woli trzymać
+             się jak najdalej od tyczki, która wznosi się tutaj, zwieńczona tym
+             niedorzecznym, uroczystym kapeluszem. Obok stoi oddział żołnierzy
+             i obserwuje każdego przechodnia.",
+        n_to north_square,
+        s_to south_square,
+        warnings_count 0,       ! liczy ostrzeżenia żołnierza
+        before [;
+          Go:
+            if (noun == s_obj) {
+                self.warnings_count = 0;
+                pole.has_been_saluted = false;
+            }
+            if (noun == n_obj) {
+                if (pole.has_been_saluted == true) {
+                    print "^„I żeby mi miłego dnia było”.^";
+                    return false;
+                }
+                else {
+                    self.warnings_count = self.warnings_count + 1;
+                    switch (self.warnings_count) {
+                     1: print_ret "Żołnierz zastępuje ci drogę. ^^
+                            „Ej, ty, dryblasie, zapomniałeś o manierach, co? Może
+                            byś tak ładnie pozdrowił kapelusz wójta?”";
+                     2: print_ret "^„Znam cię, Tell, z ciebie jest wichrzyciel,
+                            no nie? Tu nam żadnej rozróby nie trzeba, więc bądź
+                            grzeczny i pozdrów ten cholerny kapelusz. Ale już:
+                            drugi raz nie będę prosił...”";
+                     default:
+                        print "^„No to już, ";
+                        style underline; print "Herr"; style roman;
+                        print " Tell, masz prawdziwe kłopoty. Prosiłem ładnie,
+                            ale byłeś za dumny i za głupi. Chyba czas, żeby wójt
+                            zamienił z tobą słówko”.
+                            ^^
+                            I z tymi słowy żołnierze chwytają ciebie i Waltera,
+                            a kiedy sierżant biegnie po Gesslera, reszta wlecze
+                            was brutalnie w stronę starej lipy na targowisku.^";
+                        move apple to son;
+                        PlayerTo(marketplace);
+                        return true;
+                    }
+                }
+            }
+        ];
+
+Furniture   pole "kapelusz/ na tyczce" mid_square
+  with  name 'tyczka' 'tyczkę' 'tyczki' 'tyczką' 'pal' 'pala' 'sosna' 'sosny'
+            'czarny' 'czerwony' 'rondo' 'pióra' 'piór',
+        description
+            "Tyczka, pień małej sosny grubości kilku cali, ma jakieś dziewięć
+             czy dziesięć stóp wysokości. Na jej szczycie starannie osadzono
+             niedorzeczny czarno-czerwony skórzany kapelusz Gesslera, z szeroko
+             wygiętym rondem i pękiem barwionych gęsich piór.",
+        has_been_saluted false,
+        before [;
+          FireAt:
+            print_ret "Kusi, ale nie szukasz guza.";
+          Salute:
+            self.has_been_saluted = true;
+            print_ret "Pozdrawiasz kapelusz na tyczce. ^^
+                „Ależ dziękuję, panie”, szydzi żołnierz.";
+        ],
+  has   scenery;
+
+! ------------------------------------------------------------------------------
+
+Room    north_square "Północna strona rynku"
+  with  description
+            "Z brukowanego placu na północ odchodzi wąska ulica. Kawałek na
+             południe, pośrodku rynku, ostatni raz widzisz tyczkę z kapeluszem.",
+        n_to [;
+            deadflag = 3;
+            print_ret "Z Walterem u boku opuszczasz rynek północną ulicą
+                i idziesz do garbarni Johanssona.";
+        ],
+        s_to "Nie masz ochoty przechodzić przez to wszystko jeszcze raz.";
+
+! ------------------------------------------------------------------------------
+
+Room    marketplace "Targowisko przy rynku"
+  with  description
+            "Altdorfskie targowisko, tuż obok rynku, w pośpiechu oczyszczono ze
+             straganów. Oddział żołnierzy odepchnął tłum, żeby zostawić wolne
+             miejsce przed lipą, która rośnie tu od niepamiętnych czasów.
+             Zwykle daje cień starym mieszkańcom, którzy zbierają się pod nią,
+             żeby poplotkować, popatrzeć na dziewczęta i pograć w karty. Dziś
+             jednak stoi sama... jeśli nie liczyć Waltera, przywiązanego do
+             pnia. Jakieś czterdzieści jardów dalej trzyma cię dwóch ludzi wójta.",
+        cant_go "Co? I zostawić tu związanego syna?";
+
+Object  tree "lip/a" marketplace
+  with  name 'drzewo' 'drzewa' 'drzewem' 'drzewie' 'pień' 'pnia',
+        description "To po prostu wielkie drzewo.",
+        before [;
+          FireAt:
+            if (BowOrArrow(second) == true) {
+                deadflag = 3;
+                print_ret "Ręka lekko ci drży i strzała leci za wysoko, trafiając
+                    w pień kilka cali nad głową Waltera.";
+            }
+            return true;
+        ],
+  has   scenery female;
+
+NPC     governor "wójt/" marketplace
+  with  name 'gessler' 'gesslera' 'gesslerowi' 'gesslerem' 'gesslerze'
+            'hermann' 'hermanna' 'namiestnik' 'namiestnika',
+        description
+            "Niski i tęgi, ale o wąskiej, złośliwej twarzy, Gessler rozkoszuje
+             się władzą nad miejscową ludnością.",
+        initial [;
+            print "Gessler przygląda się z bezpiecznej odległości, z szyderczym
+                uśmiechem.^";
+            if (location hasnt visited)
+                print "^„Widzę, że trzeba dać ci nauczkę, głupcze. Nikt nie
+                    przejdzie przez rynek, nie oddając hołdu Jego Cesarskiej
+                    Wysokości Albertowi. Nikt, słyszysz? Mógłbym kazać ściąć cię
+                    za zdradę, ale okażę łaskę. Jeśli znów zrobisz tak głupią
+                    rzecz, nie licz na litość, lecz tym razem puszczę cię
+                    wolno... gdy tylko pokażesz swoje łucznicze umiejętności
+                    i trafisz to jabłko z miejsca, w którym stoisz. To nie
+                    powinno być zbyt trudne. Masz, sierżancie, łap. Połóż je
+                    temu małemu bękartowi na głowie”.^";
+        ],
+        life [;
+          Talk:
+            print_ret "Nie potrafisz się zmusić, żeby się do niego odezwać.";
+        ],
+        before [;
+          FireAt:
+            if (BowOrArrow(second) == true) {
+                deadflag = 3;
+                print_ret "Zanim zaskoczeni żołnierze zdążą zareagować,
+                    odwracasz się i strzelasz do Gesslera. Strzała przebija mu
+                    serce i wójt pada w kałuży krwi. Z tłumu wyrywa się westchnienie,
+                    a potem wiwaty.";
+            }
+            return true;
+        ],
+  has   male;
+
+! ------------------------------------------------------------------------------
+!   Rzeczy gracza
+! ------------------------------------------------------------------------------
+
+Object  bow "łuk/+u"
+  with  description "Twój niezawodny cisowy łuk z lnianą cięciwą.",
+        before [;
+          Drop,Give,ThrowAt:
+            print_ret "Nigdy nie rozstajesz się ze swoim niezawodnym łukiem.";
+        ]
+  has   clothing;
+
+Object  quiver "kołczan/+u"
+  with  description "Zrobiony z koziej skóry, zwykle wisi ci na lewym ramieniu.",
+        before [;
+          Drop,Give,ThrowAt:
+            print_ret "Ale to prezent od Hedwigi, twojej żony.";
+        ],
+  has   container open clothing;
+
+Arrow   "strzał/a" quiver;
+Arrow   "strzał/a" quiver;
+Arrow   "strzał/a" quiver;
+
+NPC     son "Walter/"
+  with  name 'syn' 'syna' 'synowi' 'synem' 'synu' 'chłopiec' 'chłopca' 'chłopcu'
+            'chłopcem' 'chłopak' 'chłopaka' 'chłopakiem',
+        description [;
+            if (location == marketplace)
+                print_ret "Patrzy na ciebie, starając się wyglądać dzielnie i stać
+                    nieruchomo. Ręce ma związane z tyłu, za pniem, a jabłko
+                    tkwi wśród jego jasnych włosów.";
+            else
+                print_ret "Cichy, jasnowłosy chłopiec, ma osiem lat i szybko uczy
+                    się życia w górach.";
+        ],
+        life [;
+          Give:
+            score = score + 1;
+            move noun to self;
+            print_ret "„Dziękuję, tato”.";
+          Talk:
+            if (location == marketplace)
+                print_ret "„Spokojnie, synu, i zaufaj Bogu”.";
+            else
+                print_ret "Pokazujesz mu kilka ciekawych rzeczy.";
+        ],
+        before [;
+          Examine,Listen,Salute,Talk:
+            return false;
+          FireAt:
+            if (location == marketplace) {
+                if (BowOrArrow(second) == true) {
+                    deadflag = 3;
+                    print_ret "Ojej! Chyba nie o to ci chodziło?";
+                }
+                return true;
+            }
+            else
+                return false;
+          default:
+            if (location == marketplace)
+                print_ret "Strażnicy ci na to nie pozwolą.";
+            else
+                return false;
+        ],
+        found_in [; return true; ],
+  has   male proper scenery transparent;
+
+Object  apple "jabłk/o"
+  with  description [;
+            if (location == marketplace)
+                print_ret "Z tej odległości ledwie je widać.";
+            else
+                print_ret "Jabłko ma zielono-brązowe plamy.";
+        ],
+        before [;
+          Drop:
+            print_ret "Jabłko jest sporo warte, lepiej je zatrzymaj.";
+          Eat:
+            print_ret "Helga przeznaczyła je dla Waltera...";
+          FireAt:
+            if (location == marketplace) {
+                if (BowOrArrow(second) == true) {
+                    score = score + 1;
+                    deadflag = 2;
+                    print_ret "Powoli i pewnie nakładasz strzałę na cięciwę,
+                        naciągasz łuk i celujesz staranniej niż kiedykolwiek
+                        w życiu. Wstrzymujesz oddech, nie mrugasz, pełen lęku
+                        zwalniasz cięciwę. Strzała przelatuje przez plac do
+                        twojego syna i przybija jabłko do pnia. Tłum wybucha
+                        radością, a Gessler wygląda na wyraźnie rozczarowanego.";
+                }
+                return true;
+            }
+            else
+                return false;
+        ],
+  has   neuter;
+
+! ------------------------------------------------------------------------------
+!   Punkty wejścia
+! ------------------------------------------------------------------------------
+
+[ Initialise;
+    location = street;
+    lookmode = 2;       ! jak polecenie "opisy pełne"
+    move bow to player;
+    move quiver to player; give quiver worn;
+    player.description = "Masz na sobie tradycyjny strój szwajcarskiego górala.";
+    print_ret "^^
+        Miejsce: Altdorf w szwajcarskim kantonie Uri. Jest rok 1307, a Szwajcaria
+        podlega cesarzowi Albertowi Habsburgowi. Jego tutejszy namiestnik, wójt,
+        to despotyczny Hermann Gessler, który kazał umieścić swój kapelusz na
+        drewnianej tyczce pośrodku rynku. Każdy, kto przechodzi przez plac, musi
+        pokłonić się temu znienawidzonemu symbolowi cesarskiej potęgi.
+        ^^
+        Przyszedłeś z chaty wysoko w górach, z młodszym synem, żeby kupić zapasy.
+        Jesteś dumnym, niezależnym człowiekiem, myśliwym i przewodnikiem, znanym
+        ze swoich łuczniczych umiejętności oraz z tego, że nie ukrywasz niechęci
+        do wójta, co może nie jest mądre, bo jego żołnierze są wszędzie.
+        ^^
+        Jest dzień targowy: miasto pęka w szwach od ludzi z okolicznych wiosek
+        i osad.^";
+];
+
+[ DeathMessage; print "Zepsułeś ulubioną ludową opowieść"; ];
+
+[ PrintVerb v;
+    switch (v) {
+      'strzel':            print "strzelić";
+      'strzelaj':          print "strzelać";
+      'wystrzel':          print "wystrzelić";
+      'wyceluj':           print "wycelować";
+      'celuj':             print "celować";
+      'ukłoń', 'pokłoń', 'skłoń':
+                           print "się ukłonić";
+      'zasalutuj', 'salutuj':
+                           print "zasalutować";
+      'odwiąż':            print "odwiązać";
+      'rozwiąż':           print "rozwiązać";
+      'uwolnij':           print "uwolnić";
+      default:             rfalse;
+    }
+    rtrue;
+];
+
+! ------------------------------------------------------------------------------
+!   Gramatyka
+! ------------------------------------------------------------------------------
+
+Include "PolskiG";
+
+! ------------------------------------------------------------------------------
+
+[ TalkSub;
+    if (noun == player) print_ret "Niczym się nie zaskakujesz.";
+    if (RunLife(noun,##Talk) ~= false) return;  ! life [; Talk: ]
+    print_ret "W tej chwili nie przychodzi ci do głowy nic do powiedzenia.";
+];
+
+Extend 'porozmawiaj' replace
+    * 'z//'/'ze' creature           -> Talk
+    * creature                      -> Talk;
+
+! ------------------------------------------------------------------------------
+
+[ BowOrArrow o;
+    if (o == bow or nothing || o ofclass Arrow) return true;
+    print "To dość niezwykła broń, prawda?^";
+    return false;
+];
+
+[ FireAtSub;
+    if (noun == nothing)
+        print_ret "Co, tak po prostu wystrzelić strzałę na oślep?";
+    if (BowOrArrow(second) == true)
+        print_ret "Nie do pomyślenia!";
+];
+
+Verb 'strzel' 'strzelaj' 'wystrzel' 'wyceluj' 'celuj'
+    *                                       -> FireAt
+    * noun                                  -> FireAt
+    * 'do'/'w//'/'we' noun                  -> FireAt
+    * 'do'/'w//'/'we' noun 'z//'/'ze' noun  -> FireAt
+    * 'do'/'w//'/'we' noun noun             -> FireAt
+    * 'z//'/'ze' noun 'do'/'w//'/'we' noun  -> FireAt reverse
+    * noun 'do'/'w//'/'we' noun             -> FireAt reverse;
+
+Extend 'uderz' replace
+    * noun                                  -> FireAt
+    * 'w//'/'we' noun                       -> FireAt;
+
+! ------------------------------------------------------------------------------
+
+[ SaluteSub;
+    if (noun has animate) {
+        print (CMian) noun, " ";
+        PL(noun, "odwzajemnia", "odwzajemniają");
+        " pozdrowienie.";
+    }
+    print (CMian) noun, " ";
+    PL(noun, "nie zwraca", "nie zwracają");
+    " na to uwagi.";
+];
+
+Verb 'ukłoń' 'pokłoń' 'skłoń'
+    * noun                                  -> Salute
+    * 'przed' noun                          -> Salute;
+
+Verb 'zasalutuj' 'salutuj'
+    * noun                                  -> Salute;
+
+Extend 'pozdrów' replace
+    * noun                                  -> Salute
+    * 'z//'/'ze' noun                       -> Salute;
+
+Extend only 'oddaj' first
+    * 'hołd'/'pokłon' noun                  -> Salute;
+
+Extend 'pomachaj' first
+    * 'do' noun                             -> Salute;
+
+! ------------------------------------------------------------------------------
+
+[ UntieSub; print_ret "Naprawdę nie powinieneś tego próbować."; ];
+
+Verb 'odwiąż' 'rozwiąż' 'uwolnij'
+    * noun                                  -> Untie;

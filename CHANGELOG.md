@@ -6,7 +6,8 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
 
 ## Niewydane
 
-- Nowa gra: „Heidi” z *The Inform Beginner's Guide* (`games/ibg/heidi_pl.inf`).
+- Nowe gry z *The Inform Beginner's Guide* w `games/ibg/`: „Heidi”, „Wilhelm Tell”
+  i „Kapitan Fate”.
 
 - Typografia: polskie cudzysłowy „ ” i półpauza – w bibliotece i grach (dopisane
   na końcu tablicy `Zcharacter`), jedna spacja po kropce w grach (409 miejsc).

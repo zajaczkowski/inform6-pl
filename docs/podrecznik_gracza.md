@@ -10,6 +10,8 @@ Ten podręcznik jest przeznaczony dla **graczy**, a nie dla autorów. Wyjaśnia,
 W katalogu znajdują się też:
 
 - „Heidi” (`ibg/heidi_pl.inf`) – bardzo krótka opowieść o pisklęciu, które wypadło z gniazda; najlepsza na pierwszą grę,
+- „Wilhelm Tell” (`ibg/tell_pl.inf`) – dzień targowy w Altdorfie i słynne jabłko,
+- „Kapitan Fate” (`ibg/fate_pl.inf`) – parodia komiksu: superbohater szuka miejsca, żeby się przebrać,
 - „Po drugiej stronie lustra” (`alice_pl.inf`) – gra w jednym pokoju, na motywach Lewisa Carrolla; dobra na początek,
 - „Sklep z zabawkami” (`toyshop_pl.inf`) – sklep pełen zabawek, z którymi można robić zaskakujące rzeczy,
 - „Równowaga” (`balances_pl.inf`) – krótka opowieść o czarodzieju, który uczy się i rzuca zaklęcia,

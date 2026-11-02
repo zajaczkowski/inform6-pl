@@ -79,12 +79,13 @@ Object  clearing "Polana w lesie"
 
 Object  nest "ptasi/e gniazd/o" clearing
   with  description "Gniazdo jest starannie uwite z gałązek i mchu.",
-        name 'gałązki' 'gałązek' 'mech' 'mchu',
+        desc_mie "ptasim gnieździe",
+        name 'gnieździe' 'gałązki' 'gałązek' 'mech' 'mchu',
   has   container open neuter;
 
 Object  tree "wysok/i jawor/" clearing
   with  description
-            "Stoi dumnie pośrodku polany. Jest krępy i łatwo się na niego wspiąć.",
+            "Stoi dumnie pośrodku polany. Jest gruby i łatwo się na niego wspiąć.",
         name 'drzewo' 'drzewa' 'drzewem' 'drzewie',
         before [;
           Climb, Enter:

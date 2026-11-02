@@ -18,7 +18,7 @@ if ! git diff --quiet HEAD; then
     echo "W drzewie są niezacommitowane zmiany; wydanie musi odpowiadać tagowi." >&2; exit 1
 fi
 
-gry="ruins_pl ibg/heidi_pl alice_pl toyshop_pl advent_pl balances_pl museum_pl adventureland_pl"
+gry="ruins_pl ibg/heidi_pl ibg/tell_pl ibg/fate_pl alice_pl toyshop_pl advent_pl balances_pl museum_pl adventureland_pl"
 nazwa=inform6-pl-$wersja
 katalog=$(pwd)
 tmp=$(mktemp -d)
@@ -45,6 +45,8 @@ albo bez nich ("weź lampę" i "wez lampe").
 
   ruins_pl          Ruiny
   heidi_pl          Heidi
+  tell_pl           Wilhelm Tell
+  fate_pl           Kapitan Fate
   alice_pl          Po drugiej stronie lustra
   toyshop_pl        Sklep z zabawkami
   advent_pl         Przygoda

@@ -80,6 +80,8 @@ sprawdz() {     # sprawdz <gra> <plik gry> <ziarno> <oczekiwany tekst>
 }
 sprawdz ruins_pl         build/ruins_pl.z5         1 "zdobyłeś 30 punktów na 30"
 sprawdz ibg/heidi_pl     build/heidi_pl.z5         1 "Zwyciężyłaś"
+sprawdz ibg/tell_pl      build/tell_pl.z5          1 "zdobyłeś 3 punkty na 3"
+sprawdz ibg/fate_pl      build/fate_pl.z5          1 "zdobyłeś 2 punkty na 2"
 sprawdz alice_pl         build/alice_pl.z5         1 "Zwyciężyłaś"
 sprawdz toyshop_pl       build/toyshop_pl.z5       1 "zdobyłeś 6 punktów na 6"
 sprawdz balances_pl      build/balances_pl.z5      1 "zdobyłeś 50 punktów na 51"

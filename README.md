@@ -34,7 +34,8 @@ lib/odmiana.h    automatyczna odmiana nazw zapisanych z "/" (dołączany przez p
 lib/polskig.h    gramatyka: polskie czasowniki i polecenia meta
 games/           gry: ruins_pl, alice_pl, toyshop_pl, advent_pl, balances_pl,
                  museum_pl, adventureland_pl (*.inf), gra testowa test.inf
-games/ibg/       gry z The Inform Beginner's Guide: heidi_pl
+games/ibg/       gry z The Inform Beginner's Guide: heidi_pl, tell_pl,
+                 fate_pl
                  oraz skrypty przejść *.przejscie
 docs/            podręcznik autora, suplement i podręcznik gracza
 extensions/      dodatki spoza biblioteki standardowej (np. szyfr.h – zamki szyfrowe)
@@ -158,11 +159,13 @@ Wszystkie gry w `games/` to polskie tłumaczenia [przykładowych gier Inform 6 z
 | `museum_pl.inf` | „Muzeum Informu” | „Museum” (Graham Nelson) | gra nie ma zakończenia; skrypt jest wycieczką po eksponatach |
 | `adventureland_pl.inf` | „Kraina Przygód” | „Adventureland” (Scott Adams, wersja Inform Grahama Nelsona) | 100/100 punktów |
 
-Katalog `games/ibg/` zawiera gry spoza zestawu przykładów Inform 6, z podręcznika *The Inform Beginner's Guide* (Roger Firth, Sonja Kesserich), na jego własnej licencji: zob. [POCHODZENIE.md](POCHODZENIE.md). Kompilacja: `./build.sh ibg/heidi_pl`.
+Katalog `games/ibg/` zawiera gry spoza zestawu przykładów Inform 6, z podręcznika *The Inform Beginner's Guide* (Roger Firth, Sonja Kesserich), na jego własnej licencji: zob. [POCHODZENIE.md](POCHODZENIE.md). Kompilacja: `./build.sh ibg/tell_pl`.
 
 | Plik | Gra | Oryginał | Przejście |
 |---|---|---|---|
 | `ibg/heidi_pl.inf` | „Heidi” | „Heidi” | zwycięstwo |
+| `ibg/tell_pl.inf` | „Wilhelm Tell” | „William Tell” | 3/3 punkty |
+| `ibg/fate_pl.inf` | „Kapitan Fate” | „Captain Fate” | 2/2 punkty |
 
 „Ruiny” są przykładem, na którym opiera się [podręcznik](docs/podrecznik.md), a [suplement](docs/suplement.md) omawia mechanizmy z pozostałych gier.
 
