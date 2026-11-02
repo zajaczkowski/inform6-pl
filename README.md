@@ -34,6 +34,7 @@ lib/odmiana.h    automatyczna odmiana nazw zapisanych z "/" (dołączany przez p
 lib/polskig.h    gramatyka: polskie czasowniki i polecenia meta
 games/           gry: ruins_pl, alice_pl, toyshop_pl, advent_pl, balances_pl,
                  museum_pl, adventureland_pl (*.inf), gra testowa test.inf
+games/ibg/       gry z The Inform Beginner's Guide: heidi_pl
                  oraz skrypty przejść *.przejscie
 docs/            podręcznik autora, suplement i podręcznik gracza
 extensions/      dodatki spoza biblioteki standardowej (np. szyfr.h – zamki szyfrowe)
@@ -156,6 +157,12 @@ Wszystkie gry w `games/` to polskie tłumaczenia [przykładowych gier Inform 6 z
 | `balances_pl.inf` | „Równowaga” | „Balances” (Graham Nelson) | zwycięstwo, 50/51 punktów (ostatni punkt, za zaklęcie filfre, wymaga śmierci) |
 | `museum_pl.inf` | „Muzeum Informu” | „Museum” (Graham Nelson) | gra nie ma zakończenia; skrypt jest wycieczką po eksponatach |
 | `adventureland_pl.inf` | „Kraina Przygód” | „Adventureland” (Scott Adams, wersja Inform Grahama Nelsona) | 100/100 punktów |
+
+Katalog `games/ibg/` zawiera gry spoza zestawu przykładów Inform 6, z podręcznika *The Inform Beginner's Guide* (Roger Firth, Sonja Kesserich), na jego własnej licencji: zob. [POCHODZENIE.md](POCHODZENIE.md). Kompilacja: `./build.sh ibg/heidi_pl`.
+
+| Plik | Gra | Oryginał | Przejście |
+|---|---|---|---|
+| `ibg/heidi_pl.inf` | „Heidi” | „Heidi” | zwycięstwo |
 
 „Ruiny” są przykładem, na którym opiera się [podręcznik](docs/podrecznik.md), a [suplement](docs/suplement.md) omawia mechanizmy z pozostałych gier.
 

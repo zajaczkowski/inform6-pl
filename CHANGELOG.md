@@ -6,6 +6,8 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
 
 ## Niewydane
 
+- Nowa gra: „Heidi” z *The Inform Beginner's Guide* (`games/ibg/heidi_pl.inf`).
+
 - Typografia: polskie cudzysłowy „ ” i półpauza – w bibliotece i grach (dopisane
   na końcu tablicy `Zcharacter`), jedna spacja po kropce w grach (409 miejsc).
 - Rzadkie sytuacje: `Ale tornistra tam nie ma` zamiast sztucznego komunikatu,

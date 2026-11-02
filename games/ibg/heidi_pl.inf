@@ -1,0 +1,122 @@
+!% -Cu
+!% +language_name=polski
+! ==============================================================================
+!   HEIDI - polska wersja przykładowej gry "Heidi" z "The Inform Beginner's
+!   Guide".  Najkrótsza z gier przykładowych: dobry pierwszy przykład do czytania.
+!
+!   Oryginał copyright (c) Roger Firth i Sonja Kesserich 2004.
+!   Licencja oryginału (dotyczy także tej wersji):
+!
+!       This book and its associated example games are copyright (c) Roger
+!       Firth and Sonja Kesserich 2004.  Copying and distribution, with or
+!       without modification, are permitted in any medium without royalty
+!       provided the copyright notice and this notice are preserved.
+!       Exceptions to these conditions must be negotiated directly with the
+!       authors (roger@firthworks.com and polilla@idecnet.com).
+!
+!   Bohaterką jest dziewczyna, stąd "give player female".  Odstępstwo od
+!   oryginału: "wejdź na drzewo" działa tak samo jak "wespnij się na drzewo".
+! ==============================================================================
+
+Include "PolskiZ";
+
+Constant Story "Heidi";
+Constant Headline
+            "^Prosty przykład w Informie
+             ^Roger Firth i Sonja Kesserich^Wersja polska.^";
+Constant MAX_CARRIED 1;
+
+Include "Parser";
+Include "VerbLib";
+
+! ------------------------------------------------------------------------------
+!   Obiekty gry
+! ------------------------------------------------------------------------------
+
+Object  before_cottage "Przed chatką"
+  with  description
+            "Stoisz przed chatką. Na wschodzie ciągnie się las.",
+        e_to forest,
+        in_to "Dzień jest taki piękny, że szkoda siedzieć w domu.",
+        cant_go "Jedyna ścieżka prowadzi na wschód.",
+  has   light;
+
+Object  cottage "mał/a chatk/a" before_cottage
+  with  description "Jest mała i skromna, ale bardzo ci tu dobrze.",
+        name 'dom' 'domu' 'domek' 'domku' 'chata' 'chatę' 'chaty' 'chacie',
+        before [;
+          Enter:
+            print_ret "Dzień jest taki piękny, że szkoda siedzieć w domu.";
+        ],
+  has   scenery female;
+
+Object  forest "W głębi lasu"
+  with  description
+            "Przez gęste listowie prześwituje na zachodzie jakiś budynek.
+             Na północny wschód prowadzi dróżka.",
+        w_to before_cottage,
+        ne_to clearing,
+  has   light;
+
+Object  bird "mał/y ptasz/e/k/" forest
+  with  description "Pisklę jest za małe, żeby latać, i piszczy bezradnie.",
+        desc_bie "małego ptaszka",
+        name 'pisklę' 'pisklaka' 'pisklak' 'ptak' 'ptaka',
+        before [;
+          Listen:
+            print "Brzmi jak przestraszone maleństwo, które potrzebuje pomocy.^";
+            return true;
+        ],
+  has   ;
+
+Object  clearing "Polana w lesie"
+  with  description
+            "Pośrodku polany stoi wysoki jawor. Ścieżka wije się między
+             drzewami na południowy zachód.",
+        sw_to forest,
+        u_to top_of_tree,
+  has   light;
+
+Object  nest "ptasi/e gniazd/o" clearing
+  with  description "Gniazdo jest starannie uwite z gałązek i mchu.",
+        name 'gałązki' 'gałązek' 'mech' 'mchu',
+  has   container open neuter;
+
+Object  tree "wysok/i jawor/" clearing
+  with  description
+            "Stoi dumnie pośrodku polany. Jest krępy i łatwo się na niego wspiąć.",
+        name 'drzewo' 'drzewa' 'drzewem' 'drzewie',
+        before [;
+          Climb, Enter:
+            PlayerTo(top_of_tree);
+            return true;
+        ],
+  has   scenery;
+
+Object  top_of_tree "Na szczycie drzewa"
+  with  description "Kurczowo trzymasz się pnia.",
+        d_to clearing,
+        after [;
+          Drop:
+            move noun to clearing;
+            return false;
+        ],
+  has   light;
+
+Object  branch "szerok/i mocn/y konar/" top_of_tree
+  with  description "Jest na tyle płaski, że utrzyma niewielki przedmiot.",
+        name 'gałąź' 'gałęzi' 'gałęzią',
+        each_turn [; if (bird in nest && nest in branch) deadflag = 2; ],
+  has   static supporter;
+
+! ------------------------------------------------------------------------------
+!   Punkty wejścia
+! ------------------------------------------------------------------------------
+
+[ Initialise; location = before_cottage; give player female; ];
+
+! ------------------------------------------------------------------------------
+!   Gramatyka
+! ------------------------------------------------------------------------------
+
+Include "PolskiG";

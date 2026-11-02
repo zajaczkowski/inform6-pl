@@ -18,7 +18,7 @@ if ! git diff --quiet HEAD; then
     echo "W drzewie są niezacommitowane zmiany; wydanie musi odpowiadać tagowi." >&2; exit 1
 fi
 
-gry="ruins_pl alice_pl toyshop_pl advent_pl balances_pl museum_pl adventureland_pl"
+gry="ruins_pl ibg/heidi_pl alice_pl toyshop_pl advent_pl balances_pl museum_pl adventureland_pl"
 nazwa=inform6-pl-$wersja
 katalog=$(pwd)
 tmp=$(mktemp -d)
@@ -30,6 +30,7 @@ mkdir -p "$tmp/$nazwa/skompilowane"
 for g in $gry; do
     ./build.sh "$g" >/dev/null
     ./build.sh "$g" -G >/dev/null
+    g=$(basename "$g")
     cp "build/$g.z5" "build/$g.ulx" "$tmp/$nazwa/skompilowane/"
     cp "build/$g.z5" "build/$g.ulx" dist/
 done
@@ -43,6 +44,7 @@ albo Parchment (w przeglądarce).  Polecenia można pisać z polskimi literami
 albo bez nich ("weź lampę" i "wez lampe").
 
   ruins_pl          Ruiny
+  heidi_pl          Heidi
   alice_pl          Po drugiej stronie lustra
   toyshop_pl        Sklep z zabawkami
   advent_pl         Przygoda

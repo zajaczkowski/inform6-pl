@@ -9,6 +9,7 @@ Ten podręcznik jest przeznaczony dla **graczy**, a nie dla autorów. Wyjaśnia,
 
 W katalogu znajdują się też:
 
+- „Heidi” (`ibg/heidi_pl.inf`) – bardzo krótka opowieść o pisklęciu, które wypadło z gniazda; najlepsza na pierwszą grę,
 - „Po drugiej stronie lustra” (`alice_pl.inf`) – gra w jednym pokoju, na motywach Lewisa Carrolla; dobra na początek,
 - „Sklep z zabawkami” (`toyshop_pl.inf`) – sklep pełen zabawek, z którymi można robić zaskakujące rzeczy,
 - „Równowaga” (`balances_pl.inf`) – krótka opowieść o czarodzieju, który uczy się i rzuca zaklęcia,

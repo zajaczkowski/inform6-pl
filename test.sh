@@ -30,7 +30,7 @@ graj() {        # graj <plik gry> <ziarno> <skrypt>
 mkdir -p build
 
 echo "Kompilacja:"
-for zrodlo in games/*.inf; do
+for zrodlo in games/*.inf games/ibg/*.inf; do
     g=$(basename "$zrodlo" .inf)
     if kompiluj "$zrodlo" "build/$g.z5"; then ok "$g.z5"; else blad "$g.z5"; fi
     if kompiluj "$zrodlo" "build/$g.ulx" -G '$DICT_CHAR_SIZE=4'; then ok "$g.ulx"; else blad "$g.ulx"; fi
@@ -56,9 +56,10 @@ graj_glulx() {  # graj_glulx <plik gry> <ziarno> <skrypt>
 }
 
 sprawdz() {     # sprawdz <gra> <plik gry> <ziarno> <oczekiwany tekst>
-    bez_ogonkow "games/$1.przejscie" > "build/$1.ascii"
-    for skrypt in "games/$1.przejscie" "build/$1.ascii"; do
-        opis=$1; [ "$skrypt" = "build/$1.ascii" ] && opis="$1 (bez ogonków)"
+    ascii=build/$(basename "$1").ascii
+    bez_ogonkow "games/$1.przejscie" > "$ascii"
+    for skrypt in "games/$1.przejscie" "$ascii"; do
+        opis=$1; [ "$skrypt" = "$ascii" ] && opis="$1 (bez ogonków)"
         if graj "$2" "$3" "$skrypt" | tr '\n' ' ' | grep -q "$4"; then
             ok "$opis: $4"
         else
@@ -67,8 +68,8 @@ sprawdz() {     # sprawdz <gra> <plik gry> <ziarno> <oczekiwany tekst>
     done
     if [ -n "$GLULXE" ]; then
         ulx=$(echo "$2" | sed 's/\.z5$/.ulx/')
-        for skrypt in "games/$1.przejscie" "build/$1.ascii"; do
-            opis="$1 (Glulx)"; [ "$skrypt" = "build/$1.ascii" ] && opis="$1 (Glulx, bez ogonków)"
+        for skrypt in "games/$1.przejscie" "$ascii"; do
+            opis="$1 (Glulx)"; [ "$skrypt" = "$ascii" ] && opis="$1 (Glulx, bez ogonków)"
             if graj_glulx "$ulx" "$3" "$skrypt" | tr '\n' ' ' | grep -q "$4"; then
                 ok "$opis: $4"
             else
@@ -78,6 +79,7 @@ sprawdz() {     # sprawdz <gra> <plik gry> <ziarno> <oczekiwany tekst>
     fi
 }
 sprawdz ruins_pl         build/ruins_pl.z5         1 "zdobyłeś 30 punktów na 30"
+sprawdz ibg/heidi_pl     build/heidi_pl.z5         1 "Zwyciężyłaś"
 sprawdz alice_pl         build/alice_pl.z5         1 "Zwyciężyłaś"
 sprawdz toyshop_pl       build/toyshop_pl.z5       1 "zdobyłeś 6 punktów na 6"
 sprawdz balances_pl      build/balances_pl.z5      1 "zdobyłeś 50 punktów na 51"

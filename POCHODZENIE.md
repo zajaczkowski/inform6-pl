@@ -61,6 +61,7 @@ Rozważałem też użycie słownika fleksyjnego **Morfeusz 2** do generowania fo
 - **Kompilator Inform 6.44** i **biblioteka standardowa 6.12.8** – Graham Nelson, David Griffith, David Kinder i współtwórcy; [Inform6](https://github.com/DavidKinder/Inform6) i [inform6lib](https://gitlab.com/DavidGriffith/inform6lib). Biblioteka bazowa jest używana bez zmian. Pliki `lib/polski.h` i `lib/polskig.h` powstały na podstawie jej plików `english.h` i `grammar.h`.
 - **Frotz** (dfrotz) – Stefan Jokisch, David Griffith i współtwórcy; [frotz](https://gitlab.com/DavidGriffith/frotz), interpreter używany do testów.
 - **Gry przykładowe** przetłumaczone na polski:
+  - `ibg/heidi_pl.inf` – „Heidi” z *The Inform Beginner's Guide*, © Roger Firth i Sonja Kesserich 2004; licencja przewodnika pozwala na rozpowszechnianie ze zmianami pod warunkiem zachowania informacji o prawach autorskich i tej licencji, dlatego jej treść jest na początku pliku,
   - `ruins_pl.inf` – „Ruins”, przykład z podręcznika *The Inform Designer's Manual* (4. wydanie) Grahama Nelsona, odtworzony z fragmentów podręcznika przez Rogera Firtha (2001); w grze przypisany fikcyjnej autorce Angeli M. Horns,
   - `alice_pl.inf` – „Through the Looking-Glass”, samouczek Inform Garetha Reesa (wersja 3, 2003, „All rights given away”), na motywach powieści Lewisa Carrolla,
   - `toyshop_pl.inf` – „Toyshop”, Graham Nelson (1994),
