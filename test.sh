@@ -137,6 +137,20 @@ for zrodlo in extensions/*_przyklad.inf; do
     else blad "$g.ulx"; fi
 done
 
+# Ekrany: to, co widzi gracz, nie może mieć śladów źle sklejonego tekstu
+# (spacja przed znakiem, przyklejony łącznik, surowe "~", słowo robocze parsera).
+echo "Ekrany:"
+for skrypt in games/*_pl.przejscie games/ibg/*_pl.przejscie; do
+    g=$(basename "$skrypt" .przejscie)
+    gra=build/$g.z5; ziarno=1
+    [ "$g" = advent_pl ] && { gra=build/advent_test.z5; ziarno=3; }
+    if graj "$gra" "$ziarno" "$skrypt" | grep -v 'Wynik: ' |
+        grep -nE '[a-ząćęłńóśźż]- | -[a-ząćęłńóśźżA-Z(]| [,.;!?]( |$)|~|xxnieznan|Programming error' > "build/$g.ekran"
+    then blad "$g: zob. build/$g.ekran"
+    else ok "$g"
+    fi
+done
+
 # Odmiana i komunikaty: wynik gry testowej ma się zgadzać co do znaku z plikiem
 # testy/*.oczekiwane.  Po świadomej zmianie brzmienia plik odświeża
 # ./test.sh --odswiez.

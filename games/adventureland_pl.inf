@@ -96,7 +96,7 @@ Class ScottRoom
               if (self.i ~= 0) c++;
           if (c==0) print "Nie widać żadnych wyjść!";
           else
-          {   print "Wyjścia prowadzą ";
+          {   if (c==1) print "Wyjście prowadzi "; else print "Wyjścia prowadzą ";
               for (i=n_to: i<=d_to: i++)
                   if (self.i ~= 0)
                   {   Separator(d++, c);
@@ -410,7 +410,7 @@ ScottRoom Inside_Stump "Wnętrze pnia"
        n_to Dismal_Swamp,  s_to Dismal_Swamp,  e_to Dismal_Swamp,
        w_to Dismal_Swamp,  u_to Dismal_Swamp,  d_to Root_Chamber,
   has  light;
-Sign -> "ZOSTAW TU SKARBY – (powiedz 'WYNIK')";
+Sign -> "ZOSTAW TU SKARBY (POWIEDZ WYNIK)";
 Object -> bottle "butelk/a"
   with name 'butelka' 'butelkę' 'butelki' 'butelce' 'butelką' 'flaszka'
             'flaszkę' 'słoik' 'słoika',
@@ -553,10 +553,9 @@ Object -> root_door "drzwi"
                rtrue;
            }
            if (self has open)
-           {   PoPrzyp(self, "otwarte drzwi", "otwartych drzwi", "otwartym
-                   drzwiom", "otwarte drzwi", "otwartymi drzwiami",
-                   "otwartych drzwiach");
-               print ", za którymi jest korytarz"; rtrue;
+           {   PoPrzyp(self, "drzwi", "drzwi", "drzwiom", "drzwi", "drzwiami",
+                   "drzwiach");
+               print " do korytarza"; rtrue;
            }
            PoPrzyp(self, "zamknięte drzwi", "zamkniętych drzwi", "zamkniętym
                drzwiom", "zamknięte drzwi", "zamkniętymi drzwiami",
@@ -889,8 +888,8 @@ Sign -> "OTCHŁAŃ. ZNAJDŹ WŁAŚCIWE WYJŚCIE I ŻYJ ZNOWU!";
   StartDaemon(chiggers);
 
   "^^^^^Rozlega się grzmiący głos...^
-  Skarby mają w nazwie *. Powiedz 'WYNIK'^
-  Jeśli potrzebujesz podpowiedzi, spróbuj 'POMOC'.^";
+  Skarby mają w nazwie *. Powiedz „WYNIK”.^
+  Jeśli potrzebujesz podpowiedzi, spróbuj „POMOC”.^";
 ];
 
 [ TimePasses i;

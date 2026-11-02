@@ -1957,6 +1957,12 @@ Array pl_wielkosc --> 1;
     }
   Score: switch (n) {
         1:  if (deadflag) print "W tej grze "; else print "Do tej pory ";
+            if (MAX_SCORE == 0) {       ! gra bez punktów: same ruchy
+                Gracz("wykonałeś ", "wykonałaś ");
+                print turns, " ";
+                Liczebnik(turns, "ruch", "ruchy", "ruchów");
+                return;
+            }
             Gracz("zdobyłeś ", "zdobyłaś ");
             print score, " ";
             Liczebnik(score, "punkt", "punkty", "punktów");

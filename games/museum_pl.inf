@@ -719,8 +719,9 @@ Object weight_monitor
                     if (WeightOf(b) > bw) { bw = WeightOf(b); w=b; }
                 self.players_strength = self.players_strength + bw;
                 print "^Wyczerpan", (nop) Gracz("y", "a"), " dźwiganiem
-                    takiego ciężaru, postanawiasz porzucić ", (bie) w, ": ";
-                <<Drop w>>;
+                    takiego ciężaru, postanawiasz porzucić ", (bie) w, ".^";
+                keep_silent = true; <Drop w>; keep_silent = false;
+                rtrue;
             }
 
             w=s/100; if (w==self.warning_level) return;

@@ -6,6 +6,10 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
 
 ## Niewydane
 
+- Czytanie ekranów we wszystkich grach: „W tej grze wykonałaś 18 ruchów.” w grach
+  bez punktów, „drzwi do korytarza” w „Krainie Przygód”, „Wyjście prowadzi…”
+  przy jednym wyjściu; `test.sh` sprawdza ekrany pod kątem sklejonego tekstu.
+
 - „Kraina Przygód”: opisy miejsc i ekwipunek jako polskie zdania („Wyjścia prowadzą
   na północ i w dół.”, „Widzisz też wodę i tabliczkę z napisem „…”.”).
 
