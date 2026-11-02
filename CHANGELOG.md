@@ -6,6 +6,9 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
 
 ## Niewydane
 
+- „Kraina Przygód”: listy „Widzisz też:” i „Niesiesz:” w bierniku, „tabliczkę
+  z napisem: …” zamiast „tabliczka głosi- …”.
+
 - Polecenie `stan` działa jak `wynik`; `stan na stole` nadal znaczy „stań na stole”.
 
 - Skompilowane gry w `games/` obok źródeł (`skompiluj.sh`, hak przed commitem)

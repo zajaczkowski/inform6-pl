@@ -72,7 +72,7 @@ Class Sign
       short_name
       [;  PoPrzyp(self, "tabliczka", "tabliczki", "tabliczce", "tabliczkę",
               "tabliczką", "tabliczce");
-          print " głosi: ", (object) self; rtrue;
+          print " z napisem: ", (object) self; rtrue;
       ],
       description
       [;  print_ret "Tabliczka głosi: ", (object) self;
@@ -110,7 +110,7 @@ Class ScottRoom
           print "^Widzisz też: ";
           objectloop (i in self)
               if (i ~= player)
-              {   if (d++>0) print " – "; PrintShortName(i);
+              {   if (d++>0) print " – "; print (bie) i;
               }
           new_line; rtrue;
       ];
@@ -122,7 +122,7 @@ Class ScottRoom
    if (c==0) "Nic nie niesiesz.";
    print "Niesiesz:^";
    objectloop (i in player)
-   {   if (d++>0) print " – "; PrintShortName(i);
+   {   if (d++>0) print " – "; print (bie) i;
    }
    new_line; rtrue;
 ];
