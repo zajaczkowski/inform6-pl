@@ -63,4 +63,6 @@ if [ ! -e narzedzia/.WIELKOSC_LITER ]; then
 fi
 rm -f narzedzia/.wielkosc_liter
 
+git config core.hooksPath .githooks 2>/dev/null || true
+
 echo "Gotowe.  Teraz: ./build.sh ruins_pl   albo   ./test.sh"

@@ -14,7 +14,8 @@ Sztywne lub niepoprawne sformułowania w komunikatach to też błędy – warto 
 2. Wprowadź zmianę. Komunikaty biblioteki są w `lib/polski.h`, gramatyka w `lib/polskig.h`, odmiana nazw w `lib/odmiana.h`.
 3. Uruchom testy: `./test.sh`. Skrypt kompiluje wszystkie gry dla maszyny Z i Glulx (każde ostrzeżenie kompilatora jest błędem) i przechodzi każdą grę do końca – z polskimi literami i bez nich. Na koniec porównuje co do znaku tabelę odmiany i wszystkie komunikaty biblioteki z plikami `testy/*.oczekiwane`. Zmiana powinna zostawić wszystkie testy zielone. Po świadomej zmianie brzmienia wystarczy `./test.sh --odswiez`, a różnicę w plikach `.oczekiwane` warto przejrzeć przed commitem.
 4. Jeśli poprawka dotyczy zachowania widocznego w grze, dopisz polecenie, które je sprawdza, do skryptu przejścia odpowiedniej gry (`games/*.przejscie`).
-5. Opisz zmianę w sekcji „Niewydane” na początku `CHANGELOG.md`.
+5. Skompilowane gry leżą w `games/` obok źródeł. Hak `.githooks/pre-commit` (włącza go `przygotuj.sh`) kompiluje je przed commitem, jeśli zmienia się `lib/` albo źródło gry; ręcznie: `./skompiluj.sh`.
+6. Opisz zmianę w sekcji „Niewydane” na początku `CHANGELOG.md`.
 
 Te same testy uruchamia GitHub Actions przy każdym pushu i pull requeście.
 

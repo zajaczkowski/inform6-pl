@@ -1,0 +1,11 @@
+#!/bin/sh
+# Przed commitem, który zmienia bibliotekę albo gry, kompiluje gry na nowo
+# i dołącza je do commita.  Włączenie: git config core.hooksPath .githooks
+# (robi to przygotuj.sh).
+if git diff --cached --name-only | grep -qE '^(lib/|games/.*\.inf$)'; then
+    if ! ./skompiluj.sh; then
+        echo "Nie udało się skompilować gier; commit przerwany." >&2
+        exit 1
+    fi
+    git add games/*.z5 games/*.ulx games/ibg/*.z5 games/ibg/*.ulx
+fi

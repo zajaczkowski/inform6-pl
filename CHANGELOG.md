@@ -6,6 +6,9 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
 
 ## Niewydane
 
+- Skompilowane gry w `games/` obok źródeł (`skompiluj.sh`, hak przed commitem)
+  i linki do gry w przeglądarce (Parchment) w README.
+
 - Nowe gry z *The Inform Beginner's Guide* w `games/ibg/`: „Heidi”, „Wilhelm Tell”
   i „Kapitan Fate”.
 

@@ -3,5 +3,9 @@ narzedzia/
 *.z5
 *.z8
 *.ulx
+!games/*.z5
+!games/*.ulx
+!games/ibg/*.z5
+!games/ibg/*.ulx
 .DS_Store
 dist/

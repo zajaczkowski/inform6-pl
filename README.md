@@ -6,6 +6,8 @@ Polska wersja biblioteki standardowej **Inform 6**, napisana od nowa dla bibliot
 
 **Do pobrania:** gotowe gry (`.z5` i `.ulx`) i pełne archiwum biblioteki są w [najnowszym wydaniu](https://github.com/zajaczkowski/inform6-pl/releases/latest). Jak w nie grać: [podręcznik gracza](docs/podrecznik_gracza.md).
 
+**Zagraj w przeglądarce** (Parchment, bez instalacji): [Ruiny](https://iplayif.com/?story=https://raw.githubusercontent.com/zajaczkowski/inform6-pl/main/games/ruins_pl.z5), [Po drugiej stronie lustra](https://iplayif.com/?story=https://raw.githubusercontent.com/zajaczkowski/inform6-pl/main/games/alice_pl.z5), [Sklep z zabawkami](https://iplayif.com/?story=https://raw.githubusercontent.com/zajaczkowski/inform6-pl/main/games/toyshop_pl.z5), [Przygoda](https://iplayif.com/?story=https://raw.githubusercontent.com/zajaczkowski/inform6-pl/main/games/advent_pl.z5), [Równowaga](https://iplayif.com/?story=https://raw.githubusercontent.com/zajaczkowski/inform6-pl/main/games/balances_pl.z5), [Muzeum Informu](https://iplayif.com/?story=https://raw.githubusercontent.com/zajaczkowski/inform6-pl/main/games/museum_pl.z5), [Kraina Przygód](https://iplayif.com/?story=https://raw.githubusercontent.com/zajaczkowski/inform6-pl/main/games/adventureland_pl.z5), [Heidi](https://iplayif.com/?story=https://raw.githubusercontent.com/zajaczkowski/inform6-pl/main/games/ibg/heidi_pl.z5), [Wilhelm Tell](https://iplayif.com/?story=https://raw.githubusercontent.com/zajaczkowski/inform6-pl/main/games/ibg/tell_pl.z5), [Kapitan Fate](https://iplayif.com/?story=https://raw.githubusercontent.com/zajaczkowski/inform6-pl/main/games/ibg/fate_pl.z5).
+
 Poprzednia wersja, oparta na bibliotece 6/11, znajduje się w repozytorium [inform-pl](https://github.com/zajaczkowski/inform-pl).
 
 > **In English:** a Polish translation of the Inform 6 Standard Library 6.12.8 for the Inform 6.44 compiler. It declines object names automatically through all six cases used in the game (the notation is inspired by the Russian RInform), understands commands typed with or without Polish diacritics, and runs on both the Z-machine and Glulx. All example games from the IF Archive are translated and come with walkthrough scripts that `./test.sh` runs; compiled games are in the [latest release](https://github.com/zajaczkowski/inform6-pl/releases/latest). Licensed like the Inform library itself (traditional Inform licence or Artistic License 2.0).
@@ -41,6 +43,7 @@ docs/            podręcznik autora, suplement i podręcznik gracza
 extensions/      dodatki spoza biblioteki standardowej (np. szyfr.h – zamki szyfrowe)
 przygotuj.sh     pobiera i buduje narzędzia (do katalogu narzedzia/)
 build.sh         kompiluje jedną grę
+skompiluj.sh     kompiluje wszystkie gry obok źródeł w games/
 test.sh          kompiluje wszystkie gry i sprawdza je skryptami przejść
 testy/           gry testowe odmiany i komunikatów z oczekiwanym wynikiem
 sciezki.sh       ustala, gdzie są narzędzia (używany przez build.sh i test.sh)

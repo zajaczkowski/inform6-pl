@@ -6,3 +6,7 @@ lib/*.h  linguist-language=inform7
 
 # Skrypty przejść to zwykły tekst.
 *.przejscie  linguist-detectable=false
+
+# Skompilowane gry.
+*.z5   binary
+*.ulx  binary
