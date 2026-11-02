@@ -72,7 +72,7 @@ Class Sign
       short_name
       [;  PoPrzyp(self, "tabliczka", "tabliczki", "tabliczce", "tabliczkę",
               "tabliczką", "tabliczce");
-          print " głosi- ", (object) self; rtrue;
+          print " głosi: ", (object) self; rtrue;
       ],
       description
       [;  print_ret "Tabliczka głosi: ", (object) self;
@@ -110,7 +110,7 @@ Class ScottRoom
           print "^Widzisz też: ";
           objectloop (i in self)
               if (i ~= player)
-              {   if (d++>0) print " - "; PrintShortName(i);
+              {   if (d++>0) print " – "; PrintShortName(i);
               }
           new_line; rtrue;
       ];
@@ -122,7 +122,7 @@ Class ScottRoom
    if (c==0) "Nic nie niesiesz.";
    print "Niesiesz:^";
    objectloop (i in player)
-   {   if (d++>0) print " - "; PrintShortName(i);
+   {   if (d++>0) print " – "; PrintShortName(i);
    }
    new_line; rtrue;
 ];
@@ -180,7 +180,7 @@ Treasure -> "*ZŁOTA RYBKA*"
            }
        ],
   has  female;
-Object -> axe "zardzewiała siekiera (magiczne słowo- BUNYON -jest na niej)"
+Object -> axe "zardzewiała siekiera (magiczne słowo BUNYON jest na niej)"
   with name 'zardzewiała' 'zardzewiałą' 'siekiera' 'siekierę' 'siekiery'
             'siekierą' 'topór' 'toporem',
        desc_dop "zardzewiałej siekiery", desc_cel "zardzewiałej siekierze",
@@ -667,7 +667,7 @@ ScottRoom Maze3 "Labirynt"
        u_to Maze5,  d_to Maze6;
 Object -> "rysy"
   with name 'rysy' 'rys' 'rysami' 'zadrapania' 'zadrapań' 'skała' 'skale',
-       short_name "dziwne rysy na skale głoszą- TU BYŁ ALADYN",
+       short_name "dziwne rysy na skale głoszą: TU BYŁ ALADYN",
   has  static pluralname;
 
 ScottRoom Maze4 "Labirynt"
@@ -698,7 +698,7 @@ Treasure -> net "*ZŁOTA SIEĆ*"
        desc_bie "*ZŁOTĄ SIEĆ*", desc_nar "*ZŁOTĄ SIECIĄ*",
        desc_dop "*ZŁOTEJ SIECI*", desc_cel "*ZŁOTEJ SIECI*", desc_mie "*ZŁOTEJ SIECI*",
   has  female;
-Sign -> "MAGICZNE SŁOWO TO AWAY. X LA -(reszta napisu odpadła)";
+Sign -> "MAGICZNE SŁOWO TO AWAY. X LA (reszta napisu odpadła)";
 Object -> lava "lawa"
   with name 'strumień' 'strumienia' 'lawa' 'lawy' 'lawę' 'lawą' 'tama' 'tamę',
        short_name
