@@ -1119,7 +1119,7 @@ Global pl_bez_przyimka;     ! pomija końcowy przyimek w LanguageCommand
     rfalse;
 ];
 
-Constant LanguageVersion = "Polska biblioteka inform6-pl 6.12.8-pl2";
+Constant LanguageVersion = "Polska biblioteka inform6-pl 6.12.8-pl3";
 
 Constant NKEY__TX       = "N = następny temat";
 Constant PKEY__TX       = "P = poprzedni";

@@ -6,106 +6,78 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
 
 ## Niewydane
 
-- `zbadaj` działa na kilku rzeczach naraz: „zbadaj kotki”, „zbadaj klucze”.
+## 6.12.8-pl3 – 9 listopada 2026
 
-- Czytanie ekranów we wszystkich grach: „W tej grze wykonałaś 18 ruchów.” w grach
-  bez punktów, „drzwi do korytarza” w „Krainie Przygód”, „Wyjście prowadzi…”
-  przy jednym wyjściu; `test.sh` sprawdza ekrany pod kątem sklejonego tekstu.
+**Uwaga dla autorów gier.** Biblioteka ma teraz własne polecenia `użyj`, `stan`,
+`wróć`, `cześć`, `witaj`, `żegnaj`, `dziękuję`, `dzięki`, `rozbierz`, `ukryj`,
+`złam`, `łam`, `zepsuj`, `mów`, `graj`, `budź`, `zamykaj`, `otwieraj`, `siadaj`
+i `wstawaj`.  Gra, która definiuje któreś z nich sama dyrektywą `Verb`, nie
+skompiluje się („Two different verb definitions”) i musi użyć `Extend ... replace`
+albo `Extend only ... replace` (tak zrobiły „Przygoda” i „Równowaga”).
+`Kto` przyjmuje opcjonalny czwarty argument; stare wywołania działają jak dotąd.
 
-- „Kraina Przygód”: opisy miejsc i ekwipunek jako polskie zdania („Wyjścia prowadzą
-  na północ i w dół.”, „Widzisz też wodę i tabliczkę z napisem „…”.”).
+Nowe gry i dodatki:
 
-- Polecenie `stan` działa jak `wynik`; `stan na stole` nadal znaczy „stań na stole”.
+- Gry z *The Inform Beginner's Guide* w `games/ibg/`: „Heidi”, „Wilhelm Tell”
+  i „Kapitan Fate”, na licencji przewodnika (zob. `POCHODZENIE.md`).
+- Katalog `extensions/` na dodatki spoza biblioteki standardowej; pierwszy
+  dodatek `szyfr.h` – zamki szyfrowe („otwórz sejf kodem 15432”, „wpisz 15432”,
+  „zamknij sejf na szyfr”) z instrukcją `szyfr_instrukcja.md` i grą przykładową.
+- Skompilowane gry leżą w `games/` obok źródeł, a README ma linki do gry
+  w przeglądarce (Parchment).
 
-- Skompilowane gry w `games/` obok źródeł (`skompiluj.sh`, hak przed commitem)
-  i linki do gry w przeglądarce (Parchment) w README.
+Odmiana i liczebniki:
 
-- Nowe gry z *The Inform Beginner's Guide* w `games/ibg/`: „Heidi”, „Wilhelm Tell”
-  i „Kapitan Fate”.
+- Liczebniki na listach: `plural "złot/e monet/y"` daje „dwie złote monety”,
+  „pięć złotych monet”, „dwadzieścia dwa małe klucze”; czasownik zgadza się
+  z liczbą także we wtrąceniu („(w którym jest pięć monet)”).
+- Wołacz rzeczowników na -a („kucharko”, „królowo”, „Kasiu”) i celownik na -u
+  („daj kotu”, „psu”, „bratu”).
+- Liczba mnoga w poleceniach bez `plural` i `//p`: „weź klucze”, „zbadaj kotki”;
+  „oba”, „obaj”, „obydwa”, „obydwie”.
+- Przymiotniki męskoosobowe („dzielni rycerze są zamknięci”, „dzielnych
+  rycerzy”), automatyczne „ze”/„we”, miękkie spółgłoski i „j” w odmianie
+  (kość – kości, zbroja – zbroi), -ia w wyrazach rodzimych (ziemia – ziemi).
+- Krótkie ostatnie słowa nazw w poleceniach („zbiór do gry”, „krzesło Ludwika
+  XV”); poprawiona odmiana nazw w grach (rój, plan, kierunek, kogut i inne).
 
-- Typografia: polskie cudzysłowy „ ” i półpauza – w bibliotece i grach (dopisane
-  na końcu tablicy `Zcharacter`), jedna spacja po kropce w grach (409 miejsc).
-- Rzadkie sytuacje: `Ale tornistra tam nie ma` zamiast sztucznego komunikatu,
-  poprawiony błąd programu w „Alicji” przy rozkazach dla kotków.
+Polecenia i parser:
 
-- Najdziwniejsze polecenia (każdy czasownik gramatyki z obiektami każdego rodzaju):
-  - bezokoliczniki wszystkich czasowników w „Zrozumiałem tylko tyle, że chcesz…”,
-    dopełniacz („dotykać kota”) i przyimek („dmuchnąć w lampę”, „się wspiąć na
-    drzewo”, „W co chcesz dmuchnąć?”),
-  - celownik na -u: „daj kotu”, „psu”, „bratu”; „daj mi klucz” („mi”, „mną”, „ja”),
-  - „znajdź klucz”, „szukaj klucza”; „wyjmij wszystko ze skrzyni” (dotąd „ze” było
-    czytane jak angielskie *of*),
-  - „weź klucz i potem upuść go”, „…, a następnie…”; „!” i „?” na końcu polecenia,
-  - „załóż kotu czapkę”, „Komu chcesz to powiedzieć?”, „Nie jesteś pojemnikiem.”,
-  - nowe słowa: użyj, wróć, cześć, witaj, żegnaj, dziękuję, dzięki, rozbierz,
-    „umyj się”, „ubierz się”, ukryj, złam, łam, zepsuj, mów, graj, budź, zamykaj,
-    otwieraj, siadaj, wstawaj.  **Gra, która sama definiowała któryś z tych
-    czasowników dyrektywą `Verb`, musi użyć `Extend ... replace`.**
-- Postacie w komunikatach: czasownik w liczbie mnogiej („Rybacy wchodzą”), „W pudle
-  kowal widzi…” małą literą, „(jako krótka księga)” w mianowniku.  `Kto` przyjmuje
-  czwarty argument z formą mnogą.
-- Odpowiedzi na pytania gry: nowe polecenie bez ogonków („wez lampe”) i na Glulxie
-  z ogonkami działa już jako polecenie, nie jako odpowiedź; „zapytaj kota”
-  i „powiedz kotu” dopytują o treść; „Gdzie chcesz włożyć te rzeczy?”.
-- Odmiana nazw w grach: rój, plan, reflektor, przełącznik, kogut, rudzik, bizon, wąż.
-- Krótkie ostatnie słowa nazw rozumiane w poleceniach: „zbiór do gry”, „krzesło
-  Ludwika XV”, „strzałka w dół”, „kwadrat dwa na dwa”.
-- „upuść krzesełko”, gdy się na nim siedzi: komunikat zamiast błędu programu.
-- „w lewo”, „północ kota”: „chcesz pójść w tę stronę”; „twojego dawnego ja”.
-- Glulx: „połóż się”, „potem” i „następnie” działają tak samo jak w maszynie Z.
+- Bezokoliczniki wszystkich czasowników w „Zrozumiałem tylko tyle, że chcesz…”,
+  z dopełniaczem i przyimkiem („dotykać kota”, „dmuchnąć w lampę”).
+- „daj mi klucz”, „znajdź klucz”, „szukaj klucza”, „wyjmij wszystko ze skrzyni”,
+  „weź klucz i potem upuść go”, „!” i „?” na końcu polecenia, „załóż kotu czapkę”,
+  `stan` jak `wynik`.
+- Nowe polecenie zamiast odpowiedzi na pytanie gry działa także bez ogonków
+  i na Glulxie; „zapytaj kota” i „powiedz kotu” dopytują o treść.
+- Zamki: „otwórz drzwi kluczem” otwiera zamek i drzwi, samo „otwórz drzwi”
+  używa właściwego klucza, „zamknij drzwi na klucz” wybiera pasujący klucz;
+  usunięte „zablokuj”, dodane „zaklucz”.  Opis: suplement, rozdział 16.
 
-- Liczebniki na listach: właściwość `plural` można zapisać z „/” (`plural
-  "złot/e monet/y"`) – biblioteka dobiera wtedy formę do liczby: „dwie złote
-  monety”, „pięć złotych monet”, „dwadzieścia dwa małe klucze”.  Liczebnik zna
-  rodzaj żeński („dwie”, „dwadzieścia dwie”), a czasownik zgadza się z liczbą
-  także we wtrąceniu: „(w którym jest pięć monet)”.
-- Wołacz rzeczowników na -a u żywych postaci: „kucharko”, „królowo”, „Kasiu”.
-- Liczba mnoga w poleceniach bez `plural` i bez `//p`: „weź klucze”, „upuść
-  lampy” działają na wszystkie pasujące rzeczy; biblioteka rozumie też „oba”,
-  „obaj”, „obydwa” i „obydwie”.
-- Przymiotniki męskoosobowe na -i: „dzielnych rycerzy” zamiast „dzielnich”.
-- Glulx: nazwa pisana wielką literą nie gubi już polskich liter
-  („Krótka księga” zamiast „Krótka ksi?ga”).
-- Testy: `testy/odmiana.inf` i `testy/komunikaty.inf`, których wynik `test.sh`
-  porównuje co do znaku z plikami `testy/*.oczekiwane`.
+Komunikaty i tekst:
 
-- Polszczyzna komunikatów i odmiany (przegląd wszystkich komunikatów biblioteki
-  dla obiektów każdego rodzaju):
-  - przymiotniki w rodzaju męskoosobowym: „rybacy są zamknięci/puści/otwarci”
-    zamiast „zamknięte/puste/otwarte” (`PL_PrzymZ`, `PL_PrzymZL`),
-  - automatyczne „ze”/„we”: „ze stołu”, „ze skrzyni”, „we wraku” (wcześniej
-    tylko przez atrybuty `z_article`/`w_article`),
-  - odmiana: miękkie spółgłoski na końcu rdzenia (kość – kości, koń – konia),
-    „j” po samogłosce (zbroja – zbroi, pokój – pokoi), -ia w wyrazach rodzimych
-    (ziemia – ziemi, ale historia – historii),
-  - „Miałeś w rękach: … lampę sodową” (biernik), „Odwiedzone miejsca: …”,
-    szyk zaimków („Przecież go nie trzymasz”, „Masz go już na sobie”),
-    „Ten interpreter nie pozwala cofać ruchów”, przecinek przed „aby”,
-  - bez kalki „chyba” (ang. *seems*): „Kamienne drzwi są zamknięte na klucz.”,
-    „Nie ma takiej potrzeby.”
-- Zamki: „otwórz drzwi kluczem” otwiera zamek i drzwi jednym poleceniem,
-  samo „otwórz drzwi” otwiera zamek, jeśli gracz ma właściwy klucz
-  (`ImplicitUnlock`), „zamknij drzwi na klucz” wybiera pasujący klucz
-  niezależnie od jego nazwy, „na łańcuch” i narzędnik („wytrychem”) wskazują
-  przedmiot wprost; odpowiedzi w narzędniku („Zamykasz drzwi mosiężnym
-  kluczem.”).  Usunięte „zablokuj” jako synonim zamykania; dodane „zaklucz”.
-  `with_key` może być procedurą także dla „na klucz”; `before_implicit`
-  wyłącza tylko automatyczne otwieranie zamka, nie jawne „otwórz X kluczem”.
-  Opis dla autorów: suplement, rozdział 16, „Zamki i klucze”.
-- Nowy katalog `extensions/` na dodatki spoza biblioteki standardowej;
-  pierwszy dodatek `szyfr.h` – zamki szyfrowe (właściwości `with_code`
-  i `lock_for`; „otwórz sejf kodem 15432”,
-  „wpisz 15432”, „zamknij sejf na szyfr”) z instrukcją
-  `szyfr_instrukcja.md` i grą przykładową sprawdzaną przez `test.sh`.
-  `build.sh` i `test.sh` mają `extensions/` na ścieżce dołączania.
-- Komunikat „Nie masz klucza do …” (`Lock` 6) idzie przez `L__M`, więc gra
-  i dodatki mogą go zmienić.
-- Komentarze w kodzie biblioteki w całości po polsku; usunięte angielskie
-  pozostałości (słowo „the” w `ConTopic`).
-- Wydania tworzy automatycznie GitHub Actions po wypchnięciu tagu
-  (`wydanie.sh`, `.github/workflows/wydanie.yml`).
-- `CONTRIBUTING.md`, szablon zgłoszenia błędu, link do pobrania gier w README,
-  rozpoznawanie języka repozytorium (`.gitattributes`).
+- Postacie jako wykonawcy z czasownikiem w liczbie mnogiej („Rybacy wchodzą”);
+  gry bez punktów pokazują „W tej grze wykonałaś 18 ruchów.”.
+- Polskie cudzysłowy „ ” i półpauza w bibliotece i grach, jedna spacja po kropce.
+- Przegląd polszczyzny wszystkich komunikatów i gier: biernik na listach,
+  szyk zaimków, bez kalek („chyba”, „haftowanie”); w „Krainie Przygód” opisy
+  miejsc i ekwipunek jako polskie zdania.
+- Glulx: nazwa pisana wielką literą nie gubi polskich liter; „połóż się”,
+  „potem”, „następnie” działają jak w maszynie Z.
+- Poprawione błędy programu: „upuść krzesełko”, siedząc na nim; rozkazy dla
+  kotków w „Alicji”; zwycięstwo w „Kapitanie Fate” na Glulxie.
+
+Testy i narzędzia:
+
+- `testy/odmiana.inf` i `testy/komunikaty.inf` porównywane co do znaku
+  z `testy/*.oczekiwane`; `test.sh` sprawdza też ekrany gier pod kątem źle
+  sklejonego tekstu.
+- `skompiluj.sh` i hak `.githooks/pre-commit` kompilują gry przed commitem;
+  wydania buduje GitHub Actions po wypchnięciu tagu.
+
+Znane ograniczenia: liczebniki męskoosobowe („dwaj rycerze”) i rodzaj żeński
+w napisach `list_together` nie są obsługiwane; na Glulxie tekst wpisany przez
+gracza w cudzysłowie i nazwy nadane przez gracza tracą polskie litery.
 
 ## 6.12.8-pl2 – 28 października 2026
 

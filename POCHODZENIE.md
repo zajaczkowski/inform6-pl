@@ -95,5 +95,7 @@ Na końcu prac asystent wykonał serię szerokich testów językowych. Stale, pr
 - **Polecenia w prawdziwych grach:** ponad 8000 poleceń na maszynie Z i ponad 9000 na Glulxie, na obiektach dostępnych w wielu punktach przejścia każdej gry.
 - **Rzadkie sytuacje:** około 41 000 poleceń: dwa rzeczowniki naraz, rozkazy dla postaci, polecenia dla wielu rzeczy.
 - **Komunikaty parsera:** wywołane prawdziwymi poleceniami i dopisane do stałych testów.
+- **Gry z `games/ibg/`:** każdy czasownik gramatyki na każdym obiekcie w kolejnych punktach przejścia, dwa rzeczowniki i rozkazy, łącznie około 15 000 poleceń w czterech wariantach (maszyna Z i Glulx, z ogonkami i bez nich), a także wszystkie zakończenia.
+- **Czytanie ekranów:** gotowe ekrany przejść wszystkich gier, przeczytane tak, jak widzi je gracz; od tej pory `./test.sh` sprawdza je też automatycznie pod kątem źle sklejonego tekstu.
 
 Testy automatyczne wykrywają błędy programu i rozbieżności, ale nie oceniają brzmienia tekstu. Odpowiedzi z tych testów AI przeglądało w dużej części, a nie w całości, zwłaszcza tam, gdzie powtarzał się jeden wzór. Automatyczna odmiana obejmuje też obiekty z gier, ale nie zastępuje czytelnika: proza tłumaczonych gier i podręczniki nie przeszły pełnej korekty człowieka. Nie sprawdzono też wyglądu w interpreterach graficznych.
