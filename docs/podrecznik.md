@@ -315,8 +315,12 @@ Rodzaj gramatyczny obiektu ustalają atrybuty:
 | `female` | żeński | `pigmejsk/a figurk/a` |
 | `neuter` | nijaki | `wysok/ie krzesełk/o` |
 | `pluralname` | mnogi niemęskoosobowy | `kamienn/e schod/y` |
-| `pluralname animate male` | męskoosobowy | „starzy rybacy” |
+| `pluralname animate male` | męskoosobowy | `sta/rz=r/y ryba/c=k/y` – starych rybaków |
 | `animate` | żywy (biernik męski = dopełniacz) | `zmumifikowan/y kapłan/` – widzisz zmumifikowanego kapłana |
+
+W rodzaju męskoosobowym mianownik ma zwykle inną spółgłoskę niż pozostałe przypadki (*starzy* – *starych*, *rybacy* – *rybaków*), dlatego wymianę trzeba zaznaczyć: `"sta/rz=r/y ryba/c=k/y"`, `"wyso/c=k/y strażni/c=k/y"`, `"mło/dz=d/i kowal/e"`. Zapis bez wymiany (`"starz/y rybac/y"`) dałby „starzych rybacy”.
+
+Rzeczowniki żeńskie zakończone w liczbie pojedynczej na spółgłoskę (noc, rzecz, mysz, kość) potrzebują w liczbie mnogiej wskazówki `+y`: `"ciemn/e noc/e+y"` – ciemnych nocy. Bez niej biblioteka utnie końcówkę, tak jak w *lamp*, *świec*.
 
 Nazwę obiektu w liczbie mnogiej zapisuje się w mianowniku liczby mnogiej:
 
@@ -330,13 +334,15 @@ Rodzaj trzeba podać **zawsze**, gdy nie jest męski, bo biblioteka nie zgaduje 
 
 ### Gdy automat się myli: `desc_*`
 
-Polszczyzna ma mnóstwo wyjątków: *pies – psu*, *dom – domu*, *miasto – w mieście*, *ludzie – ludźmi*. Żadne reguły nie obejmą ich wszystkich, dlatego formę dowolnego przypadku można podać ręcznie we właściwości `desc_dop`, `desc_cel`, `desc_bie`, `desc_nar` albo `desc_mie`. Forma ręczna ma pierwszeństwo przed automatyczną, a parser rozpoznaje ją tak samo:
+Polszczyzna ma mnóstwo wyjątków: *dom – w domu*, *anioł – aniele*, *miasto – w mieście*, *ludzie – ludźmi*. Żadne reguły nie obejmą ich wszystkich, dlatego formę dowolnego przypadku można podać ręcznie we właściwości `desc_dop`, `desc_cel`, `desc_bie`, `desc_nar` albo `desc_mie`. Forma ręczna ma pierwszeństwo przed automatyczną, a parser rozpoznaje ją tak samo:
 
 ```inform
-Object  -> pies "wielk/i p/ie/s/"
-  with  desc_cel "wielkiemu psu",        ! automat dałby "wielkiemu psowi"
-  has   animate male;
+Object  -> dom "wielk/i dom/+u"
+  with  desc_mie "wielkim domu",         ! automat dałby "wielkim domie"
+  has   static;
 ```
+
+Najczęstsze rzeczowniki z celownikiem na -u (kot, pies, pan, brat, ojciec, chłop, chłopiec, bóg, świat, diabeł, lew, ksiądz) biblioteka zna sama: „kotu”, „psu”.
 
 W Ruinach żaden obiekt tego nie potrzebuje. W „Przygodzie” przykładem są liście (`desc_nar "liśćmi"`) i gniazdo (`desc_mie "gnieździe ze złotymi jajami"`).
 

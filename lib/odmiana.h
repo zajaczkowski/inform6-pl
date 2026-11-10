@@ -297,6 +297,31 @@ Array pl_wynik --> 2;
     if (c == PRZYP_CEL) print "emu"; else print "ego";
 ];
 
+! Czy rdzeń pl_s to dokładnie podane litery?
+[ PL_Rdz n a b c d e f;
+    if (pl_s_len ~= n) rfalse;
+    if (pl_s-->0 ~= a) rfalse;
+    if (n > 1 && pl_s-->1 ~= b) rfalse;
+    if (n > 2 && pl_s-->2 ~= c) rfalse;
+    if (n > 3 && pl_s-->3 ~= d) rfalse;
+    if (n > 4 && pl_s-->4 ~= e) rfalse;
+    if (n > 5 && pl_s-->5 ~= f) rfalse;
+    rtrue;
+];
+
+! Rzeczowniki męskie z celownikiem na -u zamiast -owi: kotu, psu, panu, bratu,
+! ojcu, chłopu, chłopcu, bogu, światu, diabłu, lwu, księdzu, katu, łbu.
+[ PL_CelownikU;
+    if (PL_Rdz(3,'k','o','t') || PL_Rdz(2,'p','s') || PL_Rdz(3,'p','a','n') ||
+        PL_Rdz(4,'b','r','a','t') || PL_Rdz(3,'o','j','c') ||
+        PL_Rdz(5,'c','h','ł','o','p') || PL_Rdz(6,'c','h','ł','o','p','c') ||
+        PL_Rdz(3,'b','o','g') || PL_Rdz(5,'ś','w','i','a','t') ||
+        PL_Rdz(5,'d','i','a','b','ł') || PL_Rdz(2,'l','w') ||
+        PL_Rdz(6,'k','s','i','ę','d','z') || PL_Rdz(3,'k','a','t') ||
+        PL_Rdz(2,'ł','b')) rtrue;
+    rfalse;
+];
+
 [ PL_Rzeczownik r c anim  k;
     if (c == PRZYP_MIAN) { PL_DrukN(); return; }
     if (pl_k_len) k = pl_k-->0;
@@ -312,7 +337,9 @@ Array pl_wynik --> 2;
     if (r == 1) {                           ! noc, mysz, sól, kość
         switch (c) {
           PRZYP_BIE: PL_DrukN();
-          PRZYP_NAR: PL_DrukS(0); print "ą";
+          PRZYP_NAR: PL_DrukS(0);         ! krwią, brwią, głębią, ale nocą, solą
+                     if (PL_Ost(1) == 'w' or 'b' or 'p' or 'm' or 'f') print "i";
+                     print "ą";
           default:   PL_YI(true);
         }
         return;
@@ -323,7 +350,7 @@ Array pl_wynik --> 2;
         if (r == 0 && pl_wskazowka == 'u' && ~~anim) print "u"; else print "a";
       PRZYP_CEL:
         PL_DrukS(0);
-        if (r == 0) print "owi"; else print "u";
+        if (r == 0 && ~~PL_CelownikU()) print "owi"; else print "u";
       PRZYP_BIE:
         if (r == 0 && anim) { PL_DrukS(0); print "a"; }
         else PL_DrukN();
@@ -357,6 +384,7 @@ Array pl_wynik --> 2;
       '0', 'e', 'i': typ = 0;
       default:
         if (pl_k_len == 0 || pl_k-->0 == 'a' || zen) typ = 0;
+        else if (PL_Ost(1) == 'c') typ = 1;     ! pieców, koców, kupców
         else if (PL_Miekki()) typ = 2;
         else typ = 1;
     }
@@ -470,7 +498,7 @@ Array pl_wynik --> 2;
 ! Czy słowo adr/len to rdzeń pl_s z końcówką mianownika liczby mnogiej?
 ! Reguła jest szeroka, bo typ końcówki zależy od rdzenia, a wpisane słowo
 ! i tak musi zaczynać się od rdzenia tego obiektu.
-[ PL_KoncowkaMn adr len;
+[ PL_KoncowkaMn adr len r;
     if (pl_s_len < 2 || pl_s_len+2 > PL_SL_MAX) rfalse;
     for (pl_por_len=0 : pl_por_len<pl_s_len : pl_por_len++)
         pl_por-->pl_por_len = pl_s-->pl_por_len;
@@ -478,7 +506,8 @@ Array pl_wynik --> 2;
     pl_por-->pl_s_len = 'y'; if (PL_Porownaj(adr, len)) rtrue;
     pl_por-->pl_s_len = 'i'; if (PL_Porownaj(adr, len)) rtrue;
     pl_por-->pl_s_len = 'e'; if (PL_Porownaj(adr, len)) rtrue;
-    pl_por-->pl_s_len = 'a'; if (PL_Porownaj(adr, len)) rtrue;
+    ! rdzeń + "a" w rodzaju męskim to dopełniacz ("weź klucza"), nie liczba mnoga
+    pl_por-->pl_s_len = 'a'; if (r ~= 0 && PL_Porownaj(adr, len)) rtrue;
     pl_por-->pl_s_len = 'i'; pl_por-->(pl_s_len+1) = 'e'; pl_por_len++;
     return PL_Porownaj(adr, len);
 ];
@@ -499,7 +528,7 @@ Array pl_wynik --> 2;
         if (PL_MaUkosnik(i, j)) {
             PL_Rozbierz(i, j);
             if (PL_KoncPrzym(r) || pl_przym || pl_k_len > 1) PL_PrzeniesI();
-            if (PL_KoncowkaMn(adr, len)) {
+            if (PL_KoncowkaMn(adr, len, r)) {
                 pl_g1 = i; pl_g2 = j; pl_g5 = r; pl_g6 = anim;
                 for (c=PRZYP_MIAN : c<=PRZYP_BIE : c=c+PRZYP_BIE) {
                     pl_g3 = c; pl_g4 = true;

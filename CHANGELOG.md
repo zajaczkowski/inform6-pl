@@ -6,6 +6,12 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
 
 ## Niewydane
 
+- Odmiana: narzędnik „krwią”, „brwią”, „głębią”; dopełniacz mnogi „pieców”,
+  „koców”, „kupców”; celownik „kotu”, „psu”, „panu”, „bratu”, „ojcu”, „chłopcu”
+  i podobne.
+- „weź klucza” (potoczny dopełniacz) nie jest już brane za liczbę mnogą.
+- Podręcznik: zapis rodzaju męskoosobowego i `+y` dla żeńskich w liczbie mnogiej.
+
 ## 6.12.8-pl3 – 9 listopada 2026
 
 **Uwaga dla autorów gier.** Biblioteka ma teraz własne polecenia `użyj`, `stan`,

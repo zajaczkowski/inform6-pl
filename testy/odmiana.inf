@@ -84,6 +84,16 @@ Object -> "ciepł/e mlek/o" has neuter;
 Object -> "drewnian/e drzwi/" has pluralname;
 Object -> "biał/e owc/e+ie" has pluralname female;
 Object -> "dzieln/i rycerz/e" has pluralname animate male;
+Object -> "kr/e/w/" has female;
+Object -> "gł/ą=ę/b/" has female;
+Object -> "czarn/y kot/" has animate;
+Object -> "p/ie/s/" has animate;
+Object -> "chłop/ie/c/" has animate;
+Object -> "świat/";
+Object -> "piec/e" has pluralname;
+Object -> "widelc/e" has pluralname;
+Object -> "ciemn/e noc/e+y" has pluralname female;
+Object -> "sta/rz=r/y ryba/c=k/y" has pluralname animate male;
 
 [ Tabela  o;
     objectloop (o in Probki)
