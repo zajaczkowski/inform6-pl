@@ -1117,7 +1117,7 @@ Po kompilacji z opcją `-D` (`./build.sh ruins_pl -D`) dostępne są polecenia d
 | `+y`, `+ów`, `+0` | wymuszony dopełniacz mnogi: -y/-i, -ów, bez końcówki | `inskrypcj/e+y`, `imienin/y+0` |
 | `!` | odmiana przymiotnikowa | `lamp/a sodow/a!` |
 | bez `/` | słowo nieodmienne | `z jadeitu` |
-| `desc_dop` … `desc_mie` | ręczna forma przypadku | `desc_cel "wielkiemu psu"` |
+| `desc_dop` … `desc_mie` | ręczna forma przypadku | `desc_mie "wielkim domu"` |
 
 ### Reguły wydruku
 
