@@ -47,7 +47,7 @@ Podręcznik nie zdradza rozwiązań zagadek. Przykłady pokazują tylko, *jak* p
 Gra tekstowa (ang. *interactive fiction*) to opowieść, w której to ty decydujesz, co robi bohater. Gra opisuje miejsce, w którym się znajdujesz, a ty wpisujesz polecenie po znaku `>`. Gra odpowiada, co się stało, i czeka na następne polecenie.
 
 ```
-"Wielki Plac"
+„Wielki Plac”
 Tak przynajmniej nazywasz w notatkach tę niską wapienną skarpę, choć las
 deszczowy dawno już ją sobie odebrał. ...
 Z rozmokłej ziemi wyrasta na długiej nóżce cętkowany grzyb.
@@ -108,7 +108,7 @@ Z budynku wypływa niewielki strumień i spływa w dół parowem.
 
 >wejdź do budynku
 W budynku
-Jesteś w budynku - w domku zbudowanym nad dużym źródłem.
+Jesteś w budynku – w domku zbudowanym nad dużym źródłem.
 Na ziemi leżą jakieś klucze.
 Leży tu smaczne jedzenie.
 ...
@@ -224,7 +224,7 @@ W niektórych książkach można sprawdzić hasło. W „Ruinach” służy do t
 
 ```
 >sprawdź ptaka w słowniku
-Ptak: "bogaty, zamożny?".
+Ptak: „bogaty, zamożny?”.
 ```
 
 Działa też `poszukaj X w słowniku`, `znajdź X w słowniku` i `przeczytaj o X w słowniku`.
@@ -381,8 +381,8 @@ Rozmowa polega na pytaniu i mówieniu **o konkretnych rzeczach**; swobodnej poga
 
 ```
 >zapytaj kapłana o ruiny
-"Ruiny zawsze pokonają złodziei. W podziemnym świecie rabusie są torturowani
-przez całą wieczność." Pauza. "Tak samo jak archeolodzy."
+„Ruiny zawsze pokonają złodziei. W podziemnym świecie rabusie są torturowani
+przez całą wieczność.” Pauza. „Tak samo jak archeolodzy.”
 ```
 
 Temat podawaj jednym, najważniejszym słowem: „o ruiny”, „o malowidła”, „o słownik”. Pytaj o to, co widzisz w opisach – nazwy miejsc, przedmiotów i znaków często prowadzą do ciekawych odpowiedzi. Polecenie `porozmawiaj z X` przypomni, jak prowadzić rozmowę.
@@ -401,7 +401,7 @@ Postaci można wydać polecenie: najpierw jej imię lub nazwa i przecinek, potem
 
 ```
 >kapłanie, idź na północ
-"Nie wolno mi opuszczać sanktuarium."
+„Nie wolno mi opuszczać sanktuarium.”
 ```
 
 Wołacz działa też przy imionach i nazwach żeńskich: `kucharko, idź na północ`, `Kasiu, daj mi klucz`.

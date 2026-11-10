@@ -415,7 +415,8 @@ Verb meta 'pomoc' 'help' 'instrukcja' 'podpowiedź' 'pomocy'
 Verb 'postaw' 'ustaw' 'wstaw'
     * multiheld                                 -> Drop
     * multiexcept 'na' noun                     -> PutOn
-    * multiexcept 'do'/'w//'/'we' noun          -> Insert;
+    * multiexcept 'do'/'w//'/'we' noun          -> Insert
+    * noun 'na' special                         -> SetTo;    ! "ustaw pokrętło na 4"
 
 Verb 'potrzyj' 'przetrzyj' 'wytrzyj' 'zetrzyj' 'wyczyść' 'wypoleruj' 'umyj'
     * noun                                      -> Rub;
@@ -470,8 +471,13 @@ Verb 'rzuć' 'ciśnij' 'wyrzuć' 'upuść' 'porzuć'
     * multiexcept 'do' noun                     -> Insert
     * multiexcept 'na' noun                     -> PutOn;
 
-Verb 'schowaj' 'włóż' 'wsadź' 'wrzuć' 'wetknij' 'ukryj'
+! Samo "włóż płaszcz" to ubieranie; "schowaj klucz" wymaga miejsca.
+Verb 'włóż'
     * held                                      -> Wear
+    * multiexcept 'do'/'w//'/'we' noun          -> Insert
+    * multiexcept 'pod'/'na' noun               -> PutOn;
+
+Verb 'schowaj' 'wsadź' 'wrzuć' 'wetknij' 'ukryj'
     * multiexcept 'do'/'w//'/'we' noun          -> Insert
     * multiexcept 'pod'/'na' noun               -> PutOn;
 
@@ -584,8 +590,13 @@ Verb 'zejdź' 'zleź'
     * 'z//'/'ze' noun                           -> Exit
     * 'po'/'do'/'w//'/'we' noun                 -> Enter;
 
-Verb 'wyjmij' 'wyciągnij' 'wydobądź' 'zdejmij' 'ściągnij'
+! "zdejmij płaszcz" to rozbieranie; "wyjmij klucz" to branie.
+Verb 'zdejmij' 'ściągnij'
     * held                                      -> Disrobe
+    * multi                                     -> Take
+    * multiinside 'z//'/'ze'/'spod' noun        -> Remove;
+
+Verb 'wyjmij' 'wyciągnij' 'wydobądź'
     * multi                                     -> Take
     * multiinside 'z//'/'ze'/'spod' noun        -> Remove;
 

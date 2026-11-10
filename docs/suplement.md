@@ -293,8 +293,9 @@ Sala Ciężarów w „Muzeum” liczy łączny ciężar niesionych rzeczy. Słu�
                     if (WeightOf(b) > bw) { bw = WeightOf(b); w=b; }
                 self.players_strength = self.players_strength + bw;
                 print "^Wyczerpan", (nop) Gracz("y", "a"), " dźwiganiem
-                    takiego ciężaru, postanawiasz porzucić ", (bie) w, ": ";
-                <<Drop w>>;
+                    takiego ciężaru, postanawiasz porzucić ", (bie) w, ".^";
+                keep_silent = true; <Drop w>; keep_silent = false;
+                rtrue;
             }
 ```
 
@@ -554,8 +555,8 @@ Class Ticket(6)
 ```inform
                 i = Ticket.create();
                 if (i == 0)
-                   "Naganiacz wygląda na metafizycznie zakłopotanego.  ~Yyy,
-                    system tworzenia obiektów Informu chyba nie zadziałał.~";
+                   "Naganiacz wygląda na metafizycznie zakłopotanego.  „Yyy,
+                    system tworzenia obiektów Informu chyba nie zadziałał.”";
 
                 i.number = last_called; PronounNotice(i);
 ```
@@ -830,8 +831,8 @@ W akcji `Ask` („zapytaj naganiacza o nagrody”) `noun` wskazuje postać, a `s
 ```inform
            Ask:  switch(second)
                  {   'nagroda', 'nagrodę', 'nagrody', 'nagród', 'nagrodach':
-                         "~Tylko jedna srebrna moneta i nagroda może być
-                          twoja!~";
+                         "„Tylko jedna srebrna moneta i nagroda może być
+                          twoja!”";
 ```
 
 Oryginalna „Równowaga” porównywała tu `noun`, co w bibliotece 6.12 sprawiało, że naganiacz zawsze odpowiadał „Po prostu graj, koleś”; polska wersja ma ten błąd poprawiony. Odwrotnie jest w akcji `Answer` („powiedz Krzysztofowi cześć”): słowo leży w `noun`, a postać w `second`. W „Sklepie” Krzysztof w ten sposób odpowiada na powitania.
@@ -1156,7 +1157,7 @@ Gdy gracz poda nieznany czasownik albo zaklęcie spoza zasięgu, biblioteka odpo
 ```inform
       if (flag==1)
       {   if (vb==0 or 1)
-             "Nie masz tego zaklęcia w pamięci.  [Wpisz ~zaklęcia~, żeby
+             "Nie masz tego zaklęcia w pamięci.  [Wpisz „zaklęcia”, żeby
               zobaczyć, co pamiętasz.]";
 ```
 
@@ -1238,7 +1239,7 @@ Polecenie biblioteki można też całkowicie zastąpić: `Extend 'pomoc' replace
 Właściwość kierunku (`n_to`, `e_to`…) może być miejscem, drzwiami, napisem albo procedurą. W „Muzeum” są przykłady wszystkich czterech:
 
 ```inform
-       n_to "Ten napis to wartość ~n_to~ tego pomieszczenia.",
+       n_to "Ten napis to wartość „n_to” tego pomieszczenia.",
        e_to
        [;  if (random(2)==1) return Foyer; return Room10a; ],
 ```

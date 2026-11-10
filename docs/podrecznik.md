@@ -153,7 +153,7 @@ Include "VerbLib";
 Miejsca (pomieszczenia) są w Inform zwykłymi obiektami, które nie mają rodzica. Gra zaczyna się na Wielkim Placu:
 
 ```inform
-Object  Forest "~Wielki Plac~"
+Object  Forest "„Wielki Plac”"
   with  description
             "Tak przynajmniej nazywasz w notatkach tę niską wapienną skarpę,
              choć las deszczowy dawno już ją sobie odebrał. ...",
@@ -170,7 +170,7 @@ Object  Forest "~Wielki Plac~"
 ```
 
 - **Polskie cudzysłowy i półpauza** są w tablicy znaków biblioteki: w tekstach można pisać wprost „tak” i –. Gry przykładowe już tak robią. Znak `~` nadal drukuje prosty cudzysłów.
-- **Nazwa miejsca** (`"~Wielki Plac~"`) pojawia się w nagłówku opisu i w linii statusu. Znak `~` oznacza w napisach Inform cudzysłów. Nazw miejsc nie trzeba zapisywać w notacji odmiany, bo biblioteka wypisuje je zawsze w mianowniku.
+- **Nazwa miejsca** (`"„Wielki Plac”"`) pojawia się w nagłówku opisu i w linii statusu. Polskie cudzysłowy pisze się w napisach wprost; znak `~` drukuje prosty cudzysłów. Nazw miejsc nie trzeba zapisywać w notacji odmiany, bo biblioteka wypisuje je zawsze w mianowniku.
 - **`description`** to opis wyświetlany po wejściu do miejsca i po poleceniu „rozejrzyj się”.
 - **Wyjścia** to właściwości `n_to`, `s_to`, `e_to`, `w_to`, `ne_to`, `nw_to`, `se_to`, `sw_to`, `u_to`, `d_to`, `in_to` i `out_to`. Wartością może być inne miejsce, drzwi (tutaj schody) albo tekst. W tym ostatnim przypadku gracz zostaje na miejscu i czyta podany tekst – tak jest przy próbie wspięcia się na drzewa (`u_to`).
 - **`cant_go`** to odpowiedź na próbę pójścia w kierunku, w którym nie ma wyjścia. Bez niej biblioteka odpowie ogólnym „Nie możesz pójść w tę stronę.”
@@ -494,7 +494,7 @@ Object  -> stone_table "kamienn/y ołtarz/"
   with  name 'stół' 'stołu' 'stołowi' 'stołem' 'stole'
              'płyta' 'płyty' 'płycie' 'płytę' 'płytą' ...,
         initial
-            "Sanktuarium dominuje wielka kamienna płyta - stół albo ołtarz.",
+            "W sanktuarium dominuje wielka kamienna płyta – stół albo ołtarz.",
   has   enterable supporter static;
 ```
 
@@ -814,15 +814,15 @@ Object  priest "zmumifikowan/y kapłan/"
                 'słownik', 'słownika', 'słowniku', 'książkę', 'książka', ...:
                     ...
                 'ruiny', 'ruinach', 'ruinę':
-                    "~Ruiny zawsze pokonają złodziei. ...~";
+                    "„Ruiny zawsze pokonają złodziei. ...”";
                 'xibalba', 'xibalbę', 'xibalbie', 'xibalby':
                     ...
                     Shrine.sw_to = Junction;
                     "Kapłan wyciąga kościsty palec na południowy zachód ...";
                 }
-                print "~Odpowiedź musisz znaleźć ";
+                print "„Odpowiedź musisz znaleźć ";
                 Gracz("sam", "sama");
-                ".~";
+                ".”";
             Tell:
                 "Kapłana nie interesuje twoje nędzne życie.";
             Attack, Kiss:
@@ -832,9 +832,9 @@ Object  priest "zmumifikowan/y kapłan/"
                 ...
             ],
         orders [;
-            Go:            "~Nie wolno mi opuszczać sanktuarium.~";
-            NotUnderstood: "~Mówisz zagadkami.~";
-            default:       "~Nie twoim rozkazom służę.~";
+            Go:            "„Nie wolno mi opuszczać sanktuarium.”";
+            NotUnderstood: "„Mówisz zagadkami.”";
+            default:       "„Nie twoim rozkazom służę.”";
             ],
   has   animate male;
 ```
@@ -908,14 +908,14 @@ before [ w1 w2 glyph;
         if (consult_words == 1 && (~~PL_Glif(w1))) glyph = w1;
         else if (consult_words == 2 && PL_Glif(w1)) glyph = w2;
         else if (consult_words == 2 && PL_Glif(w2)) glyph = w1;
-        else "Spróbuj ~sprawdź <nazwa glifu> w słowniku~.";
+        else "Spróbuj „sprawdź <nazwa glifu> w słowniku”.";
         switch (glyph) {
             'q1':
                 "(To jedyny glif, który znasz na pamięć!)^^
-                 Q1: ~miejsce święte~.";
+                 Q1: „miejsce święte”.";
             'ptak', 'ptaka', 'ptaku':
-                if (self.correct) "Ptak: ~martwy jak kamień~.";
-                "Ptak: ~bogaty, zamożny?~.";
+                if (self.correct) "Ptak: „martwy jak kamień”.";
+                "Ptak: „bogaty, zamożny?”.";
             ...
             default:
                 "Tego glifu jak dotąd nie odnotowano.";

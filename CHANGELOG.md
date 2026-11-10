@@ -11,6 +11,11 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
   i podobne.
 - „weź klucza” (potoczny dopełniacz) nie jest już brane za liczbę mnogą.
 - Podręcznik: zapis rodzaju męskoosobowego i `+y` dla żeńskich w liczbie mnogiej.
+- Gramatyka: tylko „włóż płaszcz” znaczy ubieranie („schowaj klucz” pyta, do czego),
+  tylko „zdejmij”/„ściągnij” znaczy rozbieranie („wyjmij klucz” bierze);
+  „ustaw pokrętło na 4”.
+- Dokumentacja: przykłady kodu i zapisy sesji zgodne z obecnymi grami (polskie
+  cudzysłowy, półpauza).
 
 ## 6.12.8-pl3 – 9 listopada 2026
 
