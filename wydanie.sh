@@ -1,8 +1,8 @@
 #!/bin/sh
 # Składa pliki wydania w katalogu dist/:
-#   - inform6-pl-<wersja>.zip: repozytorium w stanie z tagu oraz skompilowane
-#     gry w katalogu skompilowane/,
-#   - gry osobno (*.z5, *.ulx),
+#   - inform6-pl-<wersja>.zip: repozytorium w stanie z tagu, ze skompilowanymi
+#     grami obok źródeł w games/,
+#   - te same gry osobno (*.z5, *.ulx),
 #   - opis wydania (opis.md) z sekcji CHANGELOG.md dla tej wersji.
 # Użycie: ./wydanie.sh 6.12.8-pl3   (najpierw git tag; drzewo bez zmian)
 # Uruchamiany przez .github/workflows/wydanie.yml po wypchnięciu tagu.
@@ -18,50 +18,15 @@ if ! git diff --quiet HEAD; then
     echo "W drzewie są niezacommitowane zmiany; wydanie musi odpowiadać tagowi." >&2; exit 1
 fi
 
-gry="ruins_pl ibg/heidi_pl ibg/tell_pl ibg/fate_pl alice_pl toyshop_pl advent_pl balances_pl museum_pl adventureland_pl"
 nazwa=inform6-pl-$wersja
-katalog=$(pwd)
-tmp=$(mktemp -d)
 mkdir -p dist
 rm -f dist/*
 
-git archive --format=tar --prefix="$nazwa/" "$wersja" | tar xf - -C "$tmp"
-mkdir -p "$tmp/$nazwa/skompilowane"
-for g in $gry; do
-    ./build.sh "$g" >/dev/null
-    ./build.sh "$g" -G >/dev/null
-    g=$(basename "$g")
-    cp "build/$g.z5" "build/$g.ulx" "$tmp/$nazwa/skompilowane/"
-    cp "build/$g.z5" "build/$g.ulx" dist/
-done
-
-cat > "$tmp/$nazwa/skompilowane/CZYTAJ.txt" <<EOF
-Skompilowane gry przykładowe (inform6-pl $wersja)
-
-Pliki .z5 to gry dla maszyny Z, a .ulx - dla Glulx.  Obie wersje działają
-tak samo.  Otwiera się je w interpreterze, np. Frotz, Gargoyle, Lectrote
-albo Parchment (w przeglądarce).  Polecenia można pisać z polskimi literami
-albo bez nich ("weź lampę" i "wez lampe").
-
-  ruins_pl          Ruiny
-  heidi_pl          Heidi
-  tell_pl           Wilhelm Tell
-  fate_pl           Kapitan Fate
-  alice_pl          Po drugiej stronie lustra
-  toyshop_pl        Sklep z zabawkami
-  advent_pl         Przygoda
-  balances_pl       Równowaga
-  museum_pl         Muzeum Informu
-  adventureland_pl  Kraina Przygód
-
-Jak grać: docs/podrecznik_gracza.md.
-
-Compiled Polish example games for the Z-machine (.z5) and Glulx (.ulx).
-Commands may be typed with or without Polish diacritics.
-EOF
-
-( cd "$tmp" && zip -qrX "$katalog/dist/$nazwa.zip" "$nazwa" )
-rm -rf "${tmp:?}"
+# Skompilowane gry są w repozytorium obok źródeł (games/, games/ibg/; pilnuje
+# tego hak .githooks/pre-commit), więc paczka zawiera je raz, a do wydania
+# trafiają te same pliki.
+git archive --format=zip --prefix="$nazwa/" -o "dist/$nazwa.zip" "$wersja"
+cp games/*_pl.z5 games/*_pl.ulx games/ibg/*_pl.z5 games/ibg/*_pl.ulx dist/
 
 # Opis wydania: sekcja CHANGELOG.md od "## <wersja>" do następnego "## ".
 {

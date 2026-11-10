@@ -1195,13 +1195,7 @@ Constant LIBRARYV__TX   = " Biblioteka v";
         if (player has female) return 1;
         return 0;
     }
-    if (o has pluralname) {
-        if (o has animate && o has male) return 4;
-        return 3;
-    }
-    if (o has female) return 1;
-    if (o has neuter) return 2;
-    return 0;
+    return PL_Rodzaj(o);
 ];
 
 [ Mnoga o; return RodzajObiektu(o) >= 3; ];
@@ -1238,18 +1232,23 @@ Constant LIBRARYV__TX   = " Biblioteka v";
     if (RodzajObiektu(o) == 4) { print (string) meskoos; return; }
     print (string) rdzen; KoncY(o);
 ];
+! Czy obiekt jest właśnie wymieniany na liście drukowanej w bierniku
+! ("Widzisz tutaj ...", ekwipunek)?
+[ PL_NaLiscieBie o;
+    return pl_lista_rodzic && pl_lista_przyp == PRZYP_BIE && o ofclass Object &&
+        parent(o) == pl_lista_rodzic;
+];
+
 ! To samo w dopisku na liście ("butelkę (pustą)"), zob. KoncYL.
 [ PL_PrzymZL o rdzen meskoos;
-    if (pl_lista_rodzic && pl_lista_przyp == PRZYP_BIE && o ofclass Object &&
-        parent(o) == pl_lista_rodzic) { print (string) rdzen; KoncYL(o); return; }
+    if (PL_NaLiscieBie(o)) { print (string) rdzen; KoncYL(o); return; }
     PL_PrzymZ(o, rdzen, meskoos);
 ];
 
 ! Końcówka przymiotnika w dopisku na liście ("butelkę (pustą)"): w bierniku,
-! jeśli lista jest drukowana w bierniku ("Widzisz tutaj ...", ekwipunek).
+! jeśli lista jest drukowana w bierniku.
 [ KoncYL o;
-    if (pl_lista_rodzic && pl_lista_przyp == PRZYP_BIE && o ofclass Object &&
-        parent(o) == pl_lista_rodzic) {
+    if (PL_NaLiscieBie(o)) {
         if (o has animate && RodzajObiektu(o) == 0) { print "ego"; return; }
         Forma(o, "y", "ą", "e", "e", "ych");
         return;
@@ -1288,30 +1287,19 @@ Constant LIBRARYV__TX   = " Biblioteka v";
     Forma(o, "Ten", "Ta", "To", "Te", "Ci");
 ];
 
-! Przyimki "z/ze" i "w/we"
-! "z"/"ze" i "w"/"we": forma rozszerzona stoi przed zbitką spółgłosek, której
+! Przyimki "z"/"ze" i "w"/"we": forma rozszerzona stoi przed zbitką spółgłosek, której
 ! pierwsza głoska jest podobna do przyimka: "ze stołu", "ze skrzyni", "ze
 ! źródła", "ze szkła" (ale "z szafy"), "we wraku", "we framudze".  Biblioteka
 ! wypisuje nazwę w odpowiednim przypadku i sprawdza jej pierwsze litery;
 ! atrybuty z_article i w_article wymuszają formę rozszerzoną.
-#Ifdef TARGET_ZCODE;
-Array pl_poczbuf -> WORDSIZE + 200;
-#Ifnot;
-Array pl_poczbuf --> 200;
-#Endif;
+Array pl_poczbuf --> PL_ZN_MAX;
 Global pl_pocz_przyp;
 [ PL_NazwaPocz o; NazwaWPrzypadku(o, pl_pocz_przyp); ];
 [ PL_Pocz o c i  n;      ! i-ta litera nazwy o w przypadku c (małą literą)
     pl_pocz_przyp = c;
-    #Ifdef TARGET_ZCODE;
-    n = PrintToBuffer(pl_poczbuf, 200, PL_NazwaPocz, o);
-    if (i >= n) return ' ';
-    return LowerCase(pl_poczbuf->(WORDSIZE+i));
-    #Ifnot;
-    n = PL_Renderuj(pl_poczbuf, 200, PL_NazwaPocz, o);
+    n = PL_Renderuj(pl_poczbuf, PL_ZN_MAX, PL_NazwaPocz, o);
     if (i >= n) return ' ';
     return LowerCase(pl_poczbuf-->i);
-    #Endif;
 ];
 [ PL_Ze o c  c1 c2 c3;
     if (o has z_article) rtrue;

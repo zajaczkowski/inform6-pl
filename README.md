@@ -119,7 +119,7 @@ Object "mosiężn/e klucz/e"        has pluralname;                ! mosiężnyc
 Object "star/e książk/i+e"        has pluralname female;         ! starych książek
 Object "brudn/e okn/a+ie"         has pluralname neuter;         ! brudnych okien
 Object "dębow/e drzwi/"           has pluralname;                ! dębowych drzwi, drzwiami
-Object "sta/rz=r/y ryba/c=k//y"   has pluralname animate male;   ! widzisz starych rybaków
+Object "sta/rz=r/y ryba/c=k/y"   has pluralname animate male;   ! widzisz starych rybaków
 ```
 
 - Domyślny dopełniacz liczby mnogiej: w rodzaju żeńskim i nijakim bez końcówki (lamp, pudełek), w męskim po spółgłosce miękkiej -y/-i (kluczy), po twardej -ów (kamyków).

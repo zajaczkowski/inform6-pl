@@ -907,7 +907,7 @@ Global pl_klucz;    ! klucz podany w "otwórz X kluczem" dla ImplicitUnlock
     start_input = (parse+2)->(4*p_word_no+3);
     len_input = (parse+2)->(4*p_word_no+2);
     #Ifnot; ! TARGET_GLULX
-    start_input = parse-->((p_word_no+1)*3) - 2 + 2;
+    start_input = parse-->((p_word_no+1)*3);
     len_input = parse-->((p_word_no+1)*3 - 1);
     #Endif; ! TARGET_
     if (len_input > 9) len_input = 9;
@@ -942,8 +942,8 @@ Global pl_nazwa_uni_len;
     pl_nazwa_uni_len = n;
     if (n > len) n = len;
     for (i=0 : i<n : i++) {
-        s = pl_nazwa_uni-->i;
-        if (s > 255) s = '?';
+        s = pl_nazwa_uni-->i;       ! bajty bez ogonków, żeby MatchWord mogło porównać
+        if (s > 255) { s = BezOgonka(s); if (s > 255) s = '?'; }
         buf->(WORDSIZE+i) = s;
     }
     buf-->0 = n;

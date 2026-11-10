@@ -16,6 +16,12 @@ oparta jest polska wersja, i kolejnego numeru polskiego wydania:
   „ustaw pokrętło na 4”.
 - Dokumentacja: przykłady kodu i zapisy sesji zgodne z obecnymi grami (polskie
   cudzysłowy, półpauza).
+- Paczka wydania zawiera skompilowane gry raz, obok źródeł w `games/` (bez
+  katalogu `skompilowane/`).
+- Porządki w kodzie biblioteki: wspólne procedury zamiast powtórzeń
+  (`PL_Wpis`, `PL_KosztZ`, `PL_Zyw`, `PL_NaLiscieBie`), poprawione komentarze;
+  parser przyjmuje i „kotu”, i „kotowi”; na Glulxie wybór kierunku po nazwie
+  z polskimi literami („północ”).
 
 ## 6.12.8-pl3 – 9 listopada 2026
 

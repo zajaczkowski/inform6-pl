@@ -31,7 +31,7 @@
 !     star/e książk/i+e      starych książek (+e, +ie: wstawka przed ostatnią
 !     brudn/e okn/a+ie       brudnych okien    spółgłoską w dopełniaczu)
 !     noc/e+y                nocy (+y: -y/-i, +ów: -ów, +0: bez końcówki)
-!     sta/rz=r/y ryba/c=k//y starych rybaków (męskoosobowy: animate male)
+!     sta/rz=r/y ryba/c=k/y  starych rybaków (męskoosobowy: animate male)
 !
 !   Oboczności rozpoznawane automatycznie: miękka spółgłoska na końcu rdzenia
 !   przed samogłoską (kość - kości, koń - konia), "j" po samogłosce przed -i
@@ -87,7 +87,7 @@ Global pl_przym;                ! '!': odmieniaj jak przymiotnik
 Global pl_g1; Global pl_g2; Global pl_g3; Global pl_g4; Global pl_g5; Global pl_g6;
 
 #Ifdef TARGET_ZCODE;
-Array pl_bajty -> PL_ZN_MAX + 2;
+Array pl_bajty -> 2*PL_ZN_MAX + 2;    ! z zapasem: strumień 3 nie pilnuje długości
 #Ifnot; ! TARGET_GLULX
 Array pl_wynik --> 2;
 #Endif; ! TARGET_
@@ -442,9 +442,13 @@ Array pl_wynik --> 2;
     return 0;
 ];
 
+! Bity dla PL_Slowo: 1 żywotny (biernik męski = dopełniacz), 2 żeński
+! (dopełniacz mnogi bez końcówki).
+[ PL_Zyw o; return (o has animate) + 2*(o has female); ];
+
 ! Drukuje nazwę wczytaną przez PL_Odmienna(o) w przypadku c.
 [ PL_DrukujOdmiane o c  i j k n idx r anim;
-    r = PL_Rodzaj(o); anim = (o has animate) + 2*(o has female);   ! bity: 1 żywotny, 2 żeński
+    r = PL_Rodzaj(o); anim = PL_Zyw(o);
     n = PL_Glowa();
     while (i < pl_zn_len) {
         if (pl_zn-->i == ' ') { print " "; i++; continue; }
@@ -521,7 +525,7 @@ Array pl_wynik --> 2;
 [ PL_Mnoga o wnum  adr len i j r anim c;
     if (o has pluralname) rfalse;
     adr = WordAddress(wnum); len = WordLength(wnum);
-    r = PL_Rodzaj(o); anim = (o has animate) + 2*(o has female);
+    r = PL_Rodzaj(o); anim = PL_Zyw(o);
     while (i < pl_zn_len) {
         if (pl_zn-->i == ' ') { i++; continue; }
         j = i; while (j < pl_zn_len && pl_zn-->j ~= ' ') j++;
@@ -530,7 +534,7 @@ Array pl_wynik --> 2;
             if (PL_KoncPrzym(r) || pl_przym || pl_k_len > 1) PL_PrzeniesI();
             if (PL_KoncowkaMn(adr, len, r)) {
                 pl_g1 = i; pl_g2 = j; pl_g5 = r; pl_g6 = anim;
-                for (c=PRZYP_MIAN : c<=PRZYP_BIE : c=c+PRZYP_BIE) {
+                for (c=PRZYP_MIAN : c<=PRZYP_BIE : c=c+PRZYP_BIE) {    ! tylko mianownik i biernik
                     pl_g3 = c; pl_g4 = true;
                     pl_por_len = PL_Renderuj(pl_por, PL_SL_MAX, PL_SlowoG);
                     if (PL_Porownaj(adr, len)) rfalse;
@@ -576,7 +580,7 @@ Global pl_wpis_rodzic;
 ! ("wełny", "nad kominkiem") pasują w niezmienionej postaci.
 [ PL_Pasuje o wnum kier  adr len i j n idx c r anim p s e;
     adr = WordAddress(wnum); len = WordLength(wnum);
-    r = PL_Rodzaj(o); anim = (o has animate) + 2*(o has female);   ! bity: 1 żywotny, 2 żeński
+    r = PL_Rodzaj(o); anim = PL_Zyw(o);
     n = PL_Glowa();
     while (i < pl_zn_len) {
         if (pl_zn-->i == ' ') { i++; continue; }
@@ -591,12 +595,16 @@ Global pl_wpis_rodzic;
             if (idx == n && r < 3 && o has animate) {
                 pl_por_len = PL_Renderuj(pl_por, PL_SL_MAX, PL_WolaczG);
                 if (pl_por_len && PL_Porownaj(adr, len)) rtrue;
-                ! Celownik na -u obok -owi: "daj kotu", "psu", "bratu".
+                ! Celownik na -u i na -owi, niezależnie od tego, którą formę
+                ! drukuje biblioteka: "daj kotu", "daj kotowi".
                 if (r == 0) {
                     PL_Rozbierz(i, j);
-                    if (pl_s_len < PL_SL_MAX) {
+                    if (pl_s_len + 3 <= PL_SL_MAX) {
                         for (p=0 : p<pl_s_len : p++) pl_por-->p = pl_s-->p;
                         pl_por-->pl_s_len = 'u'; pl_por_len = pl_s_len+1;
+                        if (PL_Porownaj(adr, len)) rtrue;
+                        pl_por-->pl_s_len = 'o'; pl_por-->(pl_s_len+1) = 'w';
+                        pl_por-->(pl_s_len+2) = 'i'; pl_por_len = pl_s_len+3;
                         if (PL_Porownaj(adr, len)) rtrue;
                     }
                 }
@@ -644,27 +652,28 @@ Global pl_wpis_rodzic;
 
 [ PL_Adres; print (address) pl_g1; ];
 
+! Ile z-znaków zajmuje znak w słowniku maszyny Z: mała litera ASCII jeden,
+! polska litera dwa (alfabet A1, zob. polskiz.h), inne znaki cztery.
+[ PL_KosztZ c;
+    if (c >= 'a' && c <= 'z') return 1;
+    if (BezOgonka(c) ~= c) return 2;
+    return 4;
+];
+
+! Czy słowo słownika wypisane do pl_por (n znaków) zostało obcięte?  W maszynie
+! Z słowo ma najwyżej 9 z-znaków, w Glulx DICT_WORD_SIZE znaków.
+#Ifdef TARGET_ZCODE;
+[ PL_Obciete n  i z;
+    for (i=0 : i<n : i++) z = z + PL_KosztZ(pl_por-->i);
+    return (z >= 8);
+];
+#Ifnot; ! TARGET_GLULX
+[ PL_Obciete n; return (n >= DICT_WORD_SIZE); ];
+#Endif; ! TARGET_
+
 ! Czy słowo spoza słownika (wnum) to bez ogonków któreś ze słów właściwości
 ! prop ("miekki" pasuje do 'miękki')?  Słowa słownika są obcięte, więc dłuższe
-! wpisane słowo pasuje też, jeśli zaczyna się od całego słowa słownika
-! mającego co najmniej 6 liter.
-! Czy słowo słownika wypisane do pl_por (n znaków) zostało obcięte?  W maszynie
-! Z słowo ma najwyżej 9 z-znaków: mała litera ASCII zajmuje jeden, polska
-! litera dwa, inne znaki cztery.  W Glulx: DICT_WORD_SIZE znaków.
-[ PL_Obciete n  i z c;
-    #Ifdef TARGET_ZCODE;
-    for (i=0 : i<n : i++) {
-        c = pl_por-->i;
-        if (c >= 'a' && c <= 'z') z++;
-        else if (BezOgonka(c) ~= c) z = z + 2;
-        else z = z + 4;
-    }
-    return (z >= 8);
-    #Ifnot; ! TARGET_GLULX
-    i = z = c;
-    return (n >= DICT_WORD_SIZE);
-    #Endif; ! TARGET_
-];
+! wpisane słowo pasuje też, jeśli zaczyna się od całego obciętego słowa.
 
 [ PL_WSlowach obj prop wnum  adr len k n m i;
     if (~~(obj provides prop)) rfalse;
@@ -757,32 +766,29 @@ Constant PL_NIEZNANE = 'xxnieznane';
 ! je jeszcze z nazwami obiektu bez ogonków.
 Array pl_podmienione -> 64;
 
-[ PL_NieznaneSlowa  i w;
+! Adres wpisu słownikowego słowa nr i (od 1) w tablicy parse.
+#Ifdef TARGET_ZCODE;
+[ PL_Wpis i; return parse + 4*i - 2; ];
+#Ifnot; ! TARGET_GLULX
+[ PL_Wpis i; return parse + WORDSIZE*(3*i - 2); ];
+#Endif; ! TARGET_
+
+[ PL_NieznaneSlowa  i w a;
     for (i=0 : i<64 : i++) pl_podmienione->i = 0;
     ! Samo "stan" to wynik gry, ale "stan na stole" to "stań" bez ogonka.
-    if (NumberWords() > 1 && parse-->1 == 'stan') parse-->1 = 'stań';
+    a = PL_Wpis(1);
+    if (NumberWords() > 1 && a-->0 == 'stan') a-->0 = 'stań';
     for (i=1 : i<=NumberWords() : i++) {
-        #Ifdef TARGET_ZCODE;
+        a = PL_Wpis(i);
         ! Stałych ALL*__WD jest pięć: "oba" i jego odmiany parser czyta jak "obie".
         ! Podobnie ME*__WD: "daj mi klucz" czyta się jak "daj mnie klucz".
-        if (parse-->(i*2-1) == 'mi' or 'mną' or 'ja') parse-->(i*2-1) = ME1__WD;
-        if (parse-->(i*2-1) == 'oba' or 'obaj' or 'obydwa' or 'obydwie')
-            parse-->(i*2-1) = ALL5__WD;
-        if (parse-->(i*2-1) == 0) {
+        if (a-->0 == 'mi' or 'mną' or 'ja') a-->0 = ME1__WD;
+        if (a-->0 == 'oba' or 'obaj' or 'obydwa' or 'obydwie') a-->0 = ALL5__WD;
+        if (a-->0 == 0) {
             w = PL_SlowoBezOgonkow(i);
             if (w == 0) w = PL_NIEZNANE; else if (i < 64) pl_podmienione->i = 1;
-            parse-->(i*2-1) = w;
+            a-->0 = w;
         }
-        #Ifnot; ! TARGET_GLULX
-        if (parse-->(i*3-2) == 'mi' or 'mną' or 'ja') parse-->(i*3-2) = ME1__WD;
-        if (parse-->(i*3-2) == 'oba' or 'obaj' or 'obydwa' or 'obydwie')
-            parse-->(i*3-2) = ALL5__WD;
-        if (parse-->(i*3-2) == 0) {
-            w = PL_SlowoBezOgonkow(i);
-            if (w == 0) w = PL_NIEZNANE; else if (i < 64) pl_podmienione->i = 1;
-            parse-->(i*3-2) = w;
-        }
-        #Endif; ! TARGET_
     }
     rfalse;
 ];
@@ -803,8 +809,8 @@ Global pl_parse;
 Array pl_dslowo -> WORDSIZE + 40;      ! tekst słowa ze słownika
 [ PL_DrukSlowa w; print (address) w; ];
 
-! Szuka w słowniku słowa, które po zdjęciu ogonków jest
-! równy słowu nr wnum polecenia.  Słowa w słowniku są obcięte (maszyna Z:
+! Szuka w słowniku słowa, które po zdjęciu ogonków jest równe słowu nr wnum
+! polecenia.  Słowa w słowniku są obcięte (maszyna Z:
 ! 9 z-znaków, polska litera zajmuje dwa), więc obcięte słowo pasuje też
 ! jako początek dłuższego ("przetrzasnij" do 'przetrząś'), ale tylko wtedy,
 ! gdy nie ma słowa pasującego dokładnie; wygrywa wtedy najdłuższe ("polnocny" to
@@ -827,12 +833,7 @@ Array pl_dslowo -> WORDSIZE + 40;      ! tekst słowa ze słownika
         #Ifdef TARGET_ZCODE;
         n = PrintToBuffer(pl_dslowo, 40, PL_DrukSlowa, e);
         obciete = 0;
-        for (j=0 : j<n : j++) {
-            c = pl_dslowo->(WORDSIZE+j);
-            if (c >= 'a' && c <= 'z') obciete = obciete + 1;
-            else if (BezOgonka(c) ~= c) obciete = obciete + 2;
-            else obciete = obciete + 4;
-        }
+        for (j=0 : j<n : j++) obciete = obciete + PL_KosztZ(pl_dslowo->(WORDSIZE+j));
         obciete = (obciete >= 8);
         #Ifnot; ! TARGET_GLULX
         for (n=0 : n<DICT_WORD_SIZE : n++) {
